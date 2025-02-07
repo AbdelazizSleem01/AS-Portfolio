@@ -1,80 +1,68 @@
-// post fun 
-
 import { NextResponse } from 'next/server';
 import connectDB from '../../../../lib/mongodb';
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import Skill from '../../../../models/Skills';
 import Subscription from '../../../../models/Subscription';
 import nodemailer from 'nodemailer';
 
-const uploadsDir = path.join(process.cwd(), 'public/uploads');
-const imagesDir = path.join(uploadsDir, '/images/SkillsImages');
-fs.mkdirSync(imagesDir, { recursive: true });
-
 export async function POST(req) {
-
   try {
     const formData = await req.formData();
     const name = formData.get('name');
     const imageFile = formData.get('image');
 
     if (!imageFile) {
-      throw new Error("Image upload failed. Make sure an image file is provided.");
+      throw new Error('Image upload failed. Make sure an image file is provided.');
     }
 
-    // Handle Image Upload
-    const imageFilename = `${Date.now()}-${imageFile.name}`;
-    const imagePath = path.join(imagesDir, imageFilename);
-
     const imageBuffer = await imageFile.arrayBuffer();
-    fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
-    const imageUrl = `/uploads/images/SkillsImages/${imageFilename}`;
 
+    const { url: imageUrl } = await put(
+      `SkillsImages/${Date.now()}-${imageFile.name}`, 
+      Buffer.from(imageBuffer), 
+      {
+        access: 'public', 
+        contentType: imageFile.type, 
+      }
+    );
 
+    // Save to MongoDB
     await connectDB();
-
     const newSkill = await Skill.create({
       name,
       imageUrl,
     });
+
     // Send email notifications
     await sendNotifications();
 
     return NextResponse.json(
-      { message: "Skill Created Successfully", Skill: newSkill },
+      { message: 'Skill Created Successfully', Skill: newSkill },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error in POST /api/Skills:", error);
+    console.error('Error in POST /api/Skills:', error);
     return NextResponse.json(
-      { error: error.message || "Failed to create Skill" },
+      { error: error.message || 'Failed to create Skill' },
       { status: 500 }
     );
   }
 }
 
-// Function to send notifications
+// Function to send notifications (unchanged)
 const sendNotifications = async () => {
   try {
     const subscribers = await Subscription.find({ verified: true });
 
     if (subscribers.length === 0) {
-      console.log("No subscribers found.");
+      console.log('No subscribers found.');
       return;
     }
 
     console.log(`Sending emails to ${subscribers.length} subscribers...`);
 
-    const newSub = await Subscription.create({
-      email,
-      verificationToken: crypto.randomBytes(20).toString('hex'),
-      unsubscribeToken: crypto.randomBytes(20).toString('hex'),
-      verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-    });
-
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: process.env.YANDEX_USER,
         pass: process.env.YANDEX_PASS,
@@ -85,7 +73,7 @@ const sendNotifications = async () => {
       await transporter.sendMail({
         from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
         to: sub.email,
-        subject: "New Skill Update: Explore My Latest Technical Enhancements",
+        subject: 'New Skill Update: Explore My Latest Technical Enhancements',
         text: `Dear Subscriber,
     
     I'm excited to announce that I've recently updated my technical skills and portfolio with new capabilities and innovations. Discover the latest improvements in my skillset, including advancements in both front-end and back-end technologies. Visit ${process.env.NEXT_PUBLIC_BASE_URL} to see the new updates.
@@ -163,7 +151,7 @@ const sendNotifications = async () => {
                             This message was sent to ${sub.email}
                           </p>
                           <p style="margin: 0 0 10px 0;">
-                      <a href="${process.env.NEXT_PUBLIC_BASE_URL}/unsubscribe?token=${sub.unsubscribeToken}" style="color: #0984e3; text-decoration: none;">Unsubscribe</a>
+                            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/unsubscribe?token=${sub.unsubscribeToken}" 
                                style="color: #2563eb; text-decoration: none;">
                               Unsubscribe
                             </a> 
@@ -185,19 +173,17 @@ const sendNotifications = async () => {
             </table>
           </body>
           </html>
-        `
+        `,
       });
     }
 
-
-    console.log("Emails sent successfully!");
+    console.log('Emails sent successfully!');
   } catch (error) {
-    console.error("Notification error:", error);
+    console.error('Notification error:', error);
   }
 };
 
-// get all skills
-
+// GET function (unchanged)
 export async function GET(req) {
   try {
     await connectDB();
@@ -206,9 +192,9 @@ export async function GET(req) {
 
     return NextResponse.json(skills);
   } catch (error) {
-    console.error("Error in GET /api/Skills:", error);
+    console.error('Error in GET /api/Skills:', error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch skills" },
+      { error: error.message || 'Failed to fetch skills' },
       { status: 500 }
     );
   }

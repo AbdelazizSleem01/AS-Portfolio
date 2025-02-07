@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "../../../../../lib/mongodb";
 import Feedback from "../../../../../models/Feedback";
-import fs from "fs";
-import path from "path";
+
 
 export async function DELETE(req, { params }) {
   try {
@@ -25,22 +24,14 @@ export async function DELETE(req, { params }) {
     }
 
     if (feedback.imageUrl) {
-      // Remove leading slash to ensure correct path construction
-      const sanitizedImageUrl = feedback.imageUrl.startsWith('/')
-        ? feedback.imageUrl.slice(1)
-        : feedback.imageUrl;
-      const imagePath = path.join(process.cwd(), "public", sanitizedImageUrl);
-
       try {
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-          console.log("Image deleted successfully:", imagePath);
-        }
+        await del(feedback.imageUrl); 
+        console.log('Image deleted successfully from Vercel Blob:', feedback.imageUrl);
       } catch (err) {
-        console.error("Error deleting image file:", err);
-        // Proceed to delete the feedback even if image deletion fails
+        console.error('Error deleting image from Vercel Blob:', err);
       }
     }
+
 
     await Feedback.findByIdAndDelete(id);
 

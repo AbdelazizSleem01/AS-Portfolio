@@ -1,48 +1,51 @@
 import { NextResponse } from 'next/server';
+import { put } from '@vercel/blob'; // Import Vercel Blob's put method
 import connectDB from '../../../../lib/mongodb';
 import Post from '../../../../models/Post';
-import path from 'path';
-import fs from 'fs/promises';
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
 
+    // Function to handle image uploads to Vercel Blob
     const handleImageUpload = async (file) => {
       if (!file) return '';
 
       try {
-        const uploadsDir = path.join(process.cwd(), 'public/uploads');
-        const imagesDir = path.join(uploadsDir, 'images/posts');
+        // Upload the image to Vercel Blob
+        const { url } = await put(
+          `posts/${Date.now()}-${file.name}`, // Unique file path
+          Buffer.from(await file.arrayBuffer()), // File content
+          {
+            access: 'public', // Make the file publicly accessible
+            contentType: file.type, // Set the content type
+          }
+        );
 
-        await fs.mkdir(imagesDir, { recursive: true });
-
-        const imageFilename = `${Date.now()}-${file.name}`;
-        const imagePath = path.join(imagesDir, imageFilename);
-        const imageBuffer = await file.arrayBuffer();
-
-        await fs.writeFile(imagePath, Buffer.from(imageBuffer));
-
-        return `/uploads/images/posts/${imageFilename}`;
+        return url; // Return the public URL of the uploaded image
       } catch (error) {
         console.error('File upload error:', error);
         throw new Error('Failed to upload image');
       }
     };
 
+    // Extract form data
     const postData = {
       email: formData.get('email'),
       title: formData.get('title'),
       content: formData.get('content'),
       slug: formData.get('slug'),
       excerpt: formData.get('excerpt'),
-      tags: formData.get('tags') ? formData.get('tags').split(',').map(tag => tag.trim()) : [],
+      tags: formData.get('tags')
+        ? formData.get('tags').split(',').map((tag) => tag.trim())
+        : [],
       coverImage: await handleImageUpload(formData.get('coverImage')),
-      userImage: await handleImageUpload(formData.get('userImage'))
+      userImage: await handleImageUpload(formData.get('userImage')),
     };
 
+    // Validate required fields
     const requiredFields = ['email', 'title', 'slug', 'content'];
-    const missingFields = requiredFields.filter(field => !postData[field]);
+    const missingFields = requiredFields.filter((field) => !postData[field]);
 
     if (missingFields.length > 0) {
       return NextResponse.json(
@@ -51,6 +54,7 @@ export async function POST(req) {
       );
     }
 
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(postData.email)) {
       return NextResponse.json(
@@ -59,34 +63,36 @@ export async function POST(req) {
       );
     }
 
+    // Connect to MongoDB
     await connectDB();
 
+    // Check if the slug already exists
     const existingPost = await Post.findOne({ slug: postData.slug });
     if (existingPost) {
       return NextResponse.json(
-        { error: "Slug already exists" },
+        { error: 'Slug already exists' },
         { status: 409 }
       );
     }
 
+    // Create a new post
     const newPost = await Post.create(postData);
 
     return NextResponse.json(
       {
         post: {
           ...newPost._doc,
-          _id: newPost._id.toString()
-        }
+          _id: newPost._id.toString(),
+        },
       },
       { status: 201 }
     );
-
   } catch (error) {
     console.error('Post creation error:', error);
     return NextResponse.json(
       {
-        error: error.message || "Failed to create post",
-        details: error.details || null
+        error: error.message || 'Failed to create post',
+        details: error.details || null,
       },
       { status: 500 }
     );
@@ -100,7 +106,7 @@ export async function GET() {
     return NextResponse.json(posts);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch posts" },
+      { error: 'Failed to fetch posts' },
       { status: 500 }
     );
   }

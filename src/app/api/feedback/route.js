@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '../../../../lib/mongodb';
 import Feedback from '../../../../models/Feedback';
-import fs from 'fs';
-import path from 'path';
-
-// Define the directory for storing feedback images
-const uploadsDir = path.join(process.cwd(), 'public/uploads');
-const imagesDir = path.join(uploadsDir, 'images/FeedbackImages');
-
-// Ensure the directory exists
-fs.mkdirSync(imagesDir, { recursive: true });
+import { put } from '@vercel/blob';
 
 export async function POST(req) {
   try {
@@ -25,16 +17,14 @@ export async function POST(req) {
       throw new Error("All fields are required, including the image.");
     }
 
-    // Handle Image Upload
-    const imageFilename = `${Date.now()}-${imageFile.name}`;
-    const imagePath = path.join(imagesDir, imageFilename);
-
-    // Convert image file to buffer and save it
-    const imageBuffer = await imageFile.arrayBuffer();
-    fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
-
-    // Generate the URL for the saved image
-    const imageUrl = `/uploads/images/FeedbackImages/${imageFilename}`;
+    const { url: imageUrl } = await put(
+      `FeedbackImages/${Date.now()}-${imageFile.name}`, 
+      Buffer.from(await imageFile.arrayBuffer()), 
+      {
+        access: 'public', 
+        contentType: imageFile.type,
+      }
+    );
 
     // Connect to MongoDB and save feedback
     await connectDB();

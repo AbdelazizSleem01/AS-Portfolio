@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { put, del } from '@vercel/blob'; // Import Vercel Blob methods
 import connectDB from '../../../../../lib/mongodb';
 import Skill from '../../../../../models/Skills';
 import nodemailer from 'nodemailer';
 import Subscription from '../../../../../models/Subscription';
-
-const uploadsDir = path.join(process.cwd(), 'public/uploads');
-const imagesDir = path.join(uploadsDir, 'images/SkillsImages');
-
-fs.mkdirSync(imagesDir, { recursive: true });
 
 export async function GET(req, { params }) {
   try {
@@ -33,9 +27,7 @@ export async function GET(req, { params }) {
   }
 }
 
-
 export async function PUT(req, { params }) {
-
   try {
     const { id } = await params;
     await connectDB();
@@ -47,13 +39,18 @@ export async function PUT(req, { params }) {
     const updateData = { name };
 
     if (imageFile) {
-      const imageFilename = `${Date.now()}-${imageFile.name}`;
-      const imagePath = path.join(imagesDir, imageFilename);
-      const imageBuffer = await imageFile.arrayBuffer();
-      fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
-      updateData.imageUrl = `/uploads/images/SkillsImages/${imageFilename}`;
-    }
+      // Upload new image to Vercel Blob
+      const { url: imageUrl } = await put(
+        `SkillsImages/${Date.now()}-${imageFile.name}`, // Unique file path
+        Buffer.from(await imageFile.arrayBuffer()), // File content
+        {
+          access: 'public', // Make the file publicly accessible
+          contentType: imageFile.type, // Set the content type
+        }
+      );
 
+      updateData.imageUrl = imageUrl;
+    }
 
     const updatedSkill = await Skill.findByIdAndUpdate(id, updateData, { new: true });
     // Send email notifications
@@ -70,7 +67,6 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-
   try {
     const { id } = await params;
     await connectDB();
@@ -80,12 +76,9 @@ export async function DELETE(req, { params }) {
       return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
     }
 
-    // Delete associated image
+    // Delete associated image from Vercel Blob
     if (skill.imageUrl) {
-      const imagePath = path.join(process.cwd(), 'public', skill.imageUrl);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
+      await del(skill.imageUrl); // Delete the file from Vercel Blob
     }
 
     await Skill.findByIdAndDelete(id);
@@ -105,8 +98,7 @@ export async function DELETE(req, { params }) {
   }
 }
 
-
-// Function to send notifications
+// Function to send notifications (unchanged)
 const sendNotifications = async () => {
   try {
     const subscribers = await Subscription.find({ verified: true });
@@ -125,6 +117,7 @@ const sendNotifications = async () => {
         pass: process.env.YANDEX_PASS,
       },
     });
+
     for (const sub of subscribers) {
       await transporter.sendMail({
         from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
@@ -231,109 +224,6 @@ const sendNotifications = async () => {
         `
       });
     }
-
-    // for (const sub of subscribers) {
-    //   await transporter.sendMail({
-    //     from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
-    //     to: sub.email,
-    //     subject: "New Enhancement Published: Explore My Latest Work",
-    //     text: `Dear Subscriber,\n\nI'm excited to share that I've recently updated my portfolio with new professional achievements. Visit ${process.env.NEXT_PUBLIC_BASE_URL} to view the latest additions.\n\nBest Regards,\nAS Portfolio Team`,
-    //     html: `
-    //       <!DOCTYPE html>
-    //       <html lang="en">
-    //       <head>
-    //         <meta charset="UTF-8">
-    //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    //         <title>Portfolio Update Notification</title>
-    //       </head>
-    //       <body style="margin: 0; padding: 0; font-family: 'Arial', sans-serif; color: #333333;">
-    //         <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-    //           <tr>
-    //             <td align="center" style="padding: 40px 20px;">
-    //               <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #eaeaea;">
-    //                 <!-- Header Section -->
-    //                 <tr>
-    //                   <td style="padding: 40px 30px; background-color: #f8f9fa; border-bottom: 1px solid #eeeeee;">
-    //                     <a href="${process.env.NEXT_PUBLIC_BASE_URL}" target="_blank">
-    //                       <img src="https://i.ibb.co/Q7gVfkYR/Logo.png" 
-    //                            alt="AS Portfolio Logo" 
-    //                            width="150" 
-    //                            style="display: block; margin: 0 auto;">
-    //                     </a>
-    //                   </td>
-    //                 </tr>
-
-    //                 <!-- Content Section -->
-    //                 <tr>
-    //                   <td style="padding: 40px 30px;">
-    //                     <h1 style="font-size: 22px; color: #1a1a1a; margin: 0 0 25px 0;">
-    //                       New Professional Update Available
-    //                     </h1>
-
-    //                     <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-    //                       Dear Valued Subscriber,
-    //                     </p>
-
-    //                     <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-    //                       I'm pleased to inform you that I've recently enhanced my professional portfolio with new technical implementations and creative solutions. This update includes:
-    //                     </p>
-
-    //                     <ul style="font-size: 16px; line-height: 1.6; margin: 0 0 30px 0; padding-left: 20px;">
-    //                       <li>Advanced project implementations</li>
-    //                       <li>New technical skill demonstrations</li>
-    //                       <li>Updated professional achievements</li>
-    //                       <li>Enhanced solution architectures</li>
-    //                     </ul>
-
-    //                     <div style="text-align: center; margin: 40px 0;">
-    //                       <a href="${process.env.NEXT_PUBLIC_BASE_URL}" 
-    //                          style="background-color: #2563eb; color: #ffffff; 
-    //                                 padding: 14px 28px; text-decoration: none; 
-    //                                 border-radius: 5px; font-weight: 500;
-    //                                 display: inline-block; font-size: 16px;">
-    //                         Explore Updates Now
-    //                       </a>
-    //                     </div>
-
-    //                     <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-    //                       These enhancements demonstrate my ongoing commitment to technical excellence and professional development in software engineering and full-stack development.
-    //                     </p>
-    //                   </td>
-    //                 </tr>
-
-    //                 <!-- Footer Section -->
-    //                 <tr>
-    //                   <td style="padding: 30px; background-color: #f8f9fa; border-top: 1px solid #eeeeee;">
-    //                     <div style="text-align: center; font-size: 14px; color: #666666;">
-    //                       <p style="margin: 0 0 10px 0;">
-    //                         This message was sent to ${sub.email}
-    //                       </p>
-    //                       <p style="margin: 0 0 10px 0;">
-    //                         <a href="${process.env.NEXT_PUBLIC_BASE_URL}/unsubscribe?token=${sub.unsubscribeToken}" 
-    //                            style="color: #2563eb; text-decoration: none;">
-    //                           Unsubscribe
-    //                         </a> 
-    //                         | 
-    //                         <a href="${process.env.NEXT_PUBLIC_BASE_URL}/privacy" 
-    //                            style="color: #2563eb; text-decoration: none;">
-    //                           Privacy Policy
-    //                         </a>
-    //                       </p>
-    //                       <p style="margin: 0;">
-    //                         © ${new Date().getFullYear()} AS Portfolio. All rights reserved.
-    //                       </p>
-    //                     </div>
-    //                   </td>
-    //                 </tr>
-    //               </table>
-    //             </td>
-    //           </tr>
-    //         </table>
-    //       </body>
-    //       </html>
-    //       `
-    //   });
-    // }
 
     console.log("Emails sent successfully!");
   } catch (error) {
