@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { put, del } from '@vercel/blob'; // Import Vercel Blob methods
 import connectDB from '../../../../../lib/mongodb';
 import Certificate from '../../../../../models/Certificate';
-
-const uploadsDir = path.join(process.cwd(), 'public/uploads');
-const imagesDir = path.join(uploadsDir, 'images/CertificatesImages');
-
-fs.mkdirSync(imagesDir, { recursive: true });
 
 export async function GET(req, { params }) {
   try {
@@ -16,7 +10,10 @@ export async function GET(req, { params }) {
 
     const certificate = await Certificate.findById(id);
     if (!certificate) {
-      return NextResponse.json({ error: 'Certificate not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Certificate not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(certificate, { status: 200 });
@@ -30,7 +27,6 @@ export async function GET(req, { params }) {
 }
 
 export async function PUT(req, { params }) {
-
   try {
     const { id } = await params;
     await connectDB();
@@ -41,47 +37,72 @@ export async function PUT(req, { params }) {
 
     const updateData = { title };
 
+    // Fetch the existing certificate to check for old image
+    const existingCertificate = await Certificate.findById(id);
+    if (!existingCertificate) {
+      return NextResponse.json(
+        { error: 'Certificate not found' },
+        { status: 404 }
+      );
+    }
+
+    // Handle Image Upload to Vercel Blob
     if (imageFile) {
-      const imageFilename = `${Date.now()}-${imageFile.name}`;
-      const imagePath = path.join(imagesDir, imageFilename);
-      const imageBuffer = await imageFile.arrayBuffer();
-      fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
-      updateData.imageUrl = `/uploads/images/CertificatesImages/${imageFilename}`;
+      const { url: imageUrl } = await put(
+        `CertificatesImages/${Date.now()}-${imageFile.name}`,
+        Buffer.from(await imageFile.arrayBuffer()),
+        {
+          access: 'public',
+          contentType: imageFile.type,
+        }
+      );
+
+      updateData.imageUrl = imageUrl;
+
+      if (existingCertificate.imageUrl) {
+        await del(existingCertificate.imageUrl);
+      }
     }
 
+    // Update the certificate in MongoDB
+    const updatedCertificate = await Certificate.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
 
-    const updatedCertificate= await Certificate.findByIdAndUpdate(id, updateData, { new: true });
-
-    if (!updatedCertificate) {
-      return NextResponse.json({ error: 'Certificate not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ message: 'Certificate updated successfully',certificate: updatedCertificate }, { status: 200 });
+    return NextResponse.json(
+      { message: 'Certificate updated successfully', certificate: updatedCertificate },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error updating Certificate:', error);
-    return NextResponse.json({ error: 'Failed to update Certificate' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update Certificate' },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(req, { params }) {
-
   try {
     const { id } = await params;
     await connectDB();
-    const certificate = await Certificate.findById(id);
 
-    if (!certificate) {
-      return NextResponse.json({ error: 'Certificate not found' }, { status: 404 });
+    // Fetch the certificate to check for associated image
+    const deletedCertificate = await Certificate.findByIdAndDelete(id);
+
+    if (!deletedCertificate) {
+      return NextResponse.json(
+        { error: 'Certificate not found' },
+        { status: 404 }
+      );
     }
 
-    if (certificate.imageUrl) {
-      const imagePath = path.join(process.cwd(), 'public', certificate.imageUrl);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
+    // Delete the associated image from Vercel Blob
+    if (deletedCertificate.imageUrl) {
+      await del(deletedCertificate.imageUrl);
     }
-
-    await Certificate.findByIdAndDelete(id);
 
     return NextResponse.json(
       { message: 'Certificate deleted successfully' },

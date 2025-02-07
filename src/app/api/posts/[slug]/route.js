@@ -4,8 +4,8 @@ import connectDB from "../../../../../lib/mongodb";
 
 export async function GET(request, { params }) {
   try {
-    const { slug } =await params;
-    
+    const { slug } = await params;
+
     if (!slug) {
       return NextResponse.json(
         { error: "Slug parameter is required" },
@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
     await connectDB();
 
     const post = await Post.findOne({ slug }).lean();
-    
+
     if (!post) {
       return NextResponse.json(
         { error: "Post not found" },
@@ -36,8 +36,8 @@ export async function GET(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     // Properly await the params destructuring
-    const { slug } = params;
-    
+    const { slug } = await params;
+
     if (!slug) {
       return NextResponse.json(
         { error: "Slug parameter is required" },
@@ -48,7 +48,7 @@ export async function DELETE(request, { params }) {
     await connectDB();
 
     const deletedPost = await Post.findOneAndDelete({ slug });
-    
+
     if (!deletedPost) {
       return NextResponse.json(
         { error: "Post not found" },
@@ -56,7 +56,7 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Post deleted successfully",
       deletedSlug: slug
     });

@@ -7,7 +7,7 @@ export async function DELETE(req, { params }) {
   try {
     await connectDB();
 
-    const { id } = params;
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { error: "Feedback ID is required" },
@@ -25,7 +25,7 @@ export async function DELETE(req, { params }) {
 
     if (feedback.imageUrl) {
       try {
-        await del(feedback.imageUrl); 
+        await del(feedback.imageUrl);
         console.log('Image deleted successfully from Vercel Blob:', feedback.imageUrl);
       } catch (err) {
         console.error('Error deleting image from Vercel Blob:', err);
