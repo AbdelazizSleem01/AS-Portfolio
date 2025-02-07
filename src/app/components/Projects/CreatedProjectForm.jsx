@@ -84,7 +84,7 @@ export default function CreatedProjectForm() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`);
+                const res = await fetch(`/api/categories`);
                 const data = await res.json();
                 setCategories(data.categories);
             } catch (error) {
@@ -150,7 +150,7 @@ export default function CreatedProjectForm() {
             formData.append('video', video);
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects`, {
+        const response = await fetch(`/api/projects`, {
             method: 'POST',
             body: formData,
         });

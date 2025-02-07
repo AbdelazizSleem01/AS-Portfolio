@@ -42,7 +42,7 @@ export default function HomePage() {
   const defaultHeader = {
     title: "Hello, My name is Abdelaziz Sleem",
     description: "Experienced full-stack developer with 4+ years of expertise...",
-    imageUrl: "/imgs/default.jpg",
+    imageUrl: "/imgs/my-img.jpeg",
     githubLink: "https://github.com/AbdelazizSleem01",   
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
   };

@@ -23,7 +23,7 @@ export default function GetAllSkills() {
     useEffect(() => {
         const fetchSkills = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/skills`);
+                const response = await fetch(`/api/skills`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch skills");
                 }

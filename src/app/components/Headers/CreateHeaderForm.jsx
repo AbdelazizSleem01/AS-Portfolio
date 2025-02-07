@@ -73,7 +73,7 @@ export default function CreateHeaderForm() {
     formData.append("image", image);
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/headers`,
+      `/api/headers`,
       {
         method: "POST",
         body: formData,

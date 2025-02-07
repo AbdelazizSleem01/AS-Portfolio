@@ -32,7 +32,7 @@ export default function UpdateSkillForm() {
     useEffect(() => {
         const fetchSkill = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/skills/${id}`);
+                const response = await fetch(`/api/skills/${id}`);
                 if (!response.ok) throw new Error("Failed to fetch skill");
                 const data = await response.json();
                 const skillData = data.skill || data;
@@ -69,7 +69,7 @@ export default function UpdateSkillForm() {
         if (image) formData.append("image", image);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/skills/${id}`, {
+            const response = await fetch(`/api/skills/${id}`, {
                 method: "PUT",
                 body: formData,
             });

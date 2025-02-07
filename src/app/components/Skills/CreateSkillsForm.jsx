@@ -38,7 +38,7 @@ export default function CreateSkillForm() {
         formData.append("image", image);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/skills`, {
+            const response = await fetch(`/api/skills`, {
                 method: "POST",
                 body: formData,
             });

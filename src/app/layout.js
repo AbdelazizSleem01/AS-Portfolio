@@ -10,7 +10,7 @@ export const metadata = {
   title: "Abdelaziz Sleem | Fullstack Developer",
   description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB. Freelance Developer creating responsive, user-friendly websites.",
   applicationName: "Abdelaziz Sleem Portfolio",
-  metadataBase: new URL("https://yourportfolio.com"),
+  metadataBase: new URL("https://as-portfolio-ten.vercel.app/"),
   keywords: [
     "Fullstack Developer",
     "Freelance Developer",
@@ -25,7 +25,7 @@ export const metadata = {
   ],
   authors: [{
     name: "Abdelaziz Sleem",
-    url: "https://yourportfolio.com"
+    url: "https://as-portfolio-ten.vercel.app/"
   }],
   creator: "Abdelaziz Sleem",
   publisher: "Abdelaziz Sleem",
@@ -50,7 +50,7 @@ export const metadata = {
   openGraph: {
     title: "Abdelaziz Sleem | Fullstack Developer",
     description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB.",
-    url: "https://yourportfolio.com",
+    url: "https://as-portfolio-ten.vercel.app/",
     siteName: "Abdelaziz Sleem Portfolio",
     images: [
       {

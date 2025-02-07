@@ -55,7 +55,7 @@ export default function UpdateProjectForm() {
         const fetchProject = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projects/${id}`);
+                const response = await fetch(`/api/projects/${id}`);
                 if (!response.ok) throw new Error('Failed to fetch project');
                 const data = await response.json();
                 setProject(data);

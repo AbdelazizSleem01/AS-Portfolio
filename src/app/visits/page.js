@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 export default function VisitCounter() {
   const [visits, setVisits] = useState(0);
 
-  // useEffect(() => {
-  //   fetch("/api/visit", { method: "POST" }); // Increment visits
-  //   fetch("/api/visit")
-  //     .then((res) => res.json())
-  //     .then((data) => setVisits(data.count));
-  // }, []);
+  useEffect(() => {
+    fetch("/api/visit", { method: "POST" }); // Increment visits
+    fetch("/api/visit")
+      .then((res) => res.json())
+      .then((data) => setVisits(data.count));
+  }, []);
 
   useEffect(() => {
     document.title = `All Visits | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -22,12 +22,12 @@ export default function VisitCounter() {
   }, []);
 
 
-  useEffect(() => {
-    let storedVisits = localStorage.getItem("visits");
-    let updatedVisits = storedVisits ? Number(storedVisits) + 1 : 1;
-    localStorage.setItem("visits", updatedVisits);
-    setVisits(updatedVisits);
-  }, []);
+  // useEffect(() => {
+  //   let storedVisits = localStorage.getItem("visits");
+  //   let updatedVisits = storedVisits ? Number(storedVisits) + 1 : 1;
+  //   localStorage.setItem("visits", updatedVisits);
+  //   setVisits(updatedVisits);
+  // }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
