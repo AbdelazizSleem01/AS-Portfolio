@@ -27,7 +27,7 @@ const GetAllHeader = () => {
   useEffect(() => {
     const fetchHeaders = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/headers`);
+        const response = await fetch(`/api/headers`);
         if (!response.ok) {
           throw new Error("Failed to fetch headers");
         }
