@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AS-Portfolio
 
-## Getting Started
+Welcome to my personal portfolio website, showcasing my skills and projects as a passionate Fullstack Developer. This repository contains the source code for my portfolio website, built using Next.js, Tailwind CSS, and DaisyUI. The site includes a sleek, user-friendly design with dynamic theme capabilities and various features to highlight my work and expertise.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Responsive Design**: The website is fully responsive and works seamlessly on all devices, including desktops, tablets, and mobile phones.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **About Me Section**: A brief introduction about myself, my skills, and my passion for development.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. **Projects Section**: A curated list of my projects with descriptions, technologies used, and links to live demos or GitHub repositories.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Portfolio Showcase**: Display of my projects with detailed information and technologies used.
 
-## Learn More
+5. **Skills Section**: A visual representation of my technical skills, including programming languages, frameworks, and tools.
 
-To learn more about Next.js, take a look at the following resources:
+6. **Contact Form**: An easy-to-use contact form that allows visitors to send me messages directly.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+7. **Dark/Light Mode**: A toggle switch to switch between dark and light themes for better user experience.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+8. **Smooth Scrolling**: Smooth scrolling navigation for a better user experience.
 
-## Deploy on Vercel
+9. **SEO Optimized**: The website is optimized for search engines to improve visibility.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+10. **Animations**: Subtle animations to enhance the user experience and make the website more engaging.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+11. **Social Media Links**: Links to my LinkedIn, GitHub, and other social media profiles.
+
+## Technologies Used
+
+- **Next.js**: A React framework for building the website with a focus on SEO and server-side rendering.
+- **Tailwind CSS**: A utility-first CSS framework for fast and efficient styling.
+- **DaisyUI**: An accessible and customizable component library for React to style UI elements.
+- **MongoDB**: A NoSQL database used for storing subscription data.
+- Pure CSS
+- clerk/nextjs for Authantication
+- emoji-mart to add emoji
+- tiptap to make text editor bar
+- chart.js to make Visibile Dashboard
+- framer-motion for animation
+- lucide-react for icons
+- nodemailer for notifacations
+- react-toastify to notifacation in Website
+- NodeJs for backend
+- MoongoDb With node to handle database
+
+## Live Demo
+Check out the live demo of the portfolio: https://as-portfolio-ten.vercel.app/
+
+## Contributing
+If you have any suggestions or find any issues, feel free to open an issue or submit a pull request.
+
+## License
+This project is open-source and available under the MIT License.
+
+Thank you for visiting my portfolio repository! If you have any questions or would like to connect, feel free to reach out to me via the contact form or through my social media links.
+
