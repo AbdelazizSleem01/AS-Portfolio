@@ -29,7 +29,7 @@ export default function UpdateCertificateForm() {
     useEffect(() => {
         const fetchCertificate = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Certificates/${id}`);
+                const response = await fetch(`/api/Certificates/${id}`);
                 if (!response.ok) throw new Error("Failed to fetch certificate");
 
                 const data = await response.json();

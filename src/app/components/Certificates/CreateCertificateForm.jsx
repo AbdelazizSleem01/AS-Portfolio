@@ -38,7 +38,7 @@ export default function CreateCertificateForm() {
         formData.append("image", image);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Certificates`, {
+            const response = await fetch(`/api/Certificates`, {
                 method: "POST",
                 body: formData,
             });

@@ -17,7 +17,7 @@ export default function HomePageCertificates() {
     useEffect(() => {
         const fetchCertificates = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Certificates`);
+                const response = await fetch(`/api/Certificates`);
                 if (!response.ok) throw new Error("Failed to fetch certificates");
                 const data = await response.json();
                 setCertificates(data);
