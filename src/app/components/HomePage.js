@@ -1,0 +1,310 @@
+'use client';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { motion, useAnimation, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { Download } from 'lucide-react';
+
+export default function HomePage() {
+  const [selectedHeader, setSelectedHeader] = useState(null);
+  const [themeColor, setThemeColor] = useState("#418aff");
+  const controls = useAnimation();
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const [cursorScale, setCursorScale] = useState(1);
+
+  // Smooth spring values for cursor movement
+  const smoothX = useSpring(mouseX, { stiffness: 500, damping: 30 });
+  const smoothY = useSpring(mouseY, { stiffness: 500, damping: 30 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      const hovered = e.target.closest('[data-cursor-hover]');
+
+      setCursorScale(hovered ? 1.5 : 1);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  useEffect(() => {
+    const getPrimaryColor = () => {
+      const root = getComputedStyle(document.documentElement);
+      return root.getPropertyValue("--primary").trim() || "#418aff";
+    };
+    setThemeColor(getPrimaryColor());
+    const observer = new MutationObserver(() => setThemeColor(getPrimaryColor()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const defaultHeader = {
+    title: "Hello, My name is Abdelaziz Sleem",
+    description: "Experienced full-stack developer with 4+ years of expertise...",
+    imageUrl: "/imgs/default.jpg",
+    githubLink: "https://github.com/AbdelazizSleem01",   
+    linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
+  };
+
+
+  useEffect(() => {
+
+    const savedHeader = localStorage.getItem('selectedHeader');
+    if (savedHeader) {
+      setSelectedHeader(JSON.parse(savedHeader));
+    } else {
+      setSelectedHeader(defaultHeader);
+    }
+
+    if (typeof window !== 'undefined') {
+      const Typed = require('typed.js');
+      const typed = new Typed('.typing', {
+        strings: ['FullStack Developer,', 'Frontend Developer,', 'Backend Developer,'],
+        typeSpeed: 120,
+        backSpeed: 60,
+        loop: true,
+      });
+      return () => typed.destroy();
+    }
+  }, []);
+
+  useEffect(() => {
+    controls.start("visible");
+  }, [controls]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.3 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 1, y: 20, rotate: -5 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotate: 0,
+      transition: { type: 'spring', stiffness: 150, damping: 15 }
+    }
+  };
+
+  return (
+    <div className="w-full h-full bg-base-100 text-base-content overflow-hidden pt-20">
+      {/* Animated Mouse Cursor */}
+      <motion.div
+        className="fixed w-10 h-10 bg-primary rounded-full pointer-events-none z-50"
+        style={{
+          x: useTransform(smoothX, x => x - 10),
+          y: useTransform(smoothY, y => y - 50),
+          scale: cursorScale,
+          background: `radial-gradient(circle at center, ${themeColor} 0%, transparent 70%)`,
+          filter: 'blur(9px)'
+        }}
+        animate={{
+          opacity: [0.4, 0.5, 0.5],
+          scale: [cursorScale, cursorScale * 1.1, cursorScale],
+        }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+
+      <div className="h-full w-full mx-auto relative top-12 pb-[165px] xl:px-16 px-8 flex md:flex-row flex-col gap-8 justify-center items-center pb-10 pt-4">
+        <motion.div
+          className="w-full md:w-1/2 relative"
+          variants={itemVariants}
+          initial="hidden"
+          animate={controls}
+        >
+          {selectedHeader?.imageUrl && (
+            <motion.img
+              className="relative z-10 rounded-full lg:max-w-[60%] max-w-[60%] mx-auto outline outline-[.7rem] outline-offset-[.1rem] outline-primary/60"
+              src={selectedHeader?.imageUrl}
+              alt={selectedHeader?.title}
+              animate={{
+                y: [0, -20, 0],
+                boxShadow: [
+                  '0px 0px 20px 0px var(--primary)',
+                  '0px 0px 35px 10px var(--primary)',
+                  '0px 0px 20px 0px var(--primary)',
+                ],
+                outlineColor: [`${themeColor}60`, `${themeColor}30`, `${themeColor}60`],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+            />
+          )}
+        </motion.div>
+
+        {/* Text Content Section */}
+        <motion.div
+          className="w-full md:w-1/2 flex flex-col justify-center gap-4 md:text-left text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate={controls}
+        >
+          {/* Animated Headers */}
+          <motion.h1
+            className="md:text-4xl sm:text-3xl text-2xl font-semibold font-serif"
+            whileHover={{ scale: 1.02 }}
+          >
+            {selectedHeader?.title || "Hello, My name is Abdelaziz Sleem"}
+          </motion.h1>
+
+          <motion.h3
+            className="capitalize text-secondary font-semibold"
+            whileHover={{ x: 10 }}
+          >
+            I'm <span className="typing text-primary"></span>
+          </motion.h3>
+
+          <motion.p
+            className="text-neutral"
+            dangerouslySetInnerHTML={{
+              __html: selectedHeader?.description ||
+                "Experienced full-stack developer with 4+ years of expertise in Laravel, NestJS, Nuxt.js, Next.js, Android, and some Flutter experience.🥰.",
+            }}
+            variants={itemVariants}
+            whileHover={{ scale: 1.01 }}
+          ></motion.p>
+
+          {/* Interactive Buttons */}
+          <motion.div
+            className="sm:mt-4 mt-2 flex flex-col md:flex-row gap-4 font-serif"
+            variants={containerVariants}
+          >
+            {selectedHeader?.githubLink && (
+              <motion.button
+                className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800"
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  href={selectedHeader.githubLink}
+                  target="_blank"
+                  className="flex items-center justify-center gap-2"
+                >
+                  Github 
+                  <motion.img
+                    className="w-8 h-8"
+                    src="/imgs/github.png"
+                    alt="github-icon"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </Link>
+              </motion.button>
+            )}
+
+            {selectedHeader?.linkedInLink && (
+              <motion.button
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/95 transition"
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  href={selectedHeader.linkedInLink}
+                  target="_blank"
+                  className="flex items-center justify-center gap-2"
+                >
+                  LinkedIn 
+                  <motion.img
+                    className="w-8 h-8"
+                    src="/imgs/linkedin.png"
+                    alt="linkedin-icon"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </Link>
+              </motion.button>
+            )}
+
+            <motion.button
+              className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 transition"
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <a
+                href="/images/Abdelaziz-Sleem-CV.pdf"
+                download="Abdelaziz-Sleem-CV.pdf"
+                className="flex items-center justify-center gap-2"
+              >
+                Download CV 
+                <Download
+                  className="w-7 h-7 rounded-sm"
+                  transition={{ duration: 0.5 }}
+                  
+                />
+              </a>
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Floating Background Elements */}
+      <motion.div
+        className="absolute w-4 h-4 bg-primary/20 rounded-full"
+        style={{
+          top: '20%',
+          left: '10%'
+        }}
+        animate={{
+          y: [0, -40, 0],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+      />
+      <motion.div
+       className="absolute w-4 h-4 bg-primary/20 rounded-full"
+        style={{
+          top: '20%',
+          left: '50%'
+        }}
+        animate={{
+          y: [0, -40, 0],
+          opacity: [0.3, 0.6, 0.3],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+
+        />
+      <motion.div
+       className="absolute w-8 h-4 bg-primary/20 rounded-full"
+        style={{
+          top: '80%',
+          left: '10%'
+        }}
+        animate={{
+          x: [0, -80, 0],
+          opacity: [0.6, 1, 0.6],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        />
+
+    </div>
+  );
+}
