@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-import { MoveRight } from 'lucide-react';
+import { MoveRight, Loader2 } from 'lucide-react'; // Import Loader2 for the spinner
 
 export default function FeedbackForm({ setFeedbacks }) {
   const [name, setName] = useState('');
@@ -11,11 +11,12 @@ export default function FeedbackForm({ setFeedbacks }) {
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(5);
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false); // Add loading state
   const fileInputRef = useRef(null);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when form is submitted
 
     const formData = new FormData();
     formData.append('name', name);
@@ -38,17 +39,18 @@ export default function FeedbackForm({ setFeedbacks }) {
         setEmail('');
         setComment('');
         setRating(5);
-        setImage(null); 
+        setImage(null);
         if (fileInputRef.current) {
-          fileInputRef.current.value = ''; 
+          fileInputRef.current.value = '';
         }
         setFeedbacks(prev => [result.feedback, ...prev]);
-
       } else {
         throw new Error(result.error || 'Failed to submit feedback');
       }
     } catch (error) {
       toast.error(`❌ ${error.message}`);
+    } finally {
+      setLoading(false); // Set loading to false when submission is complete
     }
   };
 
@@ -122,8 +124,8 @@ export default function FeedbackForm({ setFeedbacks }) {
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
               className={`w-6 h-6 mask mask-star-2  ${star <= rating
-                  ? 'bg-primary hover:bg-primary-focus'
-                  : 'bg-base-300 hover:bg-base-200'
+                ? 'bg-primary hover:bg-primary-focus'
+                : 'bg-base-300 hover:bg-base-200'
                 } transition-colors duration-200`}
               onClick={() => setRating(star)}
               aria-label={`${star} star rating`}
@@ -131,7 +133,6 @@ export default function FeedbackForm({ setFeedbacks }) {
           ))}
         </div>
       </div>
-
 
       {/* Image Upload */}
       <div className="form-control">
@@ -174,10 +175,19 @@ export default function FeedbackForm({ setFeedbacks }) {
         type="submit"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="btn btn-primary btn-block btn-lg mt-8 shadow-md"
+        className="btn btn-primary btn-block bg-primary btn-lg mt-8 shadow-md"
+        // disabled={loading} 
       >
-        Submit Feedback
-        <MoveRight/>
+        {loading ? (
+          <>
+            Submit Feedback <Loader2 className="animate-spin" /> 
+          </>
+        ) : (
+          <>
+            Submit Feedback
+            <MoveRight />
+          </>
+        )}
       </motion.button>
     </motion.form>
   );

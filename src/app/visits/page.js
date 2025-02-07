@@ -1,15 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export default function VisitCounter() {
   const [visits, setVisits] = useState(0);
 
+
   useEffect(() => {
     // Increment visits
-    fetch("/api/visit", { method: "POST" })
+    fetch('/api/visit', { method: 'POST' })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to record visit");
+          throw new Error('Failed to record visit');
         }
         return response.json();
       })
@@ -17,10 +18,10 @@ export default function VisitCounter() {
       .catch((error) => console.error(error));
 
     // Fetch total visits
-    fetch("/api/visit")
+    fetch('/api/visit')
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to fetch visits");
+          throw new Error('Failed to fetch visits');
         }
         return response.json();
       })
@@ -33,7 +34,7 @@ export default function VisitCounter() {
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
-        "content",
+        'content',
         `A personal and creative portfolio website showcasing my projects, skills, and experiences. Visit count: ${visits}`
       );
   }, [visits]);
