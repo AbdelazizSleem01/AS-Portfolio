@@ -49,7 +49,7 @@ const AdminList = () => {
     return (
         <div className='flex items-center justify-center my-4'>
             <motion.ul
-                className="menu rounded-box bg-neutral h-full w-full md:w-[50%] sm:w-[70%] max-sm:w-[70%]"
+                className="menu rounded-box bg-neutral px-6 py-3 h-full w-full md:w-[50%] sm:w-[70%] max-sm:w-[70%]"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -57,15 +57,15 @@ const AdminList = () => {
                 {menuItems.map((item, index) => (
                     <Link
                         href={item.href}
-                        className='border my-3 border-base-100 rounded-md text-base-100 bg-primary block w-full hover:bg-primary-focus transition-colors duration-200'
+                        className='border my-2  border-base-100 rounded-md text-base-100 bg-primary block w-full transition-colors duration-200'
                         key={index}
                     >
                         <motion.li
                             variants={itemVariants}
                             whileTap={tapEffect}
-                            className='w-full text-center flex flex-row items-center p-3 gap-3'
+                            className='w-full text-center flex flex-row items-center py-1 gap-2 hover:bg-neutral transition-all'
                         >
-                            <p className="flex-grow">{item.text} {item.icon}</p>
+                            <p className="flex justify-center mx-auto text-center text-[16px] font-semibold">{item.text} {item.icon}</p>
                         </motion.li>
                     </Link>
                 ))}

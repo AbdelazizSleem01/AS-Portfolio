@@ -6,30 +6,6 @@
 }
 
 
-.menu {
-      text-align: center;
-      box-shadow: 1px 1px 4px white;
-      padding: 10px 20px ;
-      li {
-            color: var(--secondary-background);
-            display: grid;
-            place-content: center;
-            padding: 7px;
-            transition: background-color 0.3s ease;
-            font-size: 18px;
-            font-weight: 500;
-            border-radius: 5px;
-
-            &:hover {
-                  background-color: var(--background);
-                  color: var(--foreground);
-                  border-radius: 5px;
-
-            }
-      }
-
-}
-
 .truncate-ellipsis {
       overflow: hidden;
       white-space: nowrap;
