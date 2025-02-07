@@ -62,7 +62,7 @@ export default function UpdateCertificateForm() {
         if (image) formData.append("image", image);
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/Certificates/${id}`, {
+            const response = await fetch(`/api/Certificates/${id}`, {
                 method: "PUT",
                 body: formData,
             });
@@ -84,7 +84,7 @@ export default function UpdateCertificateForm() {
         try {
             setIsDeleting(true);
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/Certificates/${id}`,
+                `/api/Certificates/${id}`,
                 {
                     method: "DELETE",
                 }
