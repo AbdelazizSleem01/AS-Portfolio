@@ -238,7 +238,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.95 }}
             >
               <a
-                href="/images/Abdelaziz-Sleem-CV.pdf"
+                href="/imgs/Abdelaziz-Sleem-CV.pdf"
                 download="Abdelaziz-Sleem-CV.pdf"
                 className="flex items-center justify-center gap-2"
               >
