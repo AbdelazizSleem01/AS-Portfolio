@@ -89,7 +89,7 @@ function Navbar() {
       </motion.button>
 
       {/* Desktop Navigation */}
-      <div className="hidden lg:flex items-center xl:gap-6">
+      <div className="hidden lg:flex gap-2 items-center xl:gap-6">
         {navLinks.map((link) => (
           <motion.div
             key={link.href}
