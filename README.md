@@ -1,6 +1,6 @@
 ## AS-Portfolio 🌐
 Welcome to my personal portfolio website, showcasing my skills and projects as a passionate Fullstack Developer. This repository contains the source code for my portfolio website, built using Next.js, Tailwind CSS, and DaisyUI. The site includes a sleek, user-friendly design with dynamic theme capabilities and various features to highlight my work and expertise.
--------------------------------------------------
+
 ## Features ✨
 Responsive Design 📱: The website is fully responsive and works seamlessly on all devices, including desktops, tablets, and mobile phones.
 
@@ -23,7 +23,7 @@ SEO Optimized 🔍: The website is optimized for search engines to improve visib
 Animations 🎬: Subtle animations to enhance the user experience and make the website more engaging.
 
 Social Media Links 🔗: Links to my LinkedIn, GitHub, and other social media profiles.
--------------------------------------------------------------------------
+
 ## Technologies Used 🛠️
 Next.js ⚛️: A React framework for building the website with a focus on SEO and server-side rendering.
 
@@ -54,14 +54,14 @@ React Toastify 🔔: For displaying notifications within the website.
 Node.js 🖥️: For backend development.
 
 MongoDB with Node.js 🗂️: For handling database operations.
----------------------------------------------------------------
+
 ## Live Demo 🌍
 Check out the live demo of the portfolio: AS-Portfolio Live Demo
-----------------------------------------------------------------
+
 ## Contributing 🤝
 If you have any suggestions or find any issues, feel free to open an issue or submit a pull request. Contributions are always welcome!
----------------------------------------------------------------
+
 ## License 📜
 This project is open-source and available under the MIT License.
----------------------------------------------------------------
+
 Thank you for visiting my portfolio repository! If you have any questions or would like to connect, feel free to reach out to me via the contact form or through my social media links. 😊
