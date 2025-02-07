@@ -14,11 +14,9 @@ import {
     Smile,
     XOctagon,
 } from "lucide-react";
-import { Picker } from "emoji-mart";
-import "emoji-mart/css/emoji-mart.css";
+import Picker from '@emoji-mart/react'; 
+import data from '@emoji-mart/data';
 import { useState } from "react";
-
-
 
 export default function TextToolbar({ editor }) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -192,7 +190,7 @@ export default function TextToolbar({ editor }) {
                         </p>
                     )}
                 </button>
-                {showEmojiPicker && <Picker onSelect={handleEmojiSelect} />}
+                {showEmojiPicker && <Picker data={data} onEmojiSelect={handleEmojiSelect} />}
             </div>
         </div>
     );
