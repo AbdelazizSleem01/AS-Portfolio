@@ -15,9 +15,15 @@ const ContactPage = () => {
           "content",
           `Contact me for any questions, inquiries, or collaboration opportunities at ${process.env.NEXT_PUBLIC_META_TITLE}.`
         );
+      // kaywords
+      document.querySelector('meta[name="keywords"]')
+        ?.setAttribute(
+          "content",
+          "contact, message, send, email, portfolio, web developer, software engineer, freelance"
+        );
     }
   }, []);
-  
+
 
 
   const [formData, setFormData] = useState({

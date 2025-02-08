@@ -5,15 +5,21 @@ import { motion } from 'framer-motion';
 export default function ServicesPage() {
 
 
- useEffect(() => {
-    document.title = `My Service | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-    document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `Discover my services at ${process.env.NEXT_PUBLIC_META_TITLE}`
-    );
-  }, []);
+    useEffect(() => {
+        document.title = `My Service | ${process.env.NEXT_PUBLIC_META_TITLE}`;
+        document
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Discover my services at ${process.env.NEXT_PUBLIC_META_TITLE}`
+            );
+        // kaywords
+        document.querySelector('meta[name="keywords"]')
+            ?.setAttribute(
+                'content',
+                'web development, software development, graphic design, digital marketing, business development'
+            );
+    }, []);
 
 
 
@@ -73,7 +79,7 @@ export default function ServicesPage() {
                 >
                     <motion.p
                         className="text-4xl text-primary mb-4 hover:cursor-pointer"
-                        whileHover={{ translateX:10, transition: { duration: 0.5 } }}
+                        whileHover={{ translateX: 10, transition: { duration: 0.5 } }}
                     >
                         💻
                     </motion.p>
@@ -96,7 +102,7 @@ export default function ServicesPage() {
                 >
                     <motion.div
                         className="text-4xl text-primary mb-4 hover:cursor-pointer"
-                        whileHover={{ translateX:10, transition: { duration: 0.5 } }}
+                        whileHover={{ translateX: 10, transition: { duration: 0.5 } }}
                     >
                         🛠️
                     </motion.div>
@@ -119,7 +125,7 @@ export default function ServicesPage() {
                 >
                     <motion.div
                         className="text-4xl text-primary mb-4 hover:cursor-pointer"
-                        whileHover={{ translateX:10, transition: { duration: 0.5 } }}
+                        whileHover={{ translateX: 10, transition: { duration: 0.5 } }}
                     >
                         🌐
                     </motion.div>
@@ -142,7 +148,7 @@ export default function ServicesPage() {
                 >
                     <motion.div
                         className="text-4xl text-primary mb-4 hover:cursor-pointer"
-                        whileHover={{ translateX:10, transition: { duration: 0.5 } }}
+                        whileHover={{ translateX: 10, transition: { duration: 0.5 } }}
                     >
                         🎨
                     </motion.div>
@@ -165,7 +171,7 @@ export default function ServicesPage() {
                 >
                     <motion.div
                         className="text-4xl text-primary mb-4 hover:cursor-pointer"
-                        whileHover={{ translateX:10, transition: { duration: 0.5 } }}
+                        whileHover={{ translateX: 10, transition: { duration: 0.5 } }}
                     >
                         📈
                     </motion.div>
@@ -188,7 +194,7 @@ export default function ServicesPage() {
                 >
                     <motion.div
                         className="text-4xl text-primary mb-4 hover:cursor-pointer"
-                        whileHover={{ translateX:10, transition: { duration: 0.5 } }}
+                        whileHover={{ translateX: 10, transition: { duration: 0.5 } }}
                     >
                         🔧
                     </motion.div>

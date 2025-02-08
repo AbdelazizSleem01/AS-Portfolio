@@ -11,12 +11,19 @@ const AboutMePage = () => {
 
   useEffect(() => {
     document.title = `About Me | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-    document
-      .querySelector('meta[name="description"]')
+
+    document.querySelector('meta[name="description"]')
       ?.setAttribute(
         'content',
         `A passionate software developer with a proven track record in building high-quality applications. I specialize in JavaScript, React, and Node.js. I am currently looking for opportunities to work on cutting-edge projects and contribute to the open-source community.`
       );
+    // kaywords
+    document.querySelector('meta[name="keywords"]')
+      ?.setAttribute(
+        'content',
+        `software developer, react, node.js, javascript, junior software developer, portfolio, creative, software engineer, javascript developer, full stack developer`
+      );
+
   }, []);
 
   useEffect(() => {

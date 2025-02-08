@@ -17,11 +17,21 @@ const PageOfProjects = () => {
   useEffect(() => {
     document.title = `Projects | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `Check out my latest projects at ${process.env.NEXT_PUBLIC_META_TITLE}.`
-    );
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `Check out my latest projects at ${process.env.NEXT_PUBLIC_META_TITLE}.`
+      );
+    // kaywords
+    const keywords = ["Next.js", "React", "Tailwind CSS", "API", "Deployment"];
+    const metaDescription = `Check out my latest projects using ${keywords.join(
+      ", "
+    )} and deploy them to the cloud.`;
+    document
+      .querySelector('meta[name="keywords"]')
+      ?.setAttribute("content", keywords.join(", "));
+
+
   }, []);
 
 

@@ -15,12 +15,17 @@ export const metadata = {
     "Fullstack Developer",
     "Freelance Developer",
     "Frontend Development",
+    "Node.js Developer",
+    "MongoDB Developer",
     "React",
     "Next.js",
     "Node.js",
     "MongoDB",
     "Tailwind CSS",
     "Web Development",
+    "Web Application Development",
+    "Freelance Developer Egypt",
+    "Responsive Web Design",
     "JavaScript Developer"
   ],
   authors: [{
@@ -82,6 +87,19 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
+
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Abdelaziz Sleem",
+  jobTitle: "Fullstack Developer",
+  url: "https://as-portfolio-ten.vercel.app",
+  sameAs: [
+    "https://github.com/AbdelazizSleem01",
+    "https://linkedin.com/in/yourprofile"
+  ]
 };
 
 export default function RootLayout({ children }) {
@@ -97,6 +115,10 @@ export default function RootLayout({ children }) {
           </ClerkProvider>
         </ThemeProvider>
       </body>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
     </html>
   );
 }

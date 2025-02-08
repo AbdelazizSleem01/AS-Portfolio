@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://as-portfolio-ten.vercel.app/sitemap.xml

@@ -19,6 +19,11 @@ export default function VisitCounter() {
         'content',
         `A personal and creative portfolio website showcasing my projects, skills, and experiences. Visit count: ${visitCount}`
       );
+    
+    document.querySelector('meta[name="keywords"]')?.setAttribute(
+      'content',
+      'portfolio, developer, web developer, software engineer, junior developer, full stack developer'
+    );
   }, [visitCount]);
 
   return (

@@ -32,11 +32,17 @@ const PrivacyPolicy = () => {
   useEffect(() => {
     document.title = `Privacy Policy | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `A detailed privacy policy for Abdelaziz Sleem's portfolio website, covering all relevant data handling and protection measures.`
-    );
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `A detailed privacy policy for Abdelaziz Sleem's portfolio website, covering all relevant data handling and protection measures.`
+      );
+    // kaywords
+    document.querySelector('meta[name="keywords"]')
+      ?.setAttribute(
+        'content',
+        'Abdelaziz Sleem, portfolio, privacy policy, data handling, protection measures'
+      );
   }, []);
 
   // Refs for each section
