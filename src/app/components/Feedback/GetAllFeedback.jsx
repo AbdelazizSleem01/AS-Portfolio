@@ -52,19 +52,19 @@ export default function FeedbackList({ feedbacks }) {
             className="card bg-neutral shadow-xl cursor-pointer"
           >
             <div className="card-body">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 w-full">
                 <motion.img
                   src={feedback.imageUrl}
                   alt={feedback.name}
-                  className="w-20 h-20 rounded-full object-cover border-2 border-primary p-0 shadow-md shadow-primary"
+                  className="w-20 h-20 rounded-full object-contain border-2 border-primary p-0 shadow-md shadow-primary"
                 />
                 <div>
                   <h2 className="card-title text-base-100 text-lg font-bold">{feedback.name}</h2>
                   <p className="text-sm text-base-100/50">{feedback.email}</p>
                 </div>
               </div>
-              <p className="mt-4 text-base-100/70">{feedback.comment}</p>
-              <div className="flex space-x-1 mx-auto">
+              <p className="mt-4 text-base-100/70 text-sm">{feedback.comment}</p>
+              <div className="flex space-x-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span
                     key={i}
