@@ -49,7 +49,7 @@ export default function FeedbackList({ feedbacks }) {
             }}
             whileHover={{ scale: 1.02 }}
             transition={{ delay: index * 0.1 }}
-            className="card bg-neutral shadow-xl cursor-pointer px-3"
+            className="card bg-neutral shadow-xl cursor-pointer pr-5 text-wrap"
           >
             <div className="card-body">
               <div className="flex items-center space-x-4 w-full">
