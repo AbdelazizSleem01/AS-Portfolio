@@ -105,6 +105,7 @@ const structuredData = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <meta name="google-site-verification" content="KgD7-qJNunRW321b9tuubey9nJO9RGcbuZhjejdYqco" />
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}>
