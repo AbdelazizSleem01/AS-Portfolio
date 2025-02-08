@@ -1,38 +1,25 @@
 // app/api/visit/route.js
 import { NextResponse } from 'next/server';
-import Visits from '../../../../models/Visits';
 import connectDB from '../../../../lib/mongodb';
+import Visit from '../../../../models/Visits';
 
-// POST: Record a visit
-export async function POST(req) {
-  await connectDB();
-  
+export async function GET(request) {
   try {
-    await Visits.create({ createdAt: new Date() }); // Log visit
-    return NextResponse.json(
-      { message: 'Visit recorded' },
-      { status: 201 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { message: error.message },
-      { status: 500 }
-    );
-  }
-}
+    await connectDB();
 
-// GET: Fetch total visits
-export async function GET(req) {
-  await connectDB();
-  try {
-    const count = await Visit.countDocuments(); // Get total visits
-    return NextResponse.json(
-      { count },
-      { status: 200 }
-    );
+    let visitCounter = await Visit.findOne({ _id: 'visitCounter' });
+    if (!visitCounter) {
+      visitCounter = new Visit({ _id: 'visitCounter', count: 0 });
+    }
+
+    visitCounter.count += 1;
+    await visitCounter.save();
+
+    return NextResponse.json({ count: visitCounter.count });
   } catch (error) {
+    console.error('Error updating visit count:', error);
     return NextResponse.json(
-      { message: error.message },
+      { error: 'Failed to update visit count', details: error.message },
       { status: 500 }
     );
   }
