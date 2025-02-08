@@ -56,7 +56,7 @@ export default function FeedbackList({ feedbacks }) {
                 <motion.img
                   src={feedback.imageUrl}
                   alt={feedback.name}
-                  className="w-20 h-20 rounded-full object-cover border-2 border-primary p-0 shadow-md shadow-primary"
+                  className="w-20 h-20 rounded-full object-contain border-2 border-primary p-0 shadow-md shadow-primary"
                 />
                 <div>
                   <h2 className="card-title text-base-100 text-lg font-bold">{feedback.name}</h2>
