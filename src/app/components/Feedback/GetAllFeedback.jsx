@@ -35,7 +35,7 @@ export default function FeedbackList({ feedbacks }) {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-4 w-full">
         {feedbacks.slice(0, visibleCount).map((feedback, index) => (
           <motion.div
             key={feedback._id}
