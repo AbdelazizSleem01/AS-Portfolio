@@ -1,5 +1,7 @@
+# public/robots.txt
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /api/ 
 
 Sitemap: https://as-portfolio-ten.vercel.app/sitemap.xml
