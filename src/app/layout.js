@@ -100,7 +100,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_BASE_URL}>
+          <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
             <Suspense fallback={<div>Loading...</div>}>
               <Navbar />
               {children}

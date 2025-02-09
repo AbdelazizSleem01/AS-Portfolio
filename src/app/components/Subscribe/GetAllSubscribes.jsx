@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Trash2, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation"; 
 
 const ITEMS_PER_PAGE = 10;
 
@@ -20,12 +20,11 @@ const GetAllSubscribes = () => {
   const [deleteId, setDeleteId] = useState(null);
 
   const { user } = useUser();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter(); 
 
-  // Redirect to sign-in if user is not authenticated
   useEffect(() => {
     if (!user) {
-      router.push("/sign-in"); // Redirect to the sign-in page
+      <RedirectToSignIn />
     }
   }, [user, router]);
 
