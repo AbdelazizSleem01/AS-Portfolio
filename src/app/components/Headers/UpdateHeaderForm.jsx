@@ -20,18 +20,26 @@ export default function UpdateHeaderForm() {
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
     const { id } = useParams();
 
     useEffect(() => {
         document.title = `Update Header | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document
-        .querySelector('meta[name="description"]')
-        ?.setAttribute(
-          'content',
-          `Update your header details on ${process.env.NEXT_PUBLIC_META_TITLE}`
-        );
-      }, []);
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Update your header details on ${process.env.NEXT_PUBLIC_META_TITLE}`
+            );
+        // Key Words
+        document.querySelector('meta[name="keywords"]')
+            ?.setAttribute(
+                'content',
+                `update, header, ${process.env.NEXT_PUBLIC_META_TITLE}`
+            );
+    }, []);
 
     const editor = useEditor({
         extensions: [
@@ -76,6 +84,7 @@ export default function UpdateHeaderForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsUpdating(true);
         const formData = new FormData();
         formData.append('Id', id);
         formData.append('title', header.title);
@@ -96,11 +105,14 @@ export default function UpdateHeaderForm() {
         } catch (error) {
             console.error('Error updating header:', error);
             toast.error('Failed to update header');
+        } finally {
+            setIsUpdating(false);
         }
     };
 
     const handleDelete = async () => {
         try {
+            setIsDeleting(true);
             const response = await fetch(`/api/headers/${id}`, {
                 method: 'DELETE',
             });
@@ -111,6 +123,9 @@ export default function UpdateHeaderForm() {
         } catch (error) {
             console.error('Error deleting header:', error);
             toast.error('Failed to delete header');
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
         }
     };
 
@@ -137,6 +152,25 @@ export default function UpdateHeaderForm() {
     if (!header) {
         return <p className="text-center text-lg">Header not found.</p>;
     }
+
+
+     // Framer Motion variants for staggered animation
+     const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+            },
+        },
+    };
+
+    const fieldVariant = {
+        hidden: { opacity: 0, x: -20 },
+        visible: { opacity: 1, x: 0 },
+    };
+
     return header ? (
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto my-5 mt-24 p-6 border border-primary text-neutral shadow-lg rounded-lg">
             <h2 className="text-2xl font-semibold text-center mb-6">Update Header</h2>
@@ -209,16 +243,47 @@ export default function UpdateHeaderForm() {
                 )}
             </div>
 
-            <div className="flex justify-between">
-                <button
+            {/* Buttons */}
+            <motion.div
+                className="flex flex-col sm:flex-row gap-4 mt-6"
+                variants={fieldVariant}
+                transition={{ delay: 0.6 }}
+            >
+                <motion.button
+                    type="submit"
+                    className="flex-1 py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 flex items-center justify-center gap-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    disabled={isUpdating || isDeleting} // Disable during loading
+                >
+                    {isUpdating ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                            Updating...
+                        </>
+                    ) : (
+                        "Update Header"
+                    )}
+                </motion.button>
+                <motion.button
                     type="button"
                     onClick={() => setShowDeleteModal(true)}
-                    className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 w-full mr-2"
+                    className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    disabled={isUpdating || isDeleting} // Disable during loading
                 >
-                    Delete
-                </button>
-                <button type="submit" className="px-4 py-2 bg-primary text-white rounded-md w-full ml-2">Update</button>
-            </div>
+                    {isDeleting ? (
+                        <>
+                            <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                            Deleting...
+                        </>
+                    ) : (
+                        "Delete Header"
+                    )}
+                </motion.button>
+            </motion.div>
+
 
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

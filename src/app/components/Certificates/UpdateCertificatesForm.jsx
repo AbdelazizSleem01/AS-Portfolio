@@ -14,17 +14,17 @@ export default function UpdateCertificateForm() {
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false); 
 
     useEffect(() => {
         document.title = `Update Certificate | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document
-        .querySelector('meta[name="description"]')
-        ?.setAttribute(
-          'content',
-          `Update your certificates on ${process.env.NEXT_PUBLIC_META_TITLE}`
-        );
-      }, []);
-    
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Update your certificates on ${process.env.NEXT_PUBLIC_META_TITLE}`
+            );
+    }, []);
 
     useEffect(() => {
         const fetchCertificate = async () => {
@@ -56,6 +56,7 @@ export default function UpdateCertificateForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsUpdating(true);
 
         const formData = new FormData();
         formData.append("title", title);
@@ -77,18 +78,17 @@ export default function UpdateCertificateForm() {
             }
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setIsUpdating(false); 
         }
     };
 
     const handleDelete = async () => {
         try {
-            setIsDeleting(true);
-            const response = await fetch(
-                `/api/Certificates/${id}`,
-                {
-                    method: "DELETE",
-                }
-            );
+            setIsDeleting(true); 
+            const response = await fetch(`/api/Certificates/${id}`, {
+                method: "DELETE",
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -101,7 +101,7 @@ export default function UpdateCertificateForm() {
             console.error("Error deleting certificate:", error);
             toast.error(error.message);
         } finally {
-            setIsDeleting(false);
+            setIsDeleting(false); 
             setShowDeleteModal(false);
         }
     };
@@ -200,27 +200,43 @@ export default function UpdateCertificateForm() {
                         )}
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         className="flex flex-col sm:flex-row gap-4 mt-6"
                         variants={fieldVariant}
                         transition={{ delay: 0.6 }}
                     >
                         <motion.button
                             type="submit"
-                            className="flex-1 py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95"
+                            className="flex-1 py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 flex items-center justify-center gap-2"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
+                            disabled={isUpdating || isDeleting} // Disable during loading
                         >
-                            Update Certificate
+                            {isUpdating ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                    Updating...
+                                </>
+                            ) : (
+                                "Update Certificate"
+                            )}
                         </motion.button>
                         <motion.button
                             type="button"
                             onClick={() => setShowDeleteModal(true)}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90"
+                            className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
+                            disabled={isUpdating || isDeleting} // Disable during loading
                         >
-                            Delete Certificate
+                            {isDeleting ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete Certificate"
+                            )}
                         </motion.button>
                     </motion.div>
                 </form>

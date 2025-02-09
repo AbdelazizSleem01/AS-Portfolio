@@ -11,8 +11,6 @@ export async function GET(req, { params }) {
     await connectDB();
 
     const skill = await Skill.findById(id);
-    // Send email notifications
-    await sendNotifications();
     if (!skill) {
       return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
     }
@@ -53,13 +51,20 @@ export async function PUT(req, { params }) {
     }
 
     const updatedSkill = await Skill.findByIdAndUpdate(id, updateData, { new: true });
-    // Send email notifications
-    await sendNotifications();
+
     if (!updatedSkill) {
       return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Skill updated successfully', skill: updatedSkill }, { status: 200 });
+    // Respond immediately
+    const response = NextResponse.json({ message: 'Skill updated successfully', skill: updatedSkill }, { status: 200 });
+
+    // Send email notifications in the background
+    setTimeout(() => {
+      sendNotifications().catch(console.error);
+    }, 0);
+
+    return response;
   } catch (error) {
     console.error('Error updating skill:', error);
     return NextResponse.json({ error: 'Failed to update skill' }, { status: 500 });
@@ -82,23 +87,23 @@ export async function DELETE(req, { params }) {
     }
 
     await Skill.findByIdAndDelete(id);
-    // Send email notifications
-    await sendNotifications();
 
-    return NextResponse.json(
-      { message: 'Skill deleted successfully' },
-      { status: 200 }
-    );
+    // Respond immediately
+    const response = NextResponse.json({ message: 'Skill deleted successfully' }, { status: 200 });
+
+    // Send email notifications in the background
+    setTimeout(() => {
+      sendNotifications().catch(console.error);
+    }, 0);
+
+    return response;
   } catch (error) {
     console.error('Error deleting skill:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete skill' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete skill' }, { status: 500 });
   }
 }
 
-// Function to send notifications (unchanged)
+// Function to send notifications asynchronously
 const sendNotifications = async () => {
   try {
     const subscribers = await Subscription.find({ verified: true });
@@ -142,7 +147,6 @@ const sendNotifications = async () => {
               <tr>
                 <td align="center" style="padding: 40px 20px;">
                   <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #eaeaea;">
-                    <!-- Header Section -->
                     <tr>
                       <td style="padding: 40px 30px; background-color: #f8f9fa; border-bottom: 1px solid #eeeeee;">
                         <a href="${process.env.NEXT_PUBLIC_BASE_URL}" target="_blank">
@@ -153,29 +157,23 @@ const sendNotifications = async () => {
                         </a>
                       </td>
                     </tr>
-    
-                    <!-- Content Section -->
                     <tr>
                       <td style="padding: 40px 30px;">
                         <h1 style="font-size: 22px; color: #1a1a1a; margin: 0 0 25px 0;">
                           New Skill Update Available
                         </h1>
-                        
                         <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                           Dear Valued Subscriber,
                         </p>
-                        
                         <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                           I'm thrilled to announce that I've recently expanded and updated my technical skillset. This update highlights:
                         </p>
-    
                         <ul style="font-size: 16px; line-height: 1.6; margin: 0 0 30px 0; padding-left: 20px;">
                           <li>New front-end frameworks and libraries</li>
                           <li>Enhanced back-end technologies and architecture</li>
                           <li>Improved DevOps practices and tools</li>
                           <li>Innovative problem-solving approaches</li>
                         </ul>
-    
                         <div style="text-align: center; margin: 40px 0;">
                           <a href="${process.env.NEXT_PUBLIC_BASE_URL}" 
                              style="background-color: #2563eb; color: #ffffff; 
@@ -185,34 +183,9 @@ const sendNotifications = async () => {
                             Discover My New Skills
                           </a>
                         </div>
-    
                         <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                           Dive into the updated portfolio to explore detailed examples of my work, projects that illustrate these new capabilities, and insights into my continuous professional development.
                         </p>
-                      </td>
-                    </tr>
-    
-                    <!-- Footer Section -->
-                    <tr>
-                      <td style="padding: 30px; background-color: #f8f9fa; border-top: 1px solid #eeeeee;">
-                        <div style="text-align: center; font-size: 14px; color: #666666;">
-                          <p style="margin: 0 0 10px 0;">
-                            This message was sent to ${sub.email}
-                          </p>
-                          <p style="margin: 0 0 10px 0;">
-                            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/unsubscribe?token=${sub.unsubscribeToken}" style="color: #0984e3; text-decoration: none;">
-                            UnSubscribe
-                            </a> 
-                            | 
-                            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/privacy-policy" 
-                               style="color: #2563eb; text-decoration: none;">
-                              Privacy Policy
-                            </a>
-                          </p>
-                          <p style="margin: 0;">
-                            © ${new Date().getFullYear()} AS Portfolio. All rights reserved.
-                          </p>
-                        </div>
                       </td>
                     </tr>
                   </table>

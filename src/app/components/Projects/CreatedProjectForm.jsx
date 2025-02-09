@@ -25,7 +25,6 @@ export default function CreatedProjectForm() {
     const [title, setTitle] = useState('');
     const [liveLink, setLiveLink] = useState('');
     const [githubLink, setGithubLink] = useState('');
-    // const [videoLink, setVideoLink] = useState('');
     const [image, setImage] = useState(null);
     const [video, setVideo] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -33,6 +32,7 @@ export default function CreatedProjectForm() {
     const [isClient, setIsClient] = useState(false);
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
+    const [isLoading, setIsLoading] = useState(false); // Loading state
 
     const router = useRouter();
 
@@ -47,7 +47,6 @@ export default function CreatedProjectForm() {
             );
     }, []);
 
-    // Initialize the editor hook unconditionally
     const editor = useEditor({
         extensions: [
             Text,
@@ -75,12 +74,10 @@ export default function CreatedProjectForm() {
 
     });
 
-    // Set client flag; this hook is always called
     useEffect(() => {
         setIsClient(true);
     }, []);
 
-    // Fetch categories on mount (always called)
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -134,39 +131,44 @@ export default function CreatedProjectForm() {
         }
     };
 
-    // Submit handler for creating a project
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); // Start loading
 
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', editor.getHTML());
         formData.append('liveLink', liveLink);
         formData.append('githubLink', githubLink);
-        // formData.append('videoLink', videoLink);
         formData.append('category', category);
         formData.append('image', image);
         if (video) {
             formData.append('video', video);
         }
 
-        const response = await fetch(`/api/projects`, {
-            method: 'POST',
-            body: formData,
-        });
+        try {
+            const response = await fetch(`/api/projects`, {
+                method: 'POST',
+                body: formData,
+            });
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Project Created:', data);
-            toast.success("Project created successfully!");
-            router.push("/allProjects");
-        } else {
-            console.error('Error creating project');
-            toast.error("Failed to create project!");
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Project Created:', data);
+                toast.success("Project created successfully!");
+                router.push("/allProjects");
+            } else {
+                console.error('Error creating project');
+                toast.error("Failed to create project!");
+            }
+        } catch (error) {
+            console.error('Error creating project:', error);
+            toast.error("An unexpected error occurred!");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // Motion animation variants
     const fieldVariant = {
         hidden: { opacity: 0, x: -20 },
         visible: { opacity: 1, x: 0 },
@@ -281,7 +283,7 @@ export default function CreatedProjectForm() {
                         {/* Category Selection */}
                         <div className="mb-4 relative">
                             <label htmlFor="category" className="flex items-center text-sm font-medium gap-2 mb-2 mt-6">
-                                Select Category <Shapes  size={20}/>
+                                Select Category <Shapes size={20} />
                             </label>
                             <select
                                 id="category"
@@ -310,27 +312,6 @@ export default function CreatedProjectForm() {
                                 <ChevronDown />
                             </div>
                         </div>
-
-                        {/* Video Link */}
-                        {/* <motion.div
-                            className="mb-4"
-                            variants={fieldVariant}
-                            initial="hidden"
-                            animate="visible"
-                            transition={{ delay: 0.4 }}
-                        >
-                            <label htmlFor="videoLink" className="block text-sm label font-medium">
-                                Video Link
-                            </label>
-                            <input
-                                id="videoLink"
-                                type="url"
-                                value={videoLink}
-                                onChange={(e) => setVideoLink(e.target.value)}
-                                placeholder="Video Link"
-                                className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md"
-                            />
-                        </motion.div> */}
 
                         {/* Image Upload */}
                         <motion.div
@@ -403,9 +384,17 @@ export default function CreatedProjectForm() {
                         >
                             <button
                                 type="submit"
-                                className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/80"
+                                className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/80 flex items-center justify-center gap-2"
+                                disabled={isLoading} 
                             >
-                                Create Project
+                                {isLoading ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                        Creating...
+                                    </>
+                                ) : (
+                                    "Create Project"
+                                )}
                             </button>
                         </motion.div>
                     </form>

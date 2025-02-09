@@ -9,17 +9,18 @@ export default function CreateSkillForm() {
     const [name, setName] = useState("");
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // Loading state
     const router = useRouter();
 
-        useEffect(() => {
-          document.title = `Create Skill | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-          document
-          .querySelector('meta[name="description"]')
-          ?.setAttribute(
-            'content',
-            `Create a new skill on my portfolio. | ${process.env.NEXT_PUBLIC_META_TITLE}`
-          );
-        }, []);
+    useEffect(() => {
+        document.title = `Create Skill | ${process.env.NEXT_PUBLIC_META_TITLE}`;
+        document
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Create a new skill on my portfolio. | ${process.env.NEXT_PUBLIC_META_TITLE}`
+            );
+    }, []);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -32,6 +33,7 @@ export default function CreateSkillForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); // Start loading
 
         const formData = new FormData();
         formData.append("name", name);
@@ -52,6 +54,8 @@ export default function CreateSkillForm() {
             }
         } catch (error) {
             toast.error("An unexpected error occurred!");
+        } finally {
+            setIsLoading(false); // Stop loading
         }
     };
 
@@ -123,15 +127,23 @@ export default function CreateSkillForm() {
 
                     <motion.button
                         type="submit"
-                        className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 focus:outline-none focus:ring-1 focus:border-black"
+                        className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 focus:outline-none focus:ring-1 focus:border-black flex items-center justify-center gap-2"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
+                        disabled={isLoading} // Disable button during loading
                     >
-                        Create Skill
+                        {isLoading ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                Creating...
+                            </>
+                        ) : (
+                            "Create Skill"
+                        )}
                     </motion.button>
                 </form>
-
             </motion.div>
+
             <motion.div
                 className="w-full flex justify-center items-center my-10"
                 initial={{ opacity: 0 }}

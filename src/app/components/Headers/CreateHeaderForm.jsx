@@ -20,6 +20,7 @@ export default function CreateHeaderForm() {
   const [githubLink, setGithubLink] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   useEffect(() => {
     document.title = `Create Header | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -64,6 +65,7 @@ export default function CreateHeaderForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading
 
     const formData = new FormData();
     formData.append("title", title);
@@ -72,22 +74,26 @@ export default function CreateHeaderForm() {
     formData.append("githubLink", githubLink);
     formData.append("image", image);
 
-    const response = await fetch(
-      `/api/headers`,
-      {
+    try {
+      const response = await fetch(`/api/headers`, {
         method: "POST",
         body: formData,
-      }
-    );
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Header Created:", data);
-      toast.success("Header created successfully!");
-      router.push("/allHeaders");
-    } else {
-      console.error("Error creating header");
-      toast.error("Failed to create header!");
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Header Created:", data);
+        toast.success("Header created successfully!");
+        router.push("/allHeaders");
+      } else {
+        console.error("Error creating header");
+        toast.error("Failed to create header!");
+      }
+    } catch (error) {
+      console.error("Error creating header:", error);
+      toast.error("An unexpected error occurred!");
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -240,9 +246,17 @@ export default function CreateHeaderForm() {
           >
             <button
               type="submit"
-              className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/80"
+              className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/80 flex items-center justify-center gap-2"
+              disabled={isLoading} // Disable button during loading
             >
-              Create Header
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Header"
+              )}
             </button>
           </motion.div>
         </motion.form>

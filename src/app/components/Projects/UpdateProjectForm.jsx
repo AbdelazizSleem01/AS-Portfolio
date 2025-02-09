@@ -21,18 +21,20 @@ export default function UpdateProjectForm() {
     const [videoPreview, setVideoPreview] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false); // Loading state for update
+    const [isDeleting, setIsDeleting] = useState(false); // Loading state for delete
     const router = useRouter();
     const { id } = useParams();
 
     useEffect(() => {
         document.title = `Update Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document
-        .querySelector('meta[name="description"]')
-        ?.setAttribute(
-          'content',
-          `Update your project details on ${process.env.NEXT_PUBLIC_META_TITLE}`
-        );
-      }, []);
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Update your project details on ${process.env.NEXT_PUBLIC_META_TITLE}`
+            );
+    }, []);
 
     const editor = useEditor({
         extensions: [
@@ -48,7 +50,6 @@ export default function UpdateProjectForm() {
         ],
         content: '',
         immediatelyRender: false,
-
     });
 
     useEffect(() => {
@@ -79,6 +80,8 @@ export default function UpdateProjectForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsUpdating(true); // Start loading for update
+
         const formData = new FormData();
         formData.append('title', project.title);
         formData.append('description', editor.getHTML());
@@ -99,11 +102,14 @@ export default function UpdateProjectForm() {
         } catch (error) {
             console.error('Error updating project:', error);
             toast.error('Failed to update project');
+        } finally {
+            setIsUpdating(false); // Stop loading for update
         }
     };
 
     const handleDelete = async () => {
         try {
+            setIsDeleting(true); // Start loading for delete
             const response = await fetch(`/api/projects/${id}`, {
                 method: 'DELETE',
             });
@@ -114,6 +120,9 @@ export default function UpdateProjectForm() {
         } catch (error) {
             console.error('Error deleting project:', error);
             toast.error('Failed to delete project');
+        } finally {
+            setIsDeleting(false); // Stop loading for delete
+            setShowDeleteModal(false);
         }
     };
 
@@ -142,8 +151,11 @@ export default function UpdateProjectForm() {
         );
     }
 
+    if (!project) {
+        return <p className="flex justify-center items-center text-xl font-bold text-gray-800">Project not found.</p>;
+    }
 
-    return project ? (
+    return (
         <motion.div
             className="min-h-screen bg-base-100 mt-16 p-8"
             initial={{ opacity: 0 }}
@@ -152,7 +164,7 @@ export default function UpdateProjectForm() {
         >
             <motion.form
                 onSubmit={handleSubmit}
-                className="max-w-4xl mx-auto my-5 p-6  text-neutral shadow-lg rounded-lg border border-primary"
+                className="max-w-4xl mx-auto my-5 p-6 text-neutral shadow-lg rounded-lg border border-primary"
                 initial="hidden"
                 animate="visible"
                 transition={{ staggerChildren: 0.1 }}
@@ -168,7 +180,7 @@ export default function UpdateProjectForm() {
 
                 {/* Title */}
                 <motion.div className="mb-4" variants={fieldVariant}>
-                    <label htmlFor="title" className="block text-sm label font-medium ">
+                    <label htmlFor="title" className="block text-sm label font-medium">
                         Title
                     </label>
                     <input
@@ -238,7 +250,7 @@ export default function UpdateProjectForm() {
                             setImage(file);
                             setImagePreview(URL.createObjectURL(file));
                         }}
-                        className="file-input file-input-primary w-full bg-neutral/10 mt-1 rounded-md "
+                        className="file-input file-input-primary w-full bg-neutral/10 mt-1 rounded-md"
                     />
                     {imagePreview && (
                         <img
@@ -263,7 +275,7 @@ export default function UpdateProjectForm() {
                             setVideo(file);
                             setVideoPreview(URL.createObjectURL(file));
                         }}
-                        className="file-input file-input-primary w-full bg-neutral/10 mt-1  rounded-md "
+                        className="file-input file-input-primary w-full bg-neutral/10 mt-1 rounded-md"
                     />
                     {videoPreview && (
                         <video controls src={videoPreview} className="mt-4 max-w-[35%] mx-auto rounded-md border border-primary">
@@ -274,19 +286,39 @@ export default function UpdateProjectForm() {
 
                 {/* Buttons */}
                 <motion.div className="flex justify-between" variants={fieldVariant} transition={{ delay: 0.6 }}>
-                    <button
+                    <motion.button
                         type="button"
                         onClick={() => setShowDeleteModal(true)}
-                        className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 w-full mr-2"
+                        className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 w-full mr-2 flex items-center justify-center gap-2"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={isUpdating || isDeleting} // Disable during loading
                     >
-                        Delete
-                    </button>
-                    <button
+                        {isDeleting ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                Deleting...
+                            </>
+                        ) : (
+                            "Delete"
+                        )}
+                    </motion.button>
+                    <motion.button
                         type="submit"
-                        className="px-4 py-2 bg-primary text-white rounded-md w-full ml-2 hover:bg-primary/95"
+                        className="px-4 py-2 bg-primary text-white rounded-md w-full ml-2 hover:bg-primary/95 flex items-center justify-center gap-2"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={isUpdating || isDeleting} // Disable during loading
                     >
-                        Update
-                    </button>
+                        {isUpdating ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                Updating...
+                            </>
+                        ) : (
+                            "Update"
+                        )}
+                    </motion.button>
                 </motion.div>
             </motion.form>
 
@@ -328,9 +360,5 @@ export default function UpdateProjectForm() {
                 </motion.div>
             )}
         </motion.div>
-    ) : (
-        <p className="flex justify-center items-center text-xl font-bold text-gray-800">
-            Project not found.
-        </p>
     );
 }

@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 
 const CreatePostPage = () => {
@@ -10,11 +10,11 @@ const CreatePostPage = () => {
   useEffect(() => {
     document.title = `Create New Post | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `Create a new post on ${process.env.NEXT_PUBLIC_META_TITLE}`
-    );
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `Create a new post on ${process.env.NEXT_PUBLIC_META_TITLE}`
+      );
   }, []);
 
   const [formData, setFormData] = useState({
@@ -148,7 +148,7 @@ const CreatePostPage = () => {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
 
-            
+
           />
         </motion.div>
 
@@ -166,7 +166,7 @@ const CreatePostPage = () => {
               setFormData({ ...formData, userImage: file });
             }}
             className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
-            
+
           />
           {formData.userImage && (
             <div className="mt-4">
@@ -198,7 +198,7 @@ const CreatePostPage = () => {
                 slug: generateSlug(newTitle)
               }));
             }}
-            
+
           />
         </motion.div>
 
@@ -217,7 +217,7 @@ const CreatePostPage = () => {
             className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md"
             value={formData.slug}
             onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            
+
           />
         </motion.div>
 
@@ -234,7 +234,7 @@ const CreatePostPage = () => {
             className="w-full bg-neutral/10 p-3 mt-1 textarea textarea-bordered h-64 rounded-md"
             value={formData.content}
             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            
+
           />
         </motion.div>
         {/* Excerpt Field */}
@@ -286,7 +286,7 @@ const CreatePostPage = () => {
               coverImage: e.target.files[0]
             })}
             className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
-            
+
           />
           {formData.coverImage && (
             <div className="mt-4">
@@ -312,7 +312,33 @@ const CreatePostPage = () => {
             disabled={loading}
             className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/80"
           >
-            {loading ? 'Creating...' : 'Create Post'}
+            {loading ?
+              (
+                <div className='flex items-center gap-3 justify-center'>
+                  Creating Post...
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
+              )
+              : 'Create Post'}
           </motion.button>
         </motion.div>
       </motion.form>

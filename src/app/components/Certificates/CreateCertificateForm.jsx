@@ -9,17 +9,18 @@ export default function CreateCertificateForm() {
     const [title, setTitle] = useState("");
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // Add loading state
     const router = useRouter();
 
-        useEffect(() => {
-          document.title = `Create Certification | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-          document
-          .querySelector('meta[name="description"]')
-          ?.setAttribute(
-            'content',
-            `Create and manage your personal certifications | ${process.env.NEXT_PUBLIC_META_DESCRIPTION}`
-          );
-        }, []);
+    useEffect(() => {
+        document.title = `Create Certification | ${process.env.NEXT_PUBLIC_META_TITLE}`;
+        document
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Create and manage your personal certifications | ${process.env.NEXT_PUBLIC_META_DESCRIPTION}`
+            );
+    }, []);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -32,6 +33,7 @@ export default function CreateCertificateForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); // Start loading
 
         const formData = new FormData();
         formData.append("title", title);
@@ -52,6 +54,8 @@ export default function CreateCertificateForm() {
             }
         } catch (error) {
             toast.error("An unexpected error occurred!");
+        } finally {
+            setIsLoading(false); // Stop loading
         }
     };
 
@@ -126,12 +130,37 @@ export default function CreateCertificateForm() {
                         className="w-full flex justify-center mx-auto py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 focus:outline-none focus:ring-1 focus:border-black"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
+                        disabled={isLoading} // Disable button during loading
                     >
-                        Create Certificate
+                        {isLoading ? (
+                            // Loading spinner SVG
+                            <svg
+                                className="animate-spin h-5 w-5 mr-3 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                        ) : (
+                            'Create Certificate'
+                        )}
                     </motion.button>
                 </form>
-
             </motion.div>
+
             <motion.div
                 className="w-full flex justify-center items-center my-10"
                 initial={{ opacity: 0 }}

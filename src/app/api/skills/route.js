@@ -18,11 +18,11 @@ export async function POST(req) {
     const imageBuffer = await imageFile.arrayBuffer();
 
     const { url: imageUrl } = await put(
-      `SkillsImages/${Date.now()}-${imageFile.name}`, 
-      Buffer.from(imageBuffer), 
+      `SkillsImages/${Date.now()}-${imageFile.name}`,
+      Buffer.from(imageBuffer),
       {
-        access: 'public', 
-        contentType: imageFile.type, 
+        access: 'public',
+        contentType: imageFile.type,
       }
     );
 
@@ -33,13 +33,18 @@ export async function POST(req) {
       imageUrl,
     });
 
-    // Send email notifications
-    await sendNotifications();
-
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: 'Skill Created Successfully', Skill: newSkill },
       { status: 201 }
     );
+
+    // Send email notifications
+    sendNotifications().catch(error => {
+      console.error('Background notification error:', error);
+    });
+
+    return response;
+
   } catch (error) {
     console.error('Error in POST /api/Skills:', error);
     return NextResponse.json(
@@ -52,6 +57,7 @@ export async function POST(req) {
 // Function to send notifications (unchanged)
 const sendNotifications = async () => {
   try {
+    await connectDB();
     const subscribers = await Subscription.find({ verified: true });
 
     if (subscribers.length === 0) {
@@ -69,18 +75,21 @@ const sendNotifications = async () => {
       },
     });
 
-    for (const sub of subscribers) {
-      await transporter.sendMail({
-        from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
-        to: sub.email,
-        subject: 'New Skill Update: Explore My Latest Technical Enhancements',
-        text: `Dear Subscriber,
+
+
+    await Promise.all(subscribers.map(async (sub) => {
+      try {
+        await transporter.sendMail({
+          from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
+          to: sub.email,
+          subject: 'New Skill Update: Explore My Latest Technical Enhancements',
+          text: `Dear Subscriber,
     
     I'm excited to announce that I've recently updated my technical skills and portfolio with new capabilities and innovations. Discover the latest improvements in my skillset, including advancements in both front-end and back-end technologies. Visit ${process.env.NEXT_PUBLIC_BASE_URL} to see the new updates.
     
     Best Regards,
     AS Portfolio Team`,
-        html: `
+          html: `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -174,10 +183,14 @@ const sendNotifications = async () => {
           </body>
           </html>
         `,
-      });
-    }
+        });
+      }
+      catch (emailError) {
+        console.error(`Failed to send email to ${sub.email}:`, emailError);
+      }
+    }))
 
-    console.log('Emails sent successfully!');
+    console.log('Email notifications processed');
   } catch (error) {
     console.error('Notification error:', error);
   }

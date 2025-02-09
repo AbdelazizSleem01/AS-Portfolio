@@ -90,17 +90,7 @@ export const metadata = {
 
 };
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Abdelaziz Sleem",
-  jobTitle: "Fullstack Developer",
-  url: "https://as-portfolio-ten.vercel.app",
-  sameAs: [
-    "https://github.com/AbdelazizSleem01",
-    "https://linkedin.com/in/yourprofile"
-  ]
-};
+
 
 export default function RootLayout({ children }) {
   return (
@@ -116,10 +106,6 @@ export default function RootLayout({ children }) {
           </ClerkProvider>
         </ThemeProvider>
       </body>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
     </html>
   );
 }

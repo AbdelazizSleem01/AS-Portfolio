@@ -16,6 +16,7 @@ export default function UpdateSkillForm() {
     const [error, setError] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false); // Loading state for update
 
     useEffect(() => {
         if (skill) {
@@ -59,10 +60,7 @@ export default function UpdateSkillForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!name) {
-            toast.error("Skill name is required");
-            return;
-        }
+        setIsUpdating(true); // Start loading for update
 
         const formData = new FormData();
         formData.append("name", name);
@@ -80,18 +78,17 @@ export default function UpdateSkillForm() {
             router.push("/allSkills");
         } catch (err) {
             toast.error(err.message);
+        } finally {
+            setIsUpdating(false); // Stop loading for update
         }
     };
 
     const handleDelete = async () => {
         try {
-            setIsDeleting(true);
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/skills/${id}`,
-                {
-                    method: "DELETE",
-                }
-            );
+            setIsDeleting(true); // Start loading for delete
+            const response = await fetch(`/api/skills/${id}`, {
+                method: "DELETE",
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -104,7 +101,7 @@ export default function UpdateSkillForm() {
             console.error("Error deleting skill:", err);
             toast.error(err.message);
         } finally {
-            setIsDeleting(false);
+            setIsDeleting(false); // Stop loading for delete
             setShowDeleteModal(false);
         }
     };
@@ -215,21 +212,36 @@ export default function UpdateSkillForm() {
                     >
                         <motion.button
                             type="submit"
-                            className="flex-1 py-3 bg-primary text-white rounded-md hover:bg-primary/95"
+                            className="flex-1 py-3 bg-primary text-white rounded-md hover:bg-primary/95 flex items-center justify-center gap-2"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            disabled={!name}
+                            disabled={isUpdating || isDeleting} // Disable during loading
                         >
-                            Update Skill
+                            {isUpdating ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                    Updating...
+                                </>
+                            ) : (
+                                "Update Skill"
+                            )}
                         </motion.button>
                         <motion.button
                             type="button"
                             onClick={() => setShowDeleteModal(true)}
-                            className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90"
+                            className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
+                            disabled={isUpdating || isDeleting} // Disable during loading
                         >
-                            Delete Skill
+                            {isDeleting ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete Skill"
+                            )}
                         </motion.button>
                     </motion.div>
                 </form>
