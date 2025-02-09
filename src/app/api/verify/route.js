@@ -13,7 +13,7 @@ export async function GET(req) {
 
     if (!subscriber) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/verify/error?code=invalid_token`
+        `/verify/error?code=invalid_token`
       );
     }
 
@@ -23,12 +23,12 @@ export async function GET(req) {
     await subscriber.save();
 
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/verify/success`
+      `/verify/success`
     );
   } catch (error) {
     console.error("Verification error:", error);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/verify/error?code=server_error`
+      `/verify/error?code=server_error`
     );
   }
 }
