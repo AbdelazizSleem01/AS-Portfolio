@@ -80,7 +80,7 @@ export default function HomePageCertificates() {
                 {certificates.length > 0 && (
                     <div className="relative group mx-auto flex justify-center mt-8">
                         {/* Carousel container */}
-                        <div className="carousel w-full sm:w-full md:w-[90%] lg:w-[80%] rounded-xl shadow-2xl bg-base-100 border border-base-300">
+                        <div className="carousel w-full sm:w-full md:w-[90%] lg:w-[80%] xl:w-[70%] rounded-xl shadow-2xl bg-base-100 border border-base-300">
                             {certificates.map((certificate, index) => (
                                 <div
                                     id={`slide${index}`}
@@ -88,17 +88,17 @@ export default function HomePageCertificates() {
                                     className="carousel-item relative w-full aspect-video"
                                 >
                                     {/* Image container */}
-                                    <div className="w-full h-full flex items-center justify-center p-2">
+                                    <div className="w-full h-full flex items-center justify-center p-3">
                                         <img
                                             src={certificate.imageUrl}
                                             alt={certificate.title}
-                                            className="w-[80%] h-[80%] rounded-lg object-cover"
+                                            className="w-full h-full sm:w-[90%] sm:h-[90%] md:w-[80%] md:h-[80%] rounded-lg object-contain"
                                         />
                                     </div>
 
                                     {/* Title overlay */}
-                                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3 bg-black/40 px-6 py-3 rounded-2xl backdrop-blur-sm ">
-                                        <h3 className="text-xl font-semibold text-white">
+                                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3 bg-black/40 px-3 py-2 sm:px-6 sm:py-3 rounded-2xl backdrop-blur-sm">
+                                        <h3 className="text-lg sm:text-xl font-semibold text-white">
                                             {certificate.title}
                                         </h3>
                                     </div>
@@ -107,13 +107,13 @@ export default function HomePageCertificates() {
                                     <div className="absolute flex justify-between transform -translate-y-1/2 left-4 right-4 top-1/2">
                                         <a
                                             href={`#slide${index === 0 ? certificates.length - 1 : index - 1}`}
-                                            className="btn btn-circle btn-md text-white btn-primary opacity-90 hover:opacity-100"
+                                            className="btn btn-circle btn-sm sm:btn-md text-white btn-primary opacity-90 hover:opacity-100"
                                         >
                                             <ArrowBigLeft />
                                         </a>
                                         <a
                                             href={`#slide${index === certificates.length - 1 ? 0 : index + 1}`}
-                                            className="btn btn-circle btn-md text-white btn-primary opacity-90 hover:opacity-100"
+                                            className="btn btn-circle btn-sm sm:btn-md text-white btn-primary opacity-90 hover:opacity-100"
                                         >
                                             <ArrowBigRight />
                                         </a>
