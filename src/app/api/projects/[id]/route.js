@@ -5,7 +5,7 @@ import Project from '../../../../../models/Project';
 
 export async function GET(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await connectDB();
 
     // Fetch the project by `id`
@@ -55,11 +55,11 @@ export async function PUT(req, { params }) {
     // Handle Image Upload to Vercel Blob
     if (imageFile) {
       const { url: imageUrl } = await put(
-        `projectsImages/${Date.now()}-${imageFile.name}`, 
-        Buffer.from(await imageFile.arrayBuffer()), 
+        `projectsImages/${Date.now()}-${imageFile.name}`,
+        Buffer.from(await imageFile.arrayBuffer()),
         {
-          access: 'public', 
-          contentType: imageFile.type, 
+          access: 'public',
+          contentType: imageFile.type,
         }
       );
 
@@ -74,11 +74,11 @@ export async function PUT(req, { params }) {
     // Handle Video Upload to Vercel Blob
     if (videoFile) {
       const { url: videoUrl } = await put(
-        `projectsVideos/${Date.now()}-${videoFile.name}`, 
-        Buffer.from(await videoFile.arrayBuffer()), 
+        `projectsVideos/${Date.now()}-${videoFile.name}`,
+        Buffer.from(await videoFile.arrayBuffer()),
         {
-          access: 'public', 
-          contentType: videoFile.type, 
+          access: 'public',
+          contentType: videoFile.type,
         }
       );
 
@@ -110,7 +110,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await connectDB();
 
     // Fetch the project to check for associated files

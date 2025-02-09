@@ -13,6 +13,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import { ChevronDown, Shapes } from 'lucide-react';
 
 export default function UpdateProjectForm() {
     const [project, setProject] = useState(null);
@@ -22,18 +23,12 @@ export default function UpdateProjectForm() {
     const [videoPreview, setVideoPreview] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false); // Loading state for update
-    const [isDeleting, setIsDeleting] = useState(false); // Loading state for delete
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
     const { id } = useParams();
-
     const { user } = useUser();
 
-    if (!user) {
-        return <RedirectToSignIn />;
-  
-    }
-  
     useEffect(() => {
         document.title = `Update Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document
@@ -83,12 +78,19 @@ export default function UpdateProjectForm() {
             }
         };
 
-        fetchProject();
-    }, [id, editor]);
+        if (user) { // Only fetch if user exists
+            fetchProject();
+        }
+    }, [id, editor, user]); // Add user to dependencies
+
+    // Check for user after all Hooks are called
+    if (!user) {
+        return <RedirectToSignIn />;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsUpdating(true); // Start loading for update
+        setIsUpdating(true);
 
         const formData = new FormData();
         formData.append('title', project.title);
@@ -111,13 +113,13 @@ export default function UpdateProjectForm() {
             console.error('Error updating project:', error);
             toast.error('Failed to update project');
         } finally {
-            setIsUpdating(false); // Stop loading for update
+            setIsUpdating(false);
         }
     };
 
     const handleDelete = async () => {
         try {
-            setIsDeleting(true); // Start loading for delete
+            setIsDeleting(true);
             const response = await fetch(`/api/projects/${id}`, {
                 method: 'DELETE',
             });
@@ -129,7 +131,7 @@ export default function UpdateProjectForm() {
             console.error('Error deleting project:', error);
             toast.error('Failed to delete project');
         } finally {
-            setIsDeleting(false); // Stop loading for delete
+            setIsDeleting(false);
             setShowDeleteModal(false);
         }
     };
@@ -300,7 +302,7 @@ export default function UpdateProjectForm() {
                         className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 w-full mr-2 flex items-center justify-center gap-2"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        disabled={isUpdating || isDeleting} // Disable during loading
+                        disabled={isUpdating || isDeleting}
                     >
                         {isDeleting ? (
                             <>
@@ -316,7 +318,7 @@ export default function UpdateProjectForm() {
                         className="px-4 py-2 bg-primary text-white rounded-md w-full ml-2 hover:bg-primary/95 flex items-center justify-center gap-2"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        disabled={isUpdating || isDeleting} // Disable during loading
+                        disabled={isUpdating || isDeleting}
                     >
                         {isUpdating ? (
                             <>

@@ -133,6 +133,7 @@ const HomePageProjects = () => {
                     </a>
                   )}
                 </div>
+                {/* category */}
                 <div className="flex justify-around items-center text-center mt-4">
                   {project.liveLink && (
                     <Link
