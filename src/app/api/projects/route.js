@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob'; // Import Vercel Blob's put method
+import { put } from '@vercel/blob';
 import connectDB from '../../../../lib/mongodb';
 import Project from '../../../../models/Project';
 import sanitizeHtml from 'sanitize-html';
@@ -19,27 +19,14 @@ export async function POST(req) {
       throw new Error('Title, description, image, and category are required.');
     }
 
+    // Start DB connection early
+    const dbPromise = connectDB();
+
     // Sanitize HTML description
     const description = sanitizeHtml(rawDescription, {
       allowedTags: [
-        'b',
-        'i',
-        'em',
-        'strong',
-        'a',
-        'p',
-        'span',
-        'img',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'div',
-        'br',
-        'u',
-        'mark',
+        'b', 'i', 'em', 'strong', 'a', 'p', 'span', 'img',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'br', 'u', 'mark'
       ],
       allowedAttributes: {
         span: ['style', 'class'],
@@ -74,40 +61,36 @@ export async function POST(req) {
       },
     });
 
-    // Handle Image Upload to Vercel Blob
-    const { url: imageUrl } = await put(
-      `projectsImages/${Date.now()}-${imageFile.name}`, 
-      Buffer.from(await imageFile.arrayBuffer()), 
-      {
-        access: 'public', 
-        contentType: imageFile.type, 
-      }
-    );
+    // Process files in parallel
+    const [imageResult, videoResult] = await Promise.all([
+      (async () => {
+        const buffer = await imageFile.arrayBuffer();
+        return put(
+          `projectsImages/${Date.now()}-${imageFile.name}`,
+          Buffer.from(buffer),
+          { access: 'public', contentType: imageFile.type }
+        );
+      })(),
+      videoFile ? (async () => {
+        const buffer = await videoFile.arrayBuffer();
+        return put(
+          `projectsVideos/${Date.now()}-${videoFile.name}`,
+          Buffer.from(buffer),
+          { access: 'public', contentType: videoFile.type }
+        );
+      })() : null
+    ]);
 
-    // Handle Video Upload to Vercel Blob (if provided)
-    let videoUrl = null;
-    if (videoFile) {
-      const { url } = await put(
-        `projectsVideos/${Date.now()}-${videoFile.name}`, 
-        Buffer.from(await videoFile.arrayBuffer()), 
-        {
-          access: 'public', 
-          contentType: videoFile.type, 
-        }
-      );
-      videoUrl = url;
-    }
-
-    // Connect to DB and save project
-    await connectDB();
+    // Wait for DB connection
+    await dbPromise;
 
     const newProject = await Project.create({
       title,
       description,
       liveLink,
       githubLink,
-      videoLink: videoUrl,
-      imageUrl,
+      videoLink: videoResult?.url || null,
+      imageUrl: imageResult.url,
       category,
     });
 
@@ -124,13 +107,10 @@ export async function POST(req) {
   }
 }
 
-// Get All Projects
-export async function GET(req) {
+export async function GET() {
   try {
     await connectDB();
-
     const projects = await Project.find().sort({ createdAt: -1 });
-
     return NextResponse.json({ projects }, { status: 200 });
   } catch (error) {
     console.error('Error in GET /api/projects:', error);

@@ -8,6 +8,7 @@ import { ArrowBigLeft } from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 const GetProjects = () => {
+    const { user } = useUser();
     const [projects, setProjects] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -15,13 +16,8 @@ const GetProjects = () => {
     const [currentProject, setCurrentProject] = useState(null);
 
 
-    const { user } = useUser();
 
-    if (!user) {
-        return <RedirectToSignIn />;
-  
-    }
-  
+
     useEffect(() => {
         document.title = `All Projects | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document
@@ -58,12 +54,6 @@ const GetProjects = () => {
         setCurrentProject(null);
     };
 
-    const retryFetch = () => {
-        setError(null);
-        setLoading(true);
-        fetchProjects();
-    };
-
     if (loading) {
         return (
             <motion.div
@@ -93,7 +83,6 @@ const GetProjects = () => {
             >
                 <p>Error: {error}</p>
                 <motion.button
-                    onClick={retryFetch}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="bg-primary text-white px-6 py-2 rounded-lg"
@@ -102,6 +91,11 @@ const GetProjects = () => {
                 </motion.button>
             </motion.div>
         );
+    }
+
+    if (!user) {
+        return <RedirectToSignIn />;
+
     }
 
     return (
@@ -139,7 +133,7 @@ const GetProjects = () => {
                             <motion.p
                                 dangerouslySetInnerHTML={{ __html: project.description }}
                                 className="mb-4 truncate h-[26px] text-base-100"
-                                
+
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
                                 transition={{ duration: 0.3 }}
