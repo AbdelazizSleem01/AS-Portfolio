@@ -13,7 +13,7 @@ export async function GET(req) {
 
     if (!subscriber) {
       return NextResponse.redirect(
-        `/verify/error?code=invalid_token`
+        `https://as-portfolio-ten.vercel.app/verify/error?code=invalid_token`
       );
     }
 
@@ -23,12 +23,12 @@ export async function GET(req) {
     await subscriber.save();
 
     return NextResponse.redirect(
-      `/verify/success`
+      `https://as-portfolio-ten.vercel.app/verify/success`
     );
   } catch (error) {
     console.error("Verification error:", error);
     return NextResponse.redirect(
-      `/verify/error?code=server_error`
+      `https://as-portfolio-ten.vercel.app/verify/error?code=server_error`
     );
   }
 }

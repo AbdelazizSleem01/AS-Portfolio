@@ -36,7 +36,7 @@ export async function POST(req) {
       auth: { user: process.env.YANDEX_USER, pass: process.env.YANDEX_PASS },
     });
 
-    const verificationLink = `/api/verify?token=${newSub.verificationToken}`;
+    const verificationLink = `https://as-portfolio-ten.vercel.app/api/verify?token=${newSub.verificationToken}`;
     await transporter.sendMail({
       from: `AS Portfolio <${process.env.YANDEX_USER}>`,
       to: email,
@@ -115,8 +115,8 @@ export async function POST(req) {
             <td style="padding: 20px; background-color: #f8f9fa; text-align: center;">
               <p style="color: #636e72; font-size: 0.8em; margin: 0;">
                 © ${new Date().getFullYear()} AS Portfolio. All rights reserved.<br>
-                <a href="/privacy" style="color: #0984e3; text-decoration: none;">Privacy Policy</a> | 
-                <a href="/unsubscribe?token=${newSub.unsubscribeToken}" style="color: #0984e3; text-decoration: none;">Unsubscribe</a>
+                <a href="https://as-portfolio-ten.vercel.app/privacy" style="color: #0984e3; text-decoration: none;">Privacy Policy</a> | 
+                <a href="https://as-portfolio-ten.vercel.app/unsubscribe?token=${newSub.unsubscribeToken}" style="color: #0984e3; text-decoration: none;">Unsubscribe</a>
               </p>
             </td>
           </tr>
