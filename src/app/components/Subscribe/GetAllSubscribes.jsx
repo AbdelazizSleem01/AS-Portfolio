@@ -1,48 +1,47 @@
-"use client"
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Trash2, Download, ChevronLeft, ChevronRight } from 'lucide-react';
-import { toast } from 'react-toastify';
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+"use client";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Search, Trash2, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "react-toastify";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
 
 const ITEMS_PER_PAGE = 10;
 
 const GetAllSubscribes = () => {
+  // Declare all Hooks at the top level
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-
   const { user } = useUser();
+  const router = useRouter(); // Initialize useRouter
 
-  if (!user) {
-      return <RedirectToSignIn />;
+  // Redirect to sign-in if user is not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push("/sign-in"); // Redirect to the sign-in page
+    }
+  }, [user, router]);
 
-  }
-
-
+  // Other useEffect hooks
   useEffect(() => {
     document.title = `All Subscribes | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `View all subscribers on ${process.env.NEXT_PUBLIC_META_TITLE}.`
-      
-    );
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", `View all subscribers on ${process.env.NEXT_PUBLIC_META_TITLE}.`);
   }, []);
-
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        const response = await fetch('/api/subscribe');
-        if (!response.ok) throw new Error('Failed to fetch subscriptions');
+        const response = await fetch("/api/subscribe");
+        if (!response.ok) throw new Error("Failed to fetch subscriptions");
         const data = await response.json();
         setSubscriptions(data);
       } catch (err) {
@@ -56,7 +55,7 @@ const GetAllSubscribes = () => {
   }, []);
 
   // Filter subscriptions based on search query
-  const filteredSubscriptions = subscriptions.filter(sub =>
+  const filteredSubscriptions = subscriptions.filter((sub) =>
     sub.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -69,15 +68,13 @@ const GetAllSubscribes = () => {
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`/api/subscribe/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        toast.success('Subscription deleted successfully!');
-        setSubscriptions(prev => prev.filter(sub => sub._id !== id));
-      };
-
-      setSubscriptions(prev => prev.filter(sub => sub._id !== id));
+        toast.success("Subscription deleted successfully!");
+        setSubscriptions((prev) => prev.filter((sub) => sub._id !== id));
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -88,17 +85,17 @@ const GetAllSubscribes = () => {
 
   const exportToCSV = () => {
     const csvContent = [
-      'Email,Verified,Subscribed At,Unsubscribe Token',
-      ...filteredSubscriptions.map(sub =>
+      "Email,Verified,Subscribed At,Unsubscribe Token",
+      ...filteredSubscriptions.map((sub) =>
         `"${sub.email}",${sub.verified},"${sub.createdAt}",${sub.unsubscribeToken}`
-      )
-    ].join('\n');
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `subscriptions_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `subscriptions_${new Date().toISOString().split("T")[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
