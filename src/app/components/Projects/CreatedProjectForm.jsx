@@ -19,6 +19,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
 import { ChevronDown, Shapes } from 'lucide-react';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 export default function CreatedProjectForm() {
     // All state hooks are called unconditionally
@@ -36,7 +37,13 @@ export default function CreatedProjectForm() {
 
     const router = useRouter();
 
-    // Set page meta information
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+  
+    }
+  
     useEffect(() => {
         document.title = `Create Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document

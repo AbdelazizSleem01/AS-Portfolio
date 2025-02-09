@@ -13,6 +13,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Link from "next/link";
 import TextToolbar from "../TextToolbar";
 import { FontSize } from "../FontSize";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function CreateHeaderForm() {
   const [title, setTitle] = useState("");
@@ -20,7 +21,14 @@ export default function CreateHeaderForm() {
   const [githubLink, setGithubLink] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false); 
+  
+  const { user } = useUser();
+
+  if (!user) {
+      return <RedirectToSignIn />;
+
+  }
 
   useEffect(() => {
     document.title = `Create Header | ${process.env.NEXT_PUBLIC_META_TITLE}`;

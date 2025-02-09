@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function UpdateCertificateForm() {
     const { id } = useParams();
@@ -15,6 +16,13 @@ export default function UpdateCertificateForm() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false); 
+
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
 
     useEffect(() => {
         document.title = `Update Certificate | ${process.env.NEXT_PUBLIC_META_TITLE}`;

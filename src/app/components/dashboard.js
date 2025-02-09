@@ -3,12 +3,21 @@
 import { useEffect, useState, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import { motion } from 'framer-motion';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [performanceScore, setPerformanceScore] = useState(0);
+
+  const { user } = useUser();
+
+  if (!user) {
+    return <RedirectToSignIn />;
+
+  }
+
 
   useEffect(() => {
     document.title = `Dashboard of ${process.env.NEXT_PUBLIC_META_TITLE}`;

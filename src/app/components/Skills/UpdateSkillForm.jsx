@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function UpdateSkillForm() {
     const { id } = useParams();
@@ -17,6 +18,13 @@ export default function UpdateSkillForm() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false); // Loading state for update
+
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
 
     useEffect(() => {
         if (skill) {

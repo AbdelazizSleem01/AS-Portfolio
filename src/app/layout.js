@@ -1,10 +1,11 @@
 import { ToastContainer } from "react-toastify";
 import "./globals.css";
 import "../app/components/AdminStyle.css"
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider, useUser } from '@clerk/nextjs';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { ThemeProvider } from "next-themes";
+import CreateSkillForm from "./components/Skills/CreateSkillsForm";
 
 export const metadata = {
   title: "Abdelaziz Sleem | Fullstack Developer",
@@ -92,13 +93,14 @@ export const metadata = {
 
 
 
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <meta name="google-site-verification" content="KgD7-qJNunRW321b9tuubey9nJO9RGcbuZhjejdYqco" />
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}>
+          <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_BASE_URL}>
             <Navbar />
             {children}
             <ToastContainer />

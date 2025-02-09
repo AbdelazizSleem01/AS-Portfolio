@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function CreateSkillForm() {
     const [name, setName] = useState("");
@@ -11,6 +12,14 @@ export default function CreateSkillForm() {
     const [imagePreview, setImagePreview] = useState(null);
     const [isLoading, setIsLoading] = useState(false); // Loading state
     const router = useRouter();
+
+    const { user } = useUser();
+
+    if (!user) {
+      return <RedirectToSignIn />;
+  
+    }
+  
 
     useEffect(() => {
         document.title = `Create Skill | ${process.env.NEXT_PUBLIC_META_TITLE}`;

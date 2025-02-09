@@ -4,21 +4,30 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { ArrowBigLeft, ArrowBigRight, Edit } from "lucide-react";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function GetAllSCertificates() {
     const [certificates, setCertificates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-        useEffect(() => {
-          document.title = `All Certificates | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-          document
-          .querySelector('meta[name="description"]')
-          ?.setAttribute(
-            'content',
-            `All my professional certifications, including ${certificates.length} certificates from ${process.env.NEXT_PUBLIC_COMPANY_NAME}`
-          );
-        }, []);
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
+
+
+    useEffect(() => {
+        document.title = `All Certificates | ${process.env.NEXT_PUBLIC_META_TITLE}`;
+        document
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `All my professional certifications, including ${certificates.length} certificates from ${process.env.NEXT_PUBLIC_COMPANY_NAME}`
+            );
+    }, []);
 
     useEffect(() => {
         const fetchCertificates = async () => {

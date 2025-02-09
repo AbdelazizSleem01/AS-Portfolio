@@ -3,9 +3,18 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Edit } from 'lucide-react';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 export default function CategoriesList() {
   const [categories, setCategories] = useState([]);
+
+  const { user } = useUser();
+
+  if (!user) {
+      return <RedirectToSignIn />;
+
+  }
+
 
   useEffect(() => {
     const fetchCategories = async () => {

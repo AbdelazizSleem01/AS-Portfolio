@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,6 +14,14 @@ const AdminPostsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+
+  const { user } = useUser();
+
+  if (!user) {
+    return <RedirectToSignIn />;
+
+  }
+
 
   useEffect(() => {
     document.title = `All Posts | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -27,10 +36,10 @@ const AdminPostsPage = () => {
       try {
         const response = await fetch('/api/posts');
         if (!response.ok) throw new Error('Failed to fetch posts');
-        
+
         const data = await response.json();
         if (!Array.isArray(data)) throw new Error('Invalid data format');
-        
+
         setPosts(data);
         setSuccess('Posts loaded successfully');
         setTimeout(() => setSuccess(''), 3000);
@@ -46,7 +55,7 @@ const AdminPostsPage = () => {
   }, []);
 
   // Filter posts based on search query
-  const filteredPosts = posts.filter(post => 
+  const filteredPosts = posts.filter(post =>
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||

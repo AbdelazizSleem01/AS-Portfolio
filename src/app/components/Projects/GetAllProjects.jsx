@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import '../AdminStyle.css';
 import { ArrowBigLeft } from "lucide-react";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 const GetProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -13,6 +14,14 @@ const GetProjects = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [currentProject, setCurrentProject] = useState(null);
 
+
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+  
+    }
+  
     useEffect(() => {
         document.title = `All Projects | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document

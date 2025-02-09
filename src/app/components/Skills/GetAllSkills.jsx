@@ -4,12 +4,22 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { ArrowBigLeft } from "lucide-react";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function GetAllSkills() {
     const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+  
+    }
+
+    
     useEffect(() => {
         document.title = `All Skills | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document

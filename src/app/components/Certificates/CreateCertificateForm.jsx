@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function CreateCertificateForm() {
     const [title, setTitle] = useState("");
@@ -11,6 +12,13 @@ export default function CreateCertificateForm() {
     const [imagePreview, setImagePreview] = useState(null);
     const [isLoading, setIsLoading] = useState(false); // Add loading state
     const router = useRouter();
+
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
 
     useEffect(() => {
         document.title = `Create Certification | ${process.env.NEXT_PUBLIC_META_TITLE}`;

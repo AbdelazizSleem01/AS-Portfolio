@@ -1,8 +1,16 @@
 "use client";
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 
 export default function VisitCounter() {
   const [visitCount, setVisitCount] = useState(0);
+
+  const { user } = useUser();
+
+  if (!user) {
+    return <RedirectToSignIn />;
+
+  }
 
   useEffect(() => {
     fetch('/api/visit')
@@ -19,7 +27,7 @@ export default function VisitCounter() {
         'content',
         `A personal and creative portfolio website showcasing my projects, skills, and experiences. Visit count: ${visitCount}`
       );
-    
+
     document.querySelector('meta[name="keywords"]')?.setAttribute(
       'content',
       'portfolio, developer, web developer, software engineer, junior developer, full stack developer'

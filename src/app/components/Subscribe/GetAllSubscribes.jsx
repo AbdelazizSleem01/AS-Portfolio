@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Trash2, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,6 +16,14 @@ const GetAllSubscribes = () => {
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+
+
+  const { user } = useUser();
+
+  if (!user) {
+      return <RedirectToSignIn />;
+
+  }
 
 
   useEffect(() => {

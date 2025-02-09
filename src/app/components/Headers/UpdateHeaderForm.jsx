@@ -12,6 +12,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
 import { motion } from "framer-motion";
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 
 export default function UpdateHeaderForm() {
@@ -24,6 +25,13 @@ export default function UpdateHeaderForm() {
     const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
     const { id } = useParams();
+
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
 
     useEffect(() => {
         document.title = `Update Header | ${process.env.NEXT_PUBLIC_META_TITLE}`;

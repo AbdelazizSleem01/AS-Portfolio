@@ -12,6 +12,7 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 export default function UpdateProjectForm() {
     const [project, setProject] = useState(null);
@@ -26,6 +27,13 @@ export default function UpdateProjectForm() {
     const router = useRouter();
     const { id } = useParams();
 
+    const { user } = useUser();
+
+    if (!user) {
+        return <RedirectToSignIn />;
+  
+    }
+  
     useEffect(() => {
         document.title = `Update Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document

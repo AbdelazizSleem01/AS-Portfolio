@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowBigLeft } from "lucide-react";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 const GetAllHeader = () => {
   const [headers, setHeaders] = useState([]);
@@ -13,6 +14,12 @@ const GetAllHeader = () => {
   const [loading, setLoading] = useState(true);
   const route = useRouter();
 
+  const { user } = useUser();
+
+  if (!user) {
+      return <RedirectToSignIn />;
+
+  }
 
   useEffect(() => {
     document.title = `All Headers | ${process.env.NEXT_PUBLIC_META_TITLE}`;

@@ -3,21 +3,28 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 const ContactsPage = () => {
   const [contacts, setContacts] = useState([]);
   const [replyTexts, setReplyTexts] = useState({});
   const [loadingId, setLoadingId] = useState(null);
 
+  const { user } = useUser();
+
+  if (!user) {
+    return <RedirectToSignIn />;
+
+  }
 
   useEffect(() => {
     document.title = `Contacts | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `View and manage my contact messages on ${process.env.NEXT_PUBLIC_META_TITLE}`
-    );
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `View and manage my contact messages on ${process.env.NEXT_PUBLIC_META_TITLE}`
+      );
   }, []);
 
 

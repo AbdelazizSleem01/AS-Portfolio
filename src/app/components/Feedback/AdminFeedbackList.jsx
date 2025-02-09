@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function AdminFeedbackList() {
 
@@ -10,6 +11,14 @@ export default function AdminFeedbackList() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState(null); 
+
+  const { user } = useUser();
+
+  if (!user) {
+      return <RedirectToSignIn />;
+
+  }
+
 
   useEffect(() => {
     document.title = `All Feedbacks | ${process.env.NEXT_PUBLIC_META_TITLE}`;

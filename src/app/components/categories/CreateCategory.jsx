@@ -5,11 +5,19 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 export default function CreateCategory() {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const { user } = useUser();
+
+  if (!user) {
+      return <RedirectToSignIn />;
+
+  }
 
   useEffect(() => {
     document.title = `Create Category | ${process.env.NEXT_PUBLIC_META_TITLE}`;
