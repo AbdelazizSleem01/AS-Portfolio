@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 import { ThemeProvider } from "next-themes";
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
   title: "Abdelaziz Sleem | Fullstack Developer",
@@ -105,6 +106,7 @@ export default function RootLayout({ children }) {
               <Navbar />
               {children}
               <ToastContainer />
+              <SpeedInsights />
               <Footer />
             </Suspense>
           </ClerkProvider>

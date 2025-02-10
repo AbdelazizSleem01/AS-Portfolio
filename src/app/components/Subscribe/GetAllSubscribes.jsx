@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Search, Trash2, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -18,15 +18,9 @@ const GetAllSubscribes = () => {
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-
   const { user } = useUser();
-  const router = useRouter(); 
 
-  useEffect(() => {
-    if (!user) {
-      <RedirectToSignIn />
-    }
-  }, [user, router]);
+  const router = useRouter();
 
   // Other useEffect hooks
   useEffect(() => {
@@ -137,6 +131,11 @@ const GetAllSubscribes = () => {
     );
   }
 
+
+  if (!user) {
+    <RedirectToSignIn />
+  }
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
