@@ -8,7 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
-
+import { Analytics } from "@vercel/analytics/react"
 export const metadata = {
   title: {
     default:"Abdelaziz Sleem | Fullstack Developer",
@@ -101,7 +101,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning >
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
@@ -109,6 +109,7 @@ export default function RootLayout({ children }) {
               <Navbar />
               {children}
               <ToastContainer />
+              <Analytics />
               <SpeedInsights />
               <Footer />
             </Suspense>
