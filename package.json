@@ -31,6 +31,7 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/blob": "^0.27.1",
     "@vercel/speed-insights": "^1.1.0",
+    "busboy": "^1.6.0",
     "chart.js": "^4.4.7",
     "crypto": "^1.0.1",
     "framer-motion": "^12.0.6",
@@ -47,7 +48,8 @@
     "react-dom": "^18.2.0",
     "react-toastify": "^11.0.2",
     "sanitize-html": "^2.14.0",
-    "typed.js": "^2.1.0"
+    "typed.js": "^2.1.0",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

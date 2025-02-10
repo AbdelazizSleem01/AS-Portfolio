@@ -77,8 +77,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Abdelaziz Sleem | Fullstack Developer",
     description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB.",
-    images: ["/thumbnail.png"],
-    creator: "@yourtwitterhandle"
+    creator: "@Abdelaziz Sleem"
   },
   robots: {
     index: true,
@@ -95,8 +94,6 @@ export const metadata = {
   },
 
 };
-
-
 
 
 export default function RootLayout({ children }) {

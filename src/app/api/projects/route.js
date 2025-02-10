@@ -6,7 +6,7 @@ import sanitizeHtml from 'sanitize-html';
 
 // Configuration constants
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 50MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
 
