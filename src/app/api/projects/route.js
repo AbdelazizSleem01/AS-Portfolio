@@ -4,6 +4,14 @@ import connectDB from '../../../../lib/mongodb';
 import Project from '../../../../models/Project';
 import sanitizeHtml from 'sanitize-html';
 
+let dbConnection;
+async function getDBConnection() {
+  if (!dbConnection) {
+    dbConnection = await connectDB();
+  }
+  return dbConnection;
+}
+
 export async function POST(req) {
   try {
     const formData = await req.formData();
@@ -15,19 +23,14 @@ export async function POST(req) {
     const imageFile = formData.get('image');
     const category = formData.get('category');
 
-    if (!title || !rawDescription || !imageFile || !category) {
-      throw new Error('Title, description, image, and category are required.');
+    if (!title?.trim() || !rawDescription?.trim() || !imageFile || !category?.trim()) {
+      return NextResponse.json({ error: 'Title, description, image, and category are required.' }, { status: 400 });
     }
 
-    // Start DB connection early
-    const dbPromise = connectDB();
+    const dbPromise = getDBConnection();
 
-    // Sanitize HTML description
     const description = sanitizeHtml(rawDescription, {
-      allowedTags: [
-        'b', 'i', 'em', 'strong', 'a', 'p', 'span', 'img',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'br', 'u', 'mark'
-      ],
+      allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'span', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'br', 'u', 'mark'],
       allowedAttributes: {
         span: ['style', 'class'],
         a: ['href', 'target', 'rel'],
@@ -48,40 +51,30 @@ export async function POST(req) {
           'text-align': [/^left$/, /^right$/, /^center$/, /^justify$/],
           'font-size': [/^[0-9]+(px|em|%)$/],
           'line-height': [/^[0-9]+(px|em|%)$/],
-          color: [
-            /^#[0-9A-Fa-f]{6}$/,
-            /^rgb\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*\)$/,
-          ],
-          'background-color': [
-            /^#[0-9A-Fa-f]{6}$/,
-            /^rgb\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*\)$/,
-          ],
+          color: [/^#[0-9A-Fa-f]{6}$/, /^rgb\((\s*\d{1,3}%?,\s*){2}\d{1,3}%?\)$/],
+          'background-color': [/^#[0-9A-Fa-f]{6}$/, /^rgb\((\s*\d{1,3}%?,\s*){2}\d{1,3}%?\)$/],
           'text-decoration': [/^underline$/],
         },
       },
     });
 
-    // Process files in parallel
     const [imageResult, videoResult] = await Promise.all([
       (async () => {
+        if (!imageFile.type.startsWith('image/')) {
+          throw new Error('Invalid image format.');
+        }
         const buffer = await imageFile.arrayBuffer();
-        return put(
-          `projectsImages/${Date.now()}-${imageFile.name}`,
-          Buffer.from(buffer),
-          { access: 'public', contentType: imageFile.type }
-        );
+        return put(`projectsImages/${Date.now()}-${imageFile.name}`, Buffer.from(buffer), { access: 'public', contentType: imageFile.type });
       })(),
       videoFile ? (async () => {
+        if (!videoFile.type.startsWith('video/')) {
+          throw new Error('Invalid video format.');
+        }
         const buffer = await videoFile.arrayBuffer();
-        return put(
-          `projectsVideos/${Date.now()}-${videoFile.name}`,
-          Buffer.from(buffer),
-          { access: 'public', contentType: videoFile.type }
-        );
-      })() : null
+        return put(`projectsVideos/${Date.now()}-${videoFile.name}`, Buffer.from(buffer), { access: 'public', contentType: videoFile.type });
+      })() : null,
     ]);
 
-    // Wait for DB connection
     await dbPromise;
 
     const newProject = await Project.create({
@@ -94,29 +87,23 @@ export async function POST(req) {
       category,
     });
 
-    return NextResponse.json(
-      { message: 'Project Created Successfully', project: newProject },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: 'Project Created Successfully', project: newProject }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/projects:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create project' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || 'Failed to create project' }, { status: 500 });
   }
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
-    await connectDB();
-    const projects = await Project.find().sort({ createdAt: -1 });
+    await getDBConnection();
+    const limit = parseInt(req.nextUrl.searchParams.get('limit')) || 10;
+    const skip = parseInt(req.nextUrl.searchParams.get('skip')) || 0;
+
+    const projects = await Project.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
     return NextResponse.json({ projects }, { status: 200 });
   } catch (error) {
-    console.error('Error in GET /api/projects:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch projects' },
-      { status: 500 }
-    );
+    console.error('Error fetching projects:', error);
+    return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
   }
 }

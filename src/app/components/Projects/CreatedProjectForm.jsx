@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { motion } from 'framer-motion';
@@ -17,7 +17,7 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Document from '@tiptap/extension-document';
 import TextAlign from '@tiptap/extension-text-align';
 import TextToolbar from '../TextToolbar';
-import { ChevronDown, Shapes } from 'lucide-react';
+import { ArrowLeftIcon, ChevronDown, Shapes } from 'lucide-react';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { FontSize } from '../FontSize';
 
@@ -37,9 +37,12 @@ export default function CreatedProjectForm() {
 
     const router = useRouter();
     const { user } = useUser();
+
     const { data: categoryData } = useSWR('/api/categories', fetcher, {
-        revalidateOnFocus: false,
+        suspense: true,
+        fallbackData: { categories: [] }
     });
+
 
     useEffect(() => {
         document.title = `Create Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -76,16 +79,16 @@ export default function CreatedProjectForm() {
             if (videoPreview) URL.revokeObjectURL(videoPreview);
         };
     }, [imagePreview, videoPreview]);
-
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            if (imagePreview) URL.revokeObjectURL(imagePreview);
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreview(previewUrl);
-            setImage(file);
-        }
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => setImagePreview(event.target.result);
+        reader.readAsDataURL(file);
+        setImage(file);
     };
+
 
     const handleVideoChange = (e) => {
         const file = e.target.files[0];
@@ -97,10 +100,11 @@ export default function CreatedProjectForm() {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        if (!title || !editor?.getHTML() || !image) return;
 
+        setIsLoading(true);
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', editor.getHTML());
@@ -123,12 +127,13 @@ export default function CreatedProjectForm() {
                 toast.error("Failed to create project!");
             }
         } catch (error) {
-            console.error('Error creating project:', error);
-            toast.error("An unexpected error occurred!");
+            console.error(error);
+            toast.error("Unexpected error!");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [title, liveLink, githubLink, category, image, video, editor]);
+
 
     if (!user) return <RedirectToSignIn />;
 
@@ -378,9 +383,9 @@ export default function CreatedProjectForm() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
                 >
-                    <Link href="/admin">
-                        <button className="text-lg bg-primary p-4 w-full text-white font-medium rounded-md hover:bg-primary/80">
-                            Go to Panel List
+                    <Link href="/admin" >
+                        <button className=" flex item-center gap-2 justify-center text-lg bg-primary p-4 w-full text-white font-medium rounded-full px-12 hover:bg-primary/80 transition-colors">
+                            <ArrowLeftIcon /> Go to Panel List
                         </button>
                     </Link>
                 </motion.div>
