@@ -10,7 +10,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
-  title: "Abdelaziz Sleem | Fullstack Developer",
+  title: {
+    default:"Abdelaziz Sleem | Fullstack Developer",
+    template:"Abdelaziz Sleem | Fullstack Developer",
+  },
   description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB. Freelance Developer creating responsive, user-friendly websites.",
   applicationName: "Abdelaziz Sleem Portfolio",
   metadataBase: new URL("https://as-portfolio-ten.vercel.app/"),

@@ -1,12 +1,11 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { motion } from 'framer-motion';
-import useSWR from 'swr';
 import StarterKit from '@tiptap/starter-kit';
 import TextColor from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
@@ -15,15 +14,15 @@ import Underline from '@tiptap/extension-underline';
 import Text from '@tiptap/extension-text';
 import Paragraph from '@tiptap/extension-paragraph';
 import Document from '@tiptap/extension-document';
+import Heading from '@tiptap/extension-heading';
 import TextAlign from '@tiptap/extension-text-align';
-import TextToolbar from '../TextToolbar';
-import { ArrowLeftIcon, ChevronDown, Shapes } from 'lucide-react';
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { FontSize } from '../FontSize';
-
-const fetcher = (...args) => fetch(...args).then(res => res.json());
+import TextToolbar from '../TextToolbar';
+import { ChevronDown, MoveLeft, Shapes } from 'lucide-react';
+import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 
 export default function CreatedProjectForm() {
+    // All state hooks are called unconditionally
     const [title, setTitle] = useState('');
     const [liveLink, setLiveLink] = useState('');
     const [githubLink, setGithubLink] = useState('');
@@ -33,21 +32,21 @@ export default function CreatedProjectForm() {
     const [videoPreview, setVideoPreview] = useState(null);
     const [isClient, setIsClient] = useState(false);
     const [category, setCategory] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [isLoading, setIsLoading] = useState(false); // Loading state
 
     const router = useRouter();
+
     const { user } = useUser();
-
-    const { data: categoryData } = useSWR('/api/categories', fetcher, {
-        suspense: true,
-        fallbackData: { categories: [] }
-    });
-
 
     useEffect(() => {
         document.title = `Create Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-        document.querySelector('meta[name="description"]')
-            ?.setAttribute('content', `Create and share your projects with ${process.env.NEXT_PUBLIC_META_TITLE}.`);
+        document
+            .querySelector('meta[name="description"]')
+            ?.setAttribute(
+                'content',
+                `Create and share your projects with ${process.env.NEXT_PUBLIC_META_TITLE}.`
+            );
     }, []);
 
     const editor = useEditor({
@@ -55,87 +54,45 @@ export default function CreatedProjectForm() {
             Text,
             Paragraph,
             Document,
-            StarterKit.configure({
-                heading: {
-                    levels: [1, 2, 3, 4, 5, 6],
+            StarterKit,
+            TextColor,
+            TextStyle.configure({
+                HTMLAttributes: {
+                    style: 'font-size',
                 },
             }),
-            TextColor,
-            TextStyle,
             FontSize,
             Highlight.configure({ multicolor: true }),
             Underline,
+            Heading.configure({
+                levels: [1, 2, 3, 4, 5, 6],
+            }),
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
         ],
-        content: '<p>Write description</p>',
+        content: '<p> Write description </p>',
+        immediatelyRender: false,
+
     });
 
     useEffect(() => {
         setIsClient(true);
-        return () => {
-            if (imagePreview) URL.revokeObjectURL(imagePreview);
-            if (videoPreview) URL.revokeObjectURL(videoPreview);
-        };
-    }, [imagePreview, videoPreview]);
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    }, []);
 
-        const reader = new FileReader();
-        reader.onload = (event) => setImagePreview(event.target.result);
-        reader.readAsDataURL(file);
-        setImage(file);
-    };
-
-
-    const handleVideoChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (videoPreview) URL.revokeObjectURL(videoPreview);
-            const previewUrl = URL.createObjectURL(file);
-            setVideoPreview(previewUrl);
-            setVideo(file);
-        }
-    };
-
-    const handleSubmit = useCallback(async (e) => {
-        e.preventDefault();
-        if (!title || !editor?.getHTML() || !image) return;
-
-        setIsLoading(true);
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', editor.getHTML());
-        formData.append('liveLink', liveLink);
-        formData.append('githubLink', githubLink);
-        formData.append('category', category);
-        formData.append('image', image);
-        if (video) formData.append('video', video);
-
-        try {
-            const response = await fetch('/api/projects', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (response.ok) {
-                toast.success("Project created successfully!");
-                router.push("/allProjects");
-            } else {
-                toast.error("Failed to create project!");
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch(`/api/categories`);
+                const data = await res.json();
+                setCategories(data.categories);
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
             }
-        } catch (error) {
-            console.error(error);
-            toast.error("Unexpected error!");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [title, liveLink, githubLink, category, image, video, editor]);
+        };
 
-
-    if (!user) return <RedirectToSignIn />;
+        fetchCategories();
+    }, []);
 
     if (!isClient || !editor) {
         return (
@@ -143,22 +100,86 @@ export default function CreatedProjectForm() {
                 className="flex flex-col items-center justify-center h-screen gap-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
             >
                 <motion.div
                     className="w-12 h-12 border-4 border-t-4 border-primary rounded-full"
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1 }}
+                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                 />
-                <span className="text-primary text-lg">Loading...</span>
+                <motion.span className="text-primary text-lg">
+                    Loading...
+                </motion.span>
             </motion.div>
         );
     }
+
+    // Handlers for image and video file changes
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+        }
+    };
+
+    const handleVideoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setVideo(file);
+            const previewUrl = URL.createObjectURL(file);
+            setVideoPreview(previewUrl);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true); // Start loading
+
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', editor.getHTML());
+        formData.append('liveLink', liveLink);
+        formData.append('githubLink', githubLink);
+        formData.append('category', category);
+        formData.append('image', image);
+        if (video) {
+            formData.append('video', video);
+        }
+
+        try {
+            const response = await fetch(`/api/projects`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Project Created:', data);
+                toast.success("Project created successfully!");
+                router.push("/allProjects");
+            } else {
+                console.error('Error creating project');
+                toast.error("Failed to create project!");
+            }
+        } catch (error) {
+            console.error('Error creating project:', error);
+            toast.error("An unexpected error occurred!");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const fieldVariant = {
         hidden: { opacity: 0, x: -20 },
         visible: { opacity: 1, x: 0 },
     };
 
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
 
     return (
         <>
@@ -268,23 +289,31 @@ export default function CreatedProjectForm() {
 
                         {/* Category Selection */}
                         <div className="mb-4 relative">
-                            <label className="flex items-center text-sm font-medium gap-2 mb-2 mt-6">
+                            <label htmlFor="category" className="flex items-center text-sm font-medium gap-2 mb-2 mt-6">
                                 Select Category <Shapes size={20} />
                             </label>
                             <select
+                                id="category"
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
                                 required
-                                className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md focus:ring-2 focus:ring-primary"
+                                className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md appearance-none focus:ring-2 focus:ring-primary focus:border-primary pr-10"
                             >
-                                <option value="" disabled>Select a Category</option>
-                                {categoryData?.categories?.map((cat) => (
-                                    <option key={cat._id} value={cat._id}>
+                                <option value="" disabled className=" bg-base-100 text-neutral">
+                                    Select a Category
+                                </option>
+                                {categories.map((cat) => (
+                                    <option
+                                        key={cat._id}
+                                        value={cat._id}
+                                        className="bg-primary py-2 text-white hover:bg-base-100"
+                                    >
                                         {cat.name}
                                     </option>
                                 ))}
                             </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 mt-10">
+                            {/* Custom dropdown arrow */}
+                            <div className="pointer-events-none absolute inset-y-0  right-0 flex items-center px-2 mt-10">
                                 <ChevronDown />
                             </div>
                         </div>
@@ -345,7 +374,7 @@ export default function CreatedProjectForm() {
                                     <video
                                         src={videoPreview}
                                         controls
-                                        className="mt-2 w-full sm:max-w-[90%] mx-auto rounded-md border border-primary p-4"
+                                        className="mt-2 max-w-full sm:max-w-[90%] mx-auto rounded-md border border-primary p-4"
                                     />
                                 </div>
                             )}
@@ -383,9 +412,9 @@ export default function CreatedProjectForm() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
                 >
-                    <Link href="/admin" >
-                        <button className=" flex item-center gap-2 justify-center text-lg bg-primary p-4 w-full text-white font-medium rounded-full px-12 hover:bg-primary/80 transition-colors">
-                            <ArrowLeftIcon /> Go to Panel List
+                    <Link href="/admin">
+                        <button className="flex item-center gap-2 px-12 text-lg bg-primary p-4 w-full text-white font-medium rounded-full hover:bg-primary/80">
+                            <MoveLeft /> Go to Panel List
                         </button>
                     </Link>
                 </motion.div>
