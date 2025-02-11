@@ -1,14 +1,22 @@
-import connectDB from "../../../lib/mongodb";
-import Visitor from "../../../models/Visits";
+"use client";
+import { useEffect, useState } from "react";
 
-export default async function VisitCount() {
-  await connectDB();
-  const visitCount = await Visitor.countDocuments();
-  const visitors = await Visitor.find().sort({ visitedAt: -1 }).limit(10); // Get latest 10 visitors
+export default function VisitCount() {
+  const [visitors, setVisitors] = useState([]);
+
+  useEffect(() => {
+    async function fetchVisitors() {
+      const res = await fetch("/api/visit");
+      const data = await res.json();
+      setVisitors(data);
+    }
+
+    fetchVisitors();
+  }, []);
 
   return (
-    <div className="p-6 mt-20 min-h-screen">
-      <h1 className="text-2xl font-bold">Total Visits: {visitCount}</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Recent Visitors</h1>
       <table className="w-full mt-4 border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
