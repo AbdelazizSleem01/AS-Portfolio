@@ -3,10 +3,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useEditor, EditorContent } from '@tiptap/react';
-import { motion } from 'framer-motion';
-import useSWR from 'swr';
+import { motion, useAnimation } from 'framer-motion';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
-import { ChevronDown, Shapes, Loader2, Trash2, Save, Link } from 'lucide-react';
+import { ChevronDown, Shapes, Loader2, Trash2, Save, Link, MoveLeft } from 'lucide-react';
 import StarterKit from '@tiptap/starter-kit';
 import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
@@ -16,14 +15,13 @@ import TextColor from '@tiptap/extension-color';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
 
-const fetcher = (...args) => fetch(...args).then(res => res.json());
-
 const fieldVariant = {
   hidden: { opacity: 0, x: -20 },
   visible: { opacity: 1, x: 0 },
 };
 
 export default function UpdateProjectForm() {
+  const controls = useAnimation(); // Initialize animation controls
   const { id } = useParams();
   const { user } = useUser();
   const router = useRouter();
@@ -31,11 +29,18 @@ export default function UpdateProjectForm() {
   const [previews, setPreviews] = useState({ image: null, video: null });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [projectData, setProjectData] = useState(null); // Local state for form data
-
-  const { data: project, error, isLoading } = useSWR(`/api/projects/${id}`, fetcher, {
-    revalidateOnFocus: false,
+  const [categories, setCategories] = useState([]);
+  const [projectData, setProjectData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    liveLink: '',
+    githubLink: '',
+    videoLink: ''
   });
+
+
+
 
   const editor = useEditor({
     extensions: [
@@ -58,19 +63,35 @@ export default function UpdateProjectForm() {
         'content',
         `Update your project details on ${process.env.NEXT_PUBLIC_META_TITLE}`
       );
-  }, []);
 
-  // Initialize local state when project data loads
-  useEffect(() => {
-    if (project) {
-      setProjectData(project);
-      editor?.commands.setContent(project.description);
-      setPreviews({
-        image: project.imageUrl,
-        video: project.videoLink,
-      });
-    }
-  }, [project, editor]);
+
+    const fetchData = async () => {
+      try {
+        const [projectRes, categoriesRes] = await Promise.all([
+          fetch(`/api/projects/${id}`),
+          fetch('/api/categories')
+        ]);
+
+        const project = await projectRes.json();
+        const categoriesData = await categoriesRes.json();
+
+        setProjectData({
+          ...project,
+          videoLink: project.videoLink || ''
+        });
+        setCategories(categoriesData.categories);
+        editor?.commands.setContent(project.description);
+        setPreviews({
+          image: project.imageUrl,
+          video: project.videoLink || project.videoUrl
+        });
+      } catch (error) {
+        toast.error('Failed to load project data');
+      }
+    };
+
+    fetchData();
+  }, [id, editor]);
 
   const handleFile = useCallback((type, file) => {
     if (!file) return;
@@ -79,12 +100,28 @@ export default function UpdateProjectForm() {
     const preview = URL.createObjectURL(file);
     setFiles(prev => ({ ...prev, [type]: file }));
     setPreviews(prev => ({ ...prev, [type]: preview }));
+
+    if (type === 'video') {
+      setProjectData(prev => ({ ...prev, videoLink: '' }));
+    }
   }, [previews]);
 
-  useEffect(() => () => {
-    Object.values(previews).forEach(url => url && URL.revokeObjectURL(url));
-  }, [previews]);
+  const handleVideoUrlChange = useCallback((value) => {
+    setProjectData(prev => ({
+      ...prev,
+      videoLink: value,
+    }));
+    setFiles(prev => ({ ...prev, video: null }));
+    setPreviews(prev => ({ ...prev, video: value }));
+  }, []);
 
+  const handleVideoFileChange = useCallback((file) => {
+    if (file) {
+      setFiles(prev => ({ ...prev, video: file }));
+      setProjectData(prev => ({ ...prev, videoLink: '' }));
+      setPreviews(prev => ({ ...prev, video: URL.createObjectURL(file) }));
+    }
+  }, []);
   const handleInputChange = useCallback((field, value) => {
     setProjectData(prev => ({
       ...prev,
@@ -104,7 +141,11 @@ export default function UpdateProjectForm() {
       formData.append('liveLink', projectData.liveLink);
       formData.append('githubLink', projectData.githubLink);
       if (files.image) formData.append('image', files.image);
-      if (files.video) formData.append('video', files.video);
+      if (projectData.videoLink) {
+        formData.append('videoLink', projectData.videoLink);
+      } else if (files.video) {
+        formData.append('video', files.video);
+      }
 
       const response = await fetch(`/api/projects/${id}`, {
         method: 'PUT',
@@ -138,8 +179,7 @@ export default function UpdateProjectForm() {
   };
 
   if (!user) return <RedirectToSignIn />;
-  if (error) return <div>Failed to load project</div>;
-  if (isLoading || !projectData) return <LoadingSpinner />;
+  if (!projectData.title) return <LoadingSpinner />;
 
   return (
     <motion.div
@@ -157,14 +197,13 @@ export default function UpdateProjectForm() {
       >
         <motion.h2
           className="text-2xl font-semibold text-center mb-6"
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
+          variants={fieldVariant}
           transition={{ duration: 0.5 }}
         >
           Update Project
         </motion.h2>
 
-        <FormSection title="Title" variants={fieldVariant}>
+        <FormSection title="Title" variants={fieldVariant} transition={{ delay: 0.1 }}>
           <input
             value={projectData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
@@ -173,7 +212,7 @@ export default function UpdateProjectForm() {
           />
         </FormSection>
 
-        <FormSection title="Description" variants={fieldVariant} transition={{ delay: 0.1 }}>
+        <FormSection title="Description" variants={fieldVariant} transition={{ delay: 0.2 }}>
           <EditorContent
             editor={editor}
             className="w-full bg-neutral/10 p-3 mt-1 input-bordered rounded-md"
@@ -181,7 +220,7 @@ export default function UpdateProjectForm() {
           <TextToolbar editor={editor} />
         </FormSection>
 
-        <FormSection title="Live Link" variants={fieldVariant} transition={{ delay: 0.2 }}>
+        <FormSection title="Live Link" variants={fieldVariant} transition={{ delay: 0.3 }}>
           <input
             type="url"
             value={projectData.liveLink}
@@ -190,7 +229,7 @@ export default function UpdateProjectForm() {
           />
         </FormSection>
 
-        <FormSection title="GitHub Link" variants={fieldVariant} transition={{ delay: 0.3 }}>
+        <FormSection title="GitHub Link" variants={fieldVariant} transition={{ delay: 0.4 }}>
           <input
             type="url"
             value={projectData.githubLink}
@@ -199,14 +238,31 @@ export default function UpdateProjectForm() {
           />
         </FormSection>
 
-        <FormSection title="Category" variants={fieldVariant} transition={{ delay: 0.4 }}>
-          <CategorySelect
-            value={projectData.category}
-            onChange={value => handleInputChange('category', value)}
-          />
+        <FormSection title="Category" variants={fieldVariant} transition={{ delay: 0.5 }}>
+          <div className="relative">
+            <select
+              value={projectData.category}
+              onChange={(e) => handleInputChange('category', e.target.value)}
+              className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md appearance-none focus:ring-2 focus:ring-primary pr-10"
+            >
+              <option value="" disabled className="bg-base-100 text-neutral">
+                Select a Category
+              </option>
+              {categories.map(cat => (
+                <option
+                  key={cat._id}
+                  value={cat._id}
+                  className="bg-primary py-2 text-white hover:bg-base-100"
+                >
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
+          </div>
         </FormSection>
 
-        <FormSection title="Image" variants={fieldVariant} transition={{ delay: 0.5 }}>
+        <FormSection title="Image" variants={fieldVariant} transition={{ delay: 0.6 }}>
           <FileUpload
             preview={previews.image}
             onFileChange={file => handleFile('image', file)}
@@ -214,19 +270,57 @@ export default function UpdateProjectForm() {
           />
         </FormSection>
 
-        <FormSection title="Video" variants={fieldVariant} transition={{ delay: 0.6 }}>
-          <FileUpload
-            preview={previews.video}
-            onFileChange={file => handleFile('video', file)}
-            accept="video/*"
-            isVideo
-          />
+        <FormSection title="Video" variants={fieldVariant} transition={{ delay: 0.7 }}>
+          <div className="">
+            <div>
+              <label className="block text-sm font-medium mb-2">Video File</label>
+              <FileUpload
+                preview={previews.video}
+                onFileChange={handleVideoFileChange}
+                accept="video/*"
+                isVideo
+              />
+            </div>
+            <div className="text-center text-lg text-primary my-3">or</div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Video URL</label>
+              <input
+                type="url"
+                value={projectData.videoLink}
+                onChange={(e) => handleVideoUrlChange(e.target.value)}
+                placeholder="Paste video URL (e.g., YouTube, Vimeo)"
+                className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md"
+              />
+            </div>
+            {projectData.videoLink && (
+              <div className="mt-4 h-[350px] overflow-hidden">
+                <p className="text-sm">Video Preview:</p>
+                {(projectData.videoLink?.startsWith("https://www.youtube") ||
+                  projectData.videoLink?.startsWith("https://youtu.be") ||
+                  projectData.videoLink?.startsWith("https://www.awesomescreenshot.com/")) ? (
+                  <iframe
+                    src={projectData.videoLink}
+                    className="mt-2 w-[90%] mx-auto h-[350px] rounded-md border border-primary "
+                    allowFullScreen
+                  >
+                    
+                  </iframe>
+                ) : (
+                  <video
+                    controls
+                    src={projectData.videoLink}
+                    className="mt-2 w-full rounded-md border border-primary"
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </FormSection>
 
         <motion.div
           className="flex justify-between mt-6"
           variants={fieldVariant}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.8 }}
         >
           <motion.button
             type="button"
@@ -282,11 +376,11 @@ export default function UpdateProjectForm() {
         className="w-full flex justify-center items-center my-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
+        transition={{ delay: 0.9, duration: 0.5 }}
       >
         <Link href="/admin">
-          <button className="text-lg bg-primary p-4 w-full text-white font-medium rounded-md hover:bg-primary/80 transition-colors">
-            Go to Panel List
+          <button className="flex item-center gap-2 px-12 text-lg bg-primary p-4 w-full text-white font-medium rounded-full hover:bg-primary/80">
+            <MoveLeft /> Go to Panel List
           </button>
         </Link>
       </motion.div>
@@ -320,33 +414,6 @@ const FormSection = ({ title, children, variants, transition }) => (
   </motion.div>
 );
 
-const CategorySelect = ({ value, onChange }) => {
-  const { data } = useSWR('/api/categories', fetcher);
-
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md appearance-none focus:ring-2 focus:ring-primary pr-10"
-      >
-        <option value="" disabled className="bg-base-100 text-neutral">
-          Select a Category
-        </option>
-        {data?.categories?.map(cat => (
-          <option
-            key={cat._id}
-            value={cat._id}
-            className="bg-primary py-2 text-white hover:bg-base-100"
-          >
-            {cat.name}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
-    </div>
-  );
-};
 
 const FileUpload = ({ preview, onFileChange, accept, isVideo }) => (
   <>

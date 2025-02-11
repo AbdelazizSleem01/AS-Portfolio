@@ -27,13 +27,14 @@ export default function CreatedProjectForm() {
     const [liveLink, setLiveLink] = useState('');
     const [githubLink, setGithubLink] = useState('');
     const [image, setImage] = useState(null);
-    const [video, setVideo] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [video, setVideo] = useState(null);
     const [videoPreview, setVideoPreview] = useState(null);
-    const [isClient, setIsClient] = useState(false);
+    const [videoLink, setVideoLink] = useState("");
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
-    const [isLoading, setIsLoading] = useState(false); // Loading state
+    const [isLoading, setIsLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     const router = useRouter();
 
@@ -55,7 +56,9 @@ export default function CreatedProjectForm() {
             Paragraph,
             Document,
             StarterKit,
-            TextColor,
+            TextColor.configure(
+                
+            ),
             TextStyle.configure({
                 HTMLAttributes: {
                     style: 'font-size',
@@ -76,9 +79,7 @@ export default function CreatedProjectForm() {
 
     });
 
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
+
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -94,7 +95,7 @@ export default function CreatedProjectForm() {
         fetchCategories();
     }, []);
 
-    if (!isClient || !editor) {
+    if (!editor) {
         return (
             <motion.div
                 className="flex flex-col items-center justify-center h-screen gap-4"
@@ -114,62 +115,80 @@ export default function CreatedProjectForm() {
         );
     }
 
-    // Handlers for image and video file changes
+    // Image change handler
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setImage(file);
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreview(previewUrl);
+            setImagePreview(URL.createObjectURL(file));
         }
     };
 
+    // Video file change handler
     const handleVideoChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setVideo(file);
-            const previewUrl = URL.createObjectURL(file);
-            setVideoPreview(previewUrl);
+            setVideoLink("");
+            setVideoPreview(URL.createObjectURL(file));
         }
+    };
+
+    // Video URL change handler
+    const handleVideoUrlChange = (e) => {
+        const url = e.target.value;
+        setVideoLink(url);
+        setVideo(null);
+        setVideoPreview(url);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true); // Start loading
+        setIsLoading(true);
+        setProgress(0);
 
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', editor.getHTML());
-        formData.append('liveLink', liveLink);
-        formData.append('githubLink', githubLink);
-        formData.append('category', category);
-        formData.append('image', image);
-        if (video) {
-            formData.append('video', video);
-        }
+        formData.append("title", title);
+        formData.append("description", editor.getHTML());
+        formData.append("liveLink", liveLink);
+        formData.append("githubLink", githubLink);
+        formData.append("category", category);
+        if (image) formData.append("image", image);
+        if (video) formData.append("video", video);
+        if (videoLink) formData.append("videoLink", videoLink);
+
+        // Simulate progress bar
+        const interval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    return 100;
+                }
+                return prev + 10;
+            });
+        }, 100);
 
         try {
-            const response = await fetch(`/api/projects`, {
-                method: 'POST',
+            const response = await fetch("/api/projects", {
+                method: "POST",
                 body: formData,
             });
 
             if (response.ok) {
-                const data = await response.json();
-                console.log('Project Created:', data);
                 toast.success("Project created successfully!");
                 router.push("/allProjects");
             } else {
-                console.error('Error creating project');
                 toast.error("Failed to create project!");
             }
         } catch (error) {
-            console.error('Error creating project:', error);
+            console.error("Error creating project:", error);
             toast.error("An unexpected error occurred!");
         } finally {
+            clearInterval(interval);
             setIsLoading(false);
         }
     };
+
 
     const fieldVariant = {
         hidden: { opacity: 0, x: -20 },
@@ -350,35 +369,43 @@ export default function CreatedProjectForm() {
                         </motion.div>
 
                         {/* Video Upload */}
-                        <motion.div
-                            className="mb-4"
-                            variants={fieldVariant}
-                            initial="hidden"
-                            animate="visible"
-                            transition={{ delay: 0.6 }}
-                        >
-                            <label htmlFor="video" className="block text-sm label font-medium">
-                                Upload Video
-                            </label>
-                            <input
-                                accept="video/*"
-                                id="video"
-                                type="file"
-                                onChange={handleVideoChange}
-                                required
-                                className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
+                        <label className="block text-sm font-medium mb-2">Video File</label>
+                        <input
+                            accept="video/*"
+                            type="file"
+                            onChange={handleVideoChange}
+                            className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
+                        />
+
+                        <div className="text-center text-lg text-primary my-3">or</div>
+
+                        <label className="block text-sm font-medium mb-2">Video URL</label>
+                        <input
+                            type="url"
+                            value={videoLink}
+                            onChange={handleVideoUrlChange}
+                            placeholder="Paste video URL (e.g., YouTube, Vimeo)"
+                            className="w-full bg-neutral/10 p-3 mt-1 mb-8 input input-bordered rounded-md"
                             />
-                            {videoPreview && (
-                                <div className="mt-4">
-                                    <p className="text-sm">Selected Video Preview:</p>
-                                    <video
+
+                        {videoPreview && (
+                            <div className="my-4 ">
+                                <p className="text-sm">Video Preview:</p>
+                                {videoPreview.includes("https://studio.youtube.com/") || videoPreview.includes("awesomescreenshot") ? (
+                                    <iframe
                                         src={videoPreview}
-                                        controls
-                                        className="mt-2 max-w-full sm:max-w-[90%] mx-auto rounded-md border border-primary p-4"
-                                    />
-                                </div>
-                            )}
-                        </motion.div>
+                                        width="100%"
+                                        height="500px"
+                                        className="border-2 border-primary overflow-hidden rounded-lg p-4"
+                                    ></iframe>
+                                ) : (
+                                    <video width="100%" height="500px" controls>
+                                        <source src={videoPreview} />
+                                    </video>
+                                )}
+                            </div>
+                        )}
+
 
                         {/* Submit Button */}
                         <motion.div
@@ -401,6 +428,15 @@ export default function CreatedProjectForm() {
                                     "Create Project"
                                 )}
                             </button>
+                            {isLoading && (
+                                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                                    <motion.div
+                                        className="h-2 bg-primary rounded-full"
+                                        animate={{ width: `${progress}%` }}
+                                        transition={{ ease: "linear", duration: 1 }}
+                                    />
+                                </div>
+                            )}
                         </motion.div>
                     </form>
                 </motion.div>

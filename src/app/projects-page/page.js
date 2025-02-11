@@ -292,12 +292,17 @@ const PageOfProjects = () => {
               </div>
 
               {currentProject.videoLink && (
-                <div className="aspect-video bg-gray-800 rounded-xl overflow-hidden mb-6">
-                  <video
+                <div className="aspect-video rounded-xl overflow-hidden mb-6">
+                  <motion.iframe
                     controls
-                    className="w-full h-full object-contain"
+                    className="w-[100%] h-[100%] rounded-xl mx-auto mb-4 border-[3px] border-primary overflow-hidden"
                     src={currentProject.videoLink}
-                  />
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    Your browser does not support the video tag.
+                  </motion.iframe>
                 </div>
               )}
 

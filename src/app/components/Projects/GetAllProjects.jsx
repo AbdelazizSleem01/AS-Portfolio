@@ -274,20 +274,23 @@ const GetProjects = () => {
                             />
 
                             {currentProject.videoLink && (
-                                <motion.video
-                                    controls
-                                    className="w-full sm:w-[55%] rounded-md mx-auto mb-4"
-                                    src={currentProject.videoLink}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                >
-                                    Your browser does not support the video tag.
-                                </motion.video>
+                                <div className="w-full mt-4 h-[350px]">
+                                    <motion.iframe
+                                        controls
+                                        allowFullScreen
+                                        className="w-[80%] h-[350px] rounded-md mx-auto mb-16 border-[3px] border-primary overflow-hidden"
+                                        src={currentProject.videoLink}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.2 }}
+                                    >
+                                        Your browser does not support the video tag.
+                                    </motion.iframe>
+                                </div>
                             )}
                             {currentProject.imageUrl && (
                                 <motion.img
-                                    className="object-contain w-full sm:w-[80%] mx-auto rounded-lg border border-primary"
+                                    className="object-contain w-full sm:w-[80%] mt-4 mx-auto rounded-lg border border-primary"
                                     src={currentProject.imageUrl}
                                     alt={currentProject.title}
                                     initial={{ opacity: 0 }}

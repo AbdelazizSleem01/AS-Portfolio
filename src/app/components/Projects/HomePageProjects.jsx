@@ -187,7 +187,7 @@ const HomePageProjects = () => {
           >
             <button
               onClick={closeDetails}
-              className="absolute top-4 right-4"
+              className="fixed top-10 right-[28%] bg-primary rounded-full"
             >
               <Image width={35} height={35} src={'/imgs/close.png'} alt="close-icon" className="close-img" />
             </button>
@@ -195,21 +195,24 @@ const HomePageProjects = () => {
             <p className="text-gray-700 mb-4" dangerouslySetInnerHTML={{ __html: currentProject.description }}></p>
 
             {currentProject.videoLink && (
-              <motion.video
-                controls
-                className="w-full  sm:w-[80%] rounded-md mx-auto mb-4"
-                src={currentProject.videoLink}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                Your browser does not support the video tag.
-              </motion.video>
+              <div className="aspect-video rounded-xl overflow-hidden mb-6">
+                <motion.iframe
+                  controls
+                  className="w-[90%] h-[100%] rounded-xl mx-auto mb-4 border-[3px] border-primary overflow-hidden"
+                  src={currentProject.videoLink}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  autoFocus
+                >
+                  Your browser does not support the video tag.
+                </motion.iframe>
+              </div>
             )}
             {currentProject.imageUrl && (
               <Link href={currentProject.imageUrl} target="_blank" rel="noopener noreferrer">
                 <motion.img
-                  className="object-contain w-full sm:w-[80%] mx-auto rounded-lg border border-primary"
+                  className="object-contain w-full sm:w-[90%] mx-auto rounded-lg border-[3px]  border-primary"
                   src={currentProject.imageUrl}
                   alt={currentProject.title}
                   initial={{ opacity: 0 }}
