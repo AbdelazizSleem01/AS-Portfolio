@@ -1,45 +1,36 @@
-"use client";
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import connectDB from "../../../lib/mongodb";
+import Visitor from "../../../models/Visits";
 
-export default function VisitCounter() {
-  const [visitCount, setVisitCount] = useState(0);
-
-  const { user } = useUser();
-
-  if (!user) {
-    return <RedirectToSignIn />;
-
-  }
-
-  useEffect(() => {
-    fetch('/api/visit')
-      .then((response) => response.json())
-      .then((data) => setVisitCount(data.count))
-      .catch((error) => console.error('Error tracking visit:', error));
-  }, []);
-
-  useEffect(() => {
-    document.title = `All Visits | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        'content',
-        `A personal and creative portfolio website showcasing my projects, skills, and experiences. Visit count: ${visitCount}`
-      );
-
-    document.querySelector('meta[name="keywords"]')?.setAttribute(
-      'content',
-      'portfolio, developer, web developer, software engineer, junior developer, full stack developer'
-    );
-  }, [visitCount]);
+export default async function VisitCount() {
+  await connectDB();
+  const visitCount = await Visitor.countDocuments();
+  const visitors = await Visitor.find().sort({ visitedAt: -1 }).limit(10); // Get latest 10 visitors
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center">
-      <h2 className="text-3xl font-bold text-neutral">Welcome to My Portfolio! 🚀</h2>
-      <div className="mt-4 px-6 py-3 bg-gradient-to-r from-primary to-black text-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-semibold">Total Visits: {visitCount}</h1>
-      </div>
+    <div className="p-6 mt-20 min-h-screen">
+      <h1 className="text-2xl font-bold">Total Visits: {visitCount}</h1>
+      <table className="w-full mt-4 border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border border-gray-300 p-2">Email</th>
+            <th className="border border-gray-300 p-2">IP</th>
+            <th className="border border-gray-300 p-2">Country</th>
+            <th className="border border-gray-300 p-2">City</th>
+            <th className="border border-gray-300 p-2">Visited At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {visitors.map((visitor, index) => (
+            <tr key={index} className="text-center border border-gray-300">
+              <td className="border border-gray-300 p-2">{visitor.email}</td>
+              <td className="border border-gray-300 p-2">{visitor.ip}</td>
+              <td className="border border-gray-300 p-2">{visitor.country}</td>
+              <td className="border border-gray-300 p-2">{visitor.city}</td>
+              <td className="border border-gray-300 p-2">{visitor.visitedAt}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
