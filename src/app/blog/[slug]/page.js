@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowBigLeft } from 'lucide-react';
+import DOMPurify from 'dompurify';
 
 const fadeIn = {
   hidden: { opacity: 0 },
@@ -20,7 +21,6 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const params = useParams();
-
 
   useEffect(() => {
     const controller = new AbortController();
@@ -62,7 +62,6 @@ export default function PostPage() {
     }
   }, [post]);
 
-
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-8">
@@ -94,8 +93,6 @@ export default function PostPage() {
     );
   }
 
-
-
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center p-8">
@@ -107,6 +104,9 @@ export default function PostPage() {
       </div>
     );
   }
+
+  // Sanitize the HTML content using DOMPurify
+  const cleanHTML = DOMPurify.sanitize(post.content || '<p>Content not available</p>');
 
   return (
     <motion.div
@@ -120,7 +120,7 @@ export default function PostPage() {
           {/* Cover Image with Fallback */}
           <motion.figure
             variants={slideUp}
-            className="mb-8   overflow-hidden shadow-lg"
+            className="mb-8 overflow-hidden shadow-lg"
           >
             <img
               src={post.coverImage}
@@ -186,10 +186,10 @@ export default function PostPage() {
               </p>
             )}
 
-            <div
-              dangerouslySetInnerHTML={{ __html: post.content || '<p>Content not available</p>' }}
-              className='mt-[-20px] px-10'
-            />
+            {/* Sanitized HTML Content */}
+            <div className="mt-[-20px] px-10">
+              <div dangerouslySetInnerHTML={{ __html: cleanHTML }} />
+            </div>
           </motion.section>
         </article>
       )}
