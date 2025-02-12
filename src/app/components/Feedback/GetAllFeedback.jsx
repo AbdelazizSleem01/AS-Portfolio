@@ -60,7 +60,7 @@ export default function FeedbackList({ feedbacks }) {
                 />
                 <div>
                   <h2 className="card-title text-base-100 text-lg font-bold">{feedback.name}</h2>
-                  <p className="text-sm text-base-100/50">{feedback.email}</p>
+                  {/* <p className="text-sm text-base-100/50">{feedback.email}</p> */}
                 </div>
               </div>
               <p className="mt-4 text-base-100/70 text-sm">{feedback.comment}</p>
