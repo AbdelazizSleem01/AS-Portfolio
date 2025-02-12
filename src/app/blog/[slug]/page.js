@@ -142,7 +142,7 @@ export default function PostPage() {
               )}
               <div>
                 <p className="text-base-100/80 text-sm">Author</p>
-                <p className="text-primary font-medium">{post.email}</p>
+                <p className="text-primary font-medium">{post.name}</p>
               </div>
             </motion.div>
             <motion.h1
@@ -188,7 +188,7 @@ export default function PostPage() {
 
             <div
               dangerouslySetInnerHTML={{ __html: post.content || '<p>Content not available</p>' }}
-              className='mt-[-20px]'
+              className='mt-[-20px] px-10'
             />
           </motion.section>
         </article>

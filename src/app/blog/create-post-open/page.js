@@ -19,7 +19,7 @@ const CreatePostPage = () => {
 
   const [formData, setFormData] = useState({
 
-    email: '',
+    name: '',
     title: '',
     content: '',
     slug: '',
@@ -36,7 +36,7 @@ const CreatePostPage = () => {
     setLoading(true);
 
     const formDataToSend = new FormData();
-    formDataToSend.append('email', formData.email);
+    formDataToSend.append('name', formData.name);
     formDataToSend.append('title', formData.title);
     formDataToSend.append('content', formData.content);
     formDataToSend.append('slug', formData.slug);
@@ -132,21 +132,21 @@ const CreatePostPage = () => {
             {error}
           </motion.div>
         )}
-        {/* Email Field */}
+        {/* name Field */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-4"
           variants={fieldVariant}>
           <label className="block text-sm label font-medium">
-            Email
+            Name
           </label>
           <input
-            type="email"
-            placeholder='Enter your email'
+            type="text"
+            placeholder='Enter your name'
             className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
 
 
           />
@@ -183,7 +183,7 @@ const CreatePostPage = () => {
         {/* Title Field */}
         <motion.div className="mb-4" variants={fieldVariant}>
           <label className="block text-sm label font-medium">
-            Title
+            Title of subject
           </label>
           <input
             type="text"

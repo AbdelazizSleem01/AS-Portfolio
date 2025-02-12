@@ -54,7 +54,7 @@ const AdminPostsPage = () => {
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    post.email.toLowerCase().includes(searchQuery.toLowerCase())
+    post.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Pagination calculations
@@ -262,7 +262,7 @@ const AdminPostsPage = () => {
                             />
                           )}
                           <div>
-                            <div className="text-sm font-medium text-primary">{post.email}</div>
+                            <div className="text-sm font-medium text-primary">{post.name}</div>
                             <div className="text-xs text-gray-500">Author</div>
                           </div>
                         </div>

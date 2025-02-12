@@ -1,17 +1,14 @@
 import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema({
-  email: {
+  name: {
     type: String,
-    required: [true, 'Email is required'],
-    match: [/.+\@.+\..+/, 'Please fill a valid email address'],
-    trim: true,
-    lowercase: true
+    required: [true, 'name is required'],
   },
   userImage: {
     type: String,
     required: [true, 'User image is required'],
-    default: '/imgs/Logo.png' // Add a default avatar
+    default: '/imgs/Logo.png' 
   },
   title: {
     type: String,

@@ -12,17 +12,16 @@ export async function POST(req) {
       if (!file) return '';
 
       try {
-        // Upload the image to Vercel Blob
         const { url } = await put(
-          `posts/${Date.now()}-${file.name}`, // Unique file path
-          Buffer.from(await file.arrayBuffer()), // File content
+          `posts/${Date.now()}-${file.name}`,
+          Buffer.from(await file.arrayBuffer()), 
           {
-            access: 'public', // Make the file publicly accessible
-            contentType: file.type, // Set the content type
+            access: 'public', 
+            contentType: file.type, 
           }
         );
 
-        return url; // Return the public URL of the uploaded image
+        return url; 
       } catch (error) {
         console.error('File upload error:', error);
         throw new Error('Failed to upload image');
@@ -31,7 +30,7 @@ export async function POST(req) {
 
     // Extract form data
     const postData = {
-      email: formData.get('email'),
+      name: formData.get('name'),
       title: formData.get('title'),
       content: formData.get('content'),
       slug: formData.get('slug'),
@@ -44,21 +43,12 @@ export async function POST(req) {
     };
 
     // Validate required fields
-    const requiredFields = ['email', 'title', 'slug', 'content'];
+    const requiredFields = [ 'name','title', 'slug', 'content'];
     const missingFields = requiredFields.filter((field) => !postData[field]);
 
     if (missingFields.length > 0) {
       return NextResponse.json(
         { error: `Missing required fields: ${missingFields.join(', ')}` },
-        { status: 400 }
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(postData.email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
         { status: 400 }
       );
     }
