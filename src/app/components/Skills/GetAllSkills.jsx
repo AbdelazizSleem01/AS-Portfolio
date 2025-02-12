@@ -10,16 +10,12 @@ export default function GetAllSkills() {
     const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-
+    
+    
     const { user } = useUser();
 
-    if (!user) {
-        return <RedirectToSignIn />;
-  
-    }
 
-    
+
     useEffect(() => {
         document.title = `All Skills | ${process.env.NEXT_PUBLIC_META_TITLE}`;
         document
@@ -81,6 +77,10 @@ export default function GetAllSkills() {
         );
     }
 
+    if (!user) {
+        return <RedirectToSignIn />;
+
+    }
     return (
         <div className="min-h-screen bg-base-100 mt-14 p-8">
             <div className="Heading w-full flex justify-center items-center ">

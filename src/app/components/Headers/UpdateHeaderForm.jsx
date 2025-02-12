@@ -13,14 +13,14 @@ import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
 import { motion } from "framer-motion";
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
-
+import Swal from 'sweetalert2';
+import { Save, Trash2 } from 'lucide-react';
 
 export default function UpdateHeaderForm() {
     const [header, setHeader] = useState(null);
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
@@ -28,9 +28,9 @@ export default function UpdateHeaderForm() {
 
     const { user } = useUser();
 
+    // Redirect if user is not logged in
     if (!user) {
         return <RedirectToSignIn />;
-
     }
 
     useEffect(() => {
@@ -63,7 +63,6 @@ export default function UpdateHeaderForm() {
         ],
         content: '',
         immediatelyRender: false,
-
     });
 
     useEffect(() => {
@@ -92,48 +91,78 @@ export default function UpdateHeaderForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsUpdating(true);
-        const formData = new FormData();
-        formData.append('Id', id);
-        formData.append('title', header.title);
-        formData.append('description', editor.getHTML());
-        formData.append('githubLink', header.githubLink);
-        formData.append('linkedInLink', header.linkedInLink);
-        if (image) formData.append('image', image);
 
-        try {
-            const response = await fetch(`/api/headers/${id}`, {
-                method: 'PUT',
-                body: formData,
-            });
+        // SweetAlert2 confirmation for update
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to update this header?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+        });
 
-            if (!response.ok) throw new Error('Failed to update header');
-            toast.success('Header updated successfully!');
-            router.push('/allHeaders');
-        } catch (error) {
-            console.error('Error updating header:', error);
-            toast.error('Failed to update header');
-        } finally {
-            setIsUpdating(false);
+        if (result.isConfirmed) {
+            setIsUpdating(true);
+            const formData = new FormData();
+            formData.append('Id', id);
+            formData.append('title', header.title);
+            formData.append('description', editor.getHTML());
+            formData.append('githubLink', header.githubLink);
+            formData.append('linkedInLink', header.linkedInLink);
+            if (image) formData.append('image', image);
+
+            try {
+                const response = await fetch(`/api/headers/${id}`, {
+                    method: 'PUT',
+                    body: formData,
+                });
+
+                if (!response.ok) throw new Error('Failed to update header');
+                Swal.fire('Updated!', 'Header updated successfully!', 'success');
+                router.push('/allHeaders');
+            } catch (error) {
+                console.error('Error updating header:', error);
+                Swal.fire('Error!', 'Failed to update header', 'error');
+            } finally {
+                setIsUpdating(false);
+            }
         }
     };
 
     const handleDelete = async () => {
-        try {
-            setIsDeleting(true);
-            const response = await fetch(`/api/headers/${id}`, {
-                method: 'DELETE',
-            });
+        // SweetAlert2 confirmation for delete
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+        });
 
-            if (!response.ok) throw new Error('Failed to delete header');
-            toast.success('Header deleted successfully!');
-            router.push('/allHeaders');
-        } catch (error) {
-            console.error('Error deleting header:', error);
-            toast.error('Failed to delete header');
-        } finally {
-            setIsDeleting(false);
-            setShowDeleteModal(false);
+        if (result.isConfirmed) {
+            try {
+                setIsDeleting(true);
+                const response = await fetch(`/api/headers/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) throw new Error('Failed to delete header');
+                Swal.fire('Deleted!', 'Header deleted successfully!', 'success');
+                router.push('/allHeaders');
+            } catch (error) {
+                console.error('Error deleting header:', error);
+                Swal.fire('Error!', 'Failed to delete header', 'error');
+            } finally {
+                setIsDeleting(false);
+            }
         }
     };
 
@@ -160,10 +189,8 @@ export default function UpdateHeaderForm() {
     if (!header) {
         return <p className="text-center text-lg">Header not found.</p>;
     }
-
-
-     // Framer Motion variants for staggered animation
-     const containerVariants = {
+    // Framer Motion variants for staggered animation
+    const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -262,7 +289,7 @@ export default function UpdateHeaderForm() {
                     className="flex-1 py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 flex items-center justify-center gap-2"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    disabled={isUpdating || isDeleting} // Disable during loading
+                    disabled={isUpdating || isDeleting}
                 >
                     {isUpdating ? (
                         <>
@@ -270,16 +297,19 @@ export default function UpdateHeaderForm() {
                             Updating...
                         </>
                     ) : (
-                        "Update Header"
+                        <>
+                            <Save size={18} />
+                            Update Header
+                        </>
                     )}
                 </motion.button>
                 <motion.button
                     type="button"
-                    onClick={() => setShowDeleteModal(true)}
+                    onClick={handleDelete}
                     className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    disabled={isUpdating || isDeleting} // Disable during loading
+                    disabled={isUpdating || isDeleting}
                 >
                     {isDeleting ? (
                         <>
@@ -287,36 +317,16 @@ export default function UpdateHeaderForm() {
                             Deleting...
                         </>
                     ) : (
-                        "Delete Header"
+                        <>
+                            <Trash2 size={18} />
+                            Delete Header
+                        </>
                     )}
                 </motion.button>
             </motion.div>
 
 
-            {showDeleteModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg mx-auto text-center">
-                        <h2 className="text-xl font-semibold mb-4">Are you sure you want to delete this header? 😢</h2>
-                        <div className="flex justify-center gap-4 ">
-                            <button
-                                onClick={() => setShowDeleteModal(false)}
-                                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600  w-full "
-                            >
-                                NO
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setShowDeleteModal(false);
-                                    handleDelete();
-                                }}
-                                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600  w-full "
-                            >
-                                YES
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+
         </form >
     ) : (
         <p className="flex justify-center items-center text-xl font-bold">Header not found.</p>

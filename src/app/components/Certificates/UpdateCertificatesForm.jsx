@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import Swal from 'sweetalert2';
+import { MoveLeftIcon, Save, Trash2 } from "lucide-react";
 
 export default function UpdateCertificateForm() {
     const { id } = useParams();
@@ -13,16 +15,10 @@ export default function UpdateCertificateForm() {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState("");
     const [loading, setLoading] = useState(true);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false); 
-
+    const [isUpdating, setIsUpdating] = useState(false);
     const { user } = useUser();
 
-    if (!user) {
-        return <RedirectToSignIn />;
-
-    }
 
     useEffect(() => {
         document.title = `Update Certificate | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -64,53 +60,68 @@ export default function UpdateCertificateForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsUpdating(true);
 
-        const formData = new FormData();
-        formData.append("title", title);
-        if (image) formData.append("image", image);
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update this certificate?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+        });
 
-        try {
-            const response = await fetch(`/api/Certificates/${id}`, {
-                method: "PUT",
-                body: formData,
-            });
+        if (result.isConfirmed) {
+            setIsUpdating(true);
 
-            const result = await response.json();
+            try {
+                const formData = new FormData();
+                formData.append('title', title);
+                if (image) formData.append('image', image);
 
-            if (response.ok) {
-                toast.success("Certificate updated successfully!");
-                router.push("/allCertificates");
-            } else {
-                throw new Error(result.error || "Failed to update certificate");
+                const response = await fetch(`/api/Certificates/${id}`, {
+                    method: 'PUT',
+                    body: formData,
+                });
+
+                if (!response.ok) throw new Error('Update failed');
+                Swal.fire('Updated!', 'Your certificate has been updated.', 'success');
+                router.push('/allCertificates');
+            } catch (error) {
+                Swal.fire('Error!', error.message || 'Update failed', 'error');
+            } finally {
+                setIsUpdating(false);
             }
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setIsUpdating(false); 
         }
     };
 
     const handleDelete = async () => {
-        try {
-            setIsDeleting(true); 
-            const response = await fetch(`/api/Certificates/${id}`, {
-                method: "DELETE",
-            });
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+        });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to delete certificate");
+        if (result.isConfirmed) {
+            try {
+                setIsDeleting(true);
+                const response = await fetch(`/api/Certificates/${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Deletion failed');
+                Swal.fire('Deleted!', 'Your certificate has been deleted.', 'success');
+                router.push('/allCertificates');
+            } catch (error) {
+                Swal.fire('Error!', error.message || 'Deletion failed', 'error');
+            } finally {
+                setIsDeleting(false);
             }
-
-            toast.success("Certificate deleted successfully!");
-            router.push("/allCertificates");
-        } catch (error) {
-            console.error("Error deleting certificate:", error);
-            toast.error(error.message);
-        } finally {
-            setIsDeleting(false); 
-            setShowDeleteModal(false);
         }
     };
 
@@ -134,6 +145,10 @@ export default function UpdateCertificateForm() {
                 <span className="text-primary text-lg">Loading Certificate...</span>
             </motion.div>
         );
+    }
+
+    if (!user) {
+        return <RedirectToSignIn />;
     }
 
     return (
@@ -218,7 +233,7 @@ export default function UpdateCertificateForm() {
                             className="flex-1 py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 flex items-center justify-center gap-2"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            disabled={isUpdating || isDeleting} // Disable during loading
+                            disabled={isUpdating || isDeleting}
                         >
                             {isUpdating ? (
                                 <>
@@ -226,16 +241,19 @@ export default function UpdateCertificateForm() {
                                     Updating...
                                 </>
                             ) : (
-                                "Update Certificate"
+                                <>
+                                    <Save size={18} />
+                                    Update Certificate
+                                </>
                             )}
                         </motion.button>
                         <motion.button
                             type="button"
-                            onClick={() => setShowDeleteModal(true)}
+                            onClick={handleDelete}
+                            className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
-                            disabled={isUpdating || isDeleting} // Disable during loading
+                            disabled={isUpdating || isDeleting}
                         >
                             {isDeleting ? (
                                 <>
@@ -243,58 +261,14 @@ export default function UpdateCertificateForm() {
                                     Deleting...
                                 </>
                             ) : (
-                                "Delete Certificate"
+                                <>
+                                    <Trash2 size={18} />
+                                    Delete Certificate
+                                </>
                             )}
                         </motion.button>
                     </motion.div>
                 </form>
-
-                {/* Delete Confirmation Modal */}
-                {showDeleteModal && (
-                    <motion.div
-                        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <motion.div
-                            className="bg-base-100 p-6 rounded-lg shadow-lg mx-4 max-w-md w-full border border-primary"
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <h2 className="text-xl font-semibold mb-4 text-primary">
-                                Confirm Deletion
-                            </h2>
-                            <p className="mb-6 text-neutral">
-                                Are you sure you want to delete this certificate? This action cannot be undone.
-                            </p>
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => setShowDeleteModal(false)}
-                                    className="flex-1 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-                                    disabled={isDeleting}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="flex-1 py-2 bg-error text-white rounded-md hover:bg-error/90 transition-colors flex items-center justify-center gap-2"
-                                    disabled={isDeleting}
-                                >
-                                    {isDeleting ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
-                                            Deleting...
-                                        </>
-                                    ) : (
-                                        "Delete"
-                                    )}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
             </motion.div>
 
             <motion.div
@@ -303,13 +277,13 @@ export default function UpdateCertificateForm() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
             >
-                <Link href="/allCertificates">
+                <Link href="/admin">
                     <motion.button
-                        className="text-lg bg-primary p-4 text-white font-medium rounded-md hover:bg-primary/95 px-8"
+                        className="text-lg bg-primary p-4 text-white font-medium rounded-full hover:bg-primary/95 px-8"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        Back to Certificates
+                      <MoveLeftIcon/>  Back to admin panel
                     </motion.button>
                 </Link>
             </motion.div>

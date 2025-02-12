@@ -391,7 +391,13 @@ export default function CreatedProjectForm() {
                         {videoPreview && (
                             <div className="my-4 ">
                                 <p className="text-sm">Video Preview:</p>
-                                {videoPreview.includes("https://studio.youtube.com/") || videoPreview.includes("awesomescreenshot") ? (
+                                {videoPreview.includes("https://studio.youtube.com/") || 
+                                videoPreview.includes("awesomescreenshot")||
+                                videoPreview.includes("https://www.youtube.com")    ||
+                                videoPreview.includes("https://youtu.be")    
+
+
+                                 ? (
                                     <iframe
                                         src={videoPreview}
                                         width="100%"

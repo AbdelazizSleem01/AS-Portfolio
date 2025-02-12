@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import Swal from 'sweetalert2';
 
 export default function UpdateSkillForm() {
     const { id } = useParams();
@@ -15,15 +16,13 @@ export default function UpdateSkillForm() {
     const [previewImage, setPreviewImage] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false); // Loading state for update
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const { user } = useUser();
 
     if (!user) {
         return <RedirectToSignIn />;
-
     }
 
     useEffect(() => {
@@ -68,49 +67,78 @@ export default function UpdateSkillForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsUpdating(true); // Start loading for update
 
-        const formData = new FormData();
-        formData.append("name", name);
-        if (image) formData.append("image", image);
+        // SweetAlert2 confirmation for update
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to update this skill?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+        });
 
-        try {
-            const response = await fetch(`/api/skills/${id}`, {
-                method: "PUT",
-                body: formData,
-            });
+        if (result.isConfirmed) {
+            setIsUpdating(true); // Start loading for update
 
-            if (!response.ok) throw new Error("Failed to update skill");
+            const formData = new FormData();
+            formData.append("name", name);
+            if (image) formData.append("image", image);
 
-            toast.success("Skill updated successfully!");
-            router.push("/allSkills");
-        } catch (err) {
-            toast.error(err.message);
-        } finally {
-            setIsUpdating(false); // Stop loading for update
+            try {
+                const response = await fetch(`/api/skills/${id}`, {
+                    method: "PUT",
+                    body: formData,
+                });
+
+                if (!response.ok) throw new Error("Failed to update skill");
+                Swal.fire('Updated!', 'Skill updated successfully!', 'success');
+                router.push("/allSkills");
+            } catch (err) {
+                Swal.fire('Error!', err.message || 'Failed to update skill', 'error');
+            } finally {
+                setIsUpdating(false); // Stop loading for update
+            }
         }
     };
 
     const handleDelete = async () => {
-        try {
-            setIsDeleting(true); // Start loading for delete
-            const response = await fetch(`/api/skills/${id}`, {
-                method: "DELETE",
-            });
+        // SweetAlert2 confirmation for delete
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+        });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to delete skill");
+        if (result.isConfirmed) {
+            try {
+                setIsDeleting(true); // Start loading for delete
+                const response = await fetch(`/api/skills/${id}`, {
+                    method: "DELETE",
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to delete skill");
+                }
+
+                Swal.fire('Deleted!', 'Skill deleted successfully!', 'success');
+                router.push("/allSkills");
+            } catch (err) {
+                console.error("Error deleting skill:", err);
+                Swal.fire('Error!', err.message || 'Failed to delete skill', 'error');
+            } finally {
+                setIsDeleting(false); // Stop loading for delete
             }
-
-            toast.success("Skill deleted successfully!");
-            router.push("/allSkills");
-        } catch (err) {
-            console.error("Error deleting skill:", err);
-            toast.error(err.message);
-        } finally {
-            setIsDeleting(false); // Stop loading for delete
-            setShowDeleteModal(false);
         }
     };
 
@@ -236,7 +264,7 @@ export default function UpdateSkillForm() {
                         </motion.button>
                         <motion.button
                             type="button"
-                            onClick={() => setShowDeleteModal(true)}
+                            onClick={handleDelete}
                             className="flex-1 py-3 bg-error text-white rounded-md hover:bg-error/90 flex items-center justify-center gap-2"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -253,53 +281,6 @@ export default function UpdateSkillForm() {
                         </motion.button>
                     </motion.div>
                 </form>
-
-                {/* Delete Confirmation Modal */}
-                {showDeleteModal && (
-                    <motion.div
-                        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <motion.div
-                            className="bg-base-100 p-6 rounded-lg shadow-lg mx-4 max-w-md w-full border border-primary"
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <h2 className="text-xl font-semibold mb-4 text-primary">
-                                Confirm Deletion
-                            </h2>
-                            <p className="mb-6 text-neutral">
-                                Are you sure you want to delete this skill? This action cannot be undone.
-                            </p>
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => setShowDeleteModal(false)}
-                                    className="flex-1 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-                                    disabled={isDeleting}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="flex-1 py-2 bg-error text-white rounded-md hover:bg-error/90 transition-colors flex items-center justify-center gap-2"
-                                    disabled={isDeleting}
-                                >
-                                    {isDeleting ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
-                                            Deleting...
-                                        </>
-                                    ) : (
-                                        "Delete"
-                                    )}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
 
                 <motion.div
                     className="mt-10 text-center"

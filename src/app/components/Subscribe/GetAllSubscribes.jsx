@@ -5,24 +5,21 @@ import { Search, Trash2, Download, ChevronLeft, ChevronRight } from "lucide-reac
 import { toast } from "react-toastify";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Swal from 'sweetalert2';
 
 const ITEMS_PER_PAGE = 10;
 
 const GetAllSubscribes = () => {
-  // Declare all Hooks at the top level
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
   const { user } = useUser();
 
   const router = useRouter();
 
-  // Other useEffect hooks
   useEffect(() => {
     document.title = `All Subscribes | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
@@ -59,20 +56,35 @@ const GetAllSubscribes = () => {
   const totalPages = Math.ceil(filteredSubscriptions.length / itemsPerPage);
 
   const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`/api/subscribe/${id}`, {
-        method: "DELETE",
-      });
+    // SweetAlert2 confirmation for delete
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
 
-      if (response.ok) {
-        toast.success("Subscription deleted successfully!");
-        setSubscriptions((prev) => prev.filter((sub) => sub._id !== id));
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`/api/subscribe/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          Swal.fire('Deleted!', 'Subscription deleted successfully!', 'success');
+          setSubscriptions((prev) => prev.filter((sub) => sub._id !== id));
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to delete subscription");
+        }
+      } catch (err) {
+        Swal.fire('Error!', err.message || 'Failed to delete subscription', 'error');
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setShowDeleteConfirmation(false);
-      setDeleteId(null);
     }
   };
 
@@ -131,11 +143,10 @@ const GetAllSubscribes = () => {
     );
   }
 
-
   if (!user) {
-    <RedirectToSignIn />
+    return <RedirectToSignIn />;
   }
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -200,7 +211,6 @@ const GetAllSubscribes = () => {
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-600">
                   {new Date(subscription.createdAt).toLocaleDateString('en-GB', {
-                    // AM and PM
                     hour12: true,
                     hour: '2-digit',
                     minute: '2-digit',
@@ -223,44 +233,12 @@ const GetAllSubscribes = () => {
 
                 <td className="px-4 py-3">
                   <button
-                    onClick={() => {
-                      setDeleteId(subscription._id);
-                      setShowDeleteConfirmation(true);
-                    }}
+                    onClick={() => handleDelete(subscription._id)}
                     className="text-red-600 hover:text-red-800 p-1 rounded-md hover:bg-red-50"
                     title="Delete subscription"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
-                  {showDeleteConfirmation && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                      <div className="bg-base-100 rounded-lg p-6 max-w-sm w-full">
-                        <h3 className="text-lg font-semibold mb-2">Confirm Deletion</h3>
-                        <p className="text-neutral mb-6">Are you sure you want to delete this subscription? This action cannot be undone.😥 </p>
-                        <div className="flex justify-end gap-3">
-                          <button
-                            onClick={() => {
-                              setShowDeleteConfirmation(false);
-                              setDeleteId(null);
-                            }}
-                            className="px-4 py-2 text-white bg-gray-400 hover:bg-gray-500 rounded-lg"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={async () => {
-                              await handleDelete(deleteId);
-                              setShowDeleteConfirmation(false);
-                              setDeleteId(null);
-                            }}
-                            className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}

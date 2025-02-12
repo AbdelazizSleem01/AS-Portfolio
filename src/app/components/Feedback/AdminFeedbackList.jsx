@@ -3,31 +3,27 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import Swal from 'sweetalert2';
+import { Trash2 } from "lucide-react";
 
 export default function AdminFeedbackList() {
-
   const [feedbacks, setFeedbacks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedFeedback, setSelectedFeedback] = useState(null); 
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
 
   const { user } = useUser();
 
-  if (!user) {
-      return <RedirectToSignIn />;
-
-  }
 
 
   useEffect(() => {
     document.title = `All Feedbacks | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
-    .querySelector('meta[name="description"]')
-    ?.setAttribute(
-      'content',
-      `See all feedbacks submitted by visitors on ${process.env.NEXT_PUBLIC_META_TITLE}.`
-    );
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `See all feedbacks submitted by visitors on ${process.env.NEXT_PUBLIC_META_TITLE}.`
+      );
   }, []);
 
   useEffect(() => {
@@ -47,42 +43,76 @@ export default function AdminFeedbackList() {
   }, []);
 
   const confirmDelete = (feedback) => {
-    setSelectedFeedback(feedback); 
-    setShowDeleteModal(true);
+    setSelectedFeedback(feedback);
+
+    // SweetAlert2 confirmation for delete
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Are you sure you want to delete feedback from ${feedback.name}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDelete(feedback._id);
+      }
+    });
   };
 
-  const handleDelete = async () => {
-    if (!selectedFeedback) return;
-
+  const handleDelete = async (feedbackId) => {
     try {
       setIsDeleting(true);
-      const response = await fetch(
-        `/api/feedback/${selectedFeedback._id}`,
-        { method: "DELETE" }
-      );
+      const response = await fetch(`/api/feedback/${feedbackId}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete feedback");
       }
 
-      setFeedbacks(prev => prev.filter(f => f._id !== selectedFeedback._id));
-      toast.success("Feedback deleted successfully! 🌟");
+      setFeedbacks((prev) => prev.filter((f) => f._id !== feedbackId));
+      Swal.fire('Deleted!', 'Feedback deleted successfully! 🌟', 'success');
     } catch (err) {
       console.error("Error deleting feedback:", err);
-      toast.error(err.message);
+      Swal.fire('Error!', err.message || 'Failed to delete feedback', 'error');
     } finally {
       setIsDeleting(false);
-      setShowDeleteModal(false);
       setSelectedFeedback(null);
     }
   };
+  if (!user) {
+    return <RedirectToSignIn />;
+  }
   return (
     <div className="Heading flex flex-col items-center p-4 mt-20">
       <h1 className="text-2xl font-bold mb-4">Manage Feedback</h1>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <motion.div
+          className="flex flex-col items-center justify-center h-screen gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="w-12 h-12 border-4 border-t-4 border-primary rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          />
+          <motion.span
+            className="text-primary text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            Loading Feedbacks...
+          </motion.span>
+        </motion.div>
+
       ) : feedbacks.length === 0 ? (
         <p>No feedback available.</p>
       ) : (
@@ -123,61 +153,25 @@ export default function AdminFeedbackList() {
                 {/* Delete Button */}
                 <button
                   onClick={() => confirmDelete(feedback)}
-                  className="btn btn-error mt-4"
+                  className="btn btn-error mt-4 text-white"
+                  disabled={isDeleting}
                 >
-                  Delete
+                  {isDeleting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      Delete
+                      <Trash2 size={18} />
+                    </>
+                  )}
                 </button>
               </div>
             </motion.div>
           ))}
         </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <motion.div
-            className="bg-base-100 p-6 rounded-lg shadow-lg mx-4 max-w-md w-full border border-primary"
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h2 className="text-xl font-semibold mb-4 text-primary">
-              Confirm Deletion
-            </h2>
-            <p className="mb-6 text-neutral">
-              Are you sure you want to delete feedback of <b className="text-primary">{selectedFeedback?.name}</b> from feedbacks ?
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 py-2 bg-error text-white rounded-md hover:bg-error/90 transition-colors flex items-center justify-center gap-2"
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white rounded-full animate-spin" />
-                    Deleting...
-                  </>
-                ) : (
-                  "Delete"
-                )}
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
       )}
     </div>
   );

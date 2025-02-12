@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import Swal from 'sweetalert2';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -16,12 +17,6 @@ const AdminPostsPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
 
   const { user } = useUser();
-
-  if (!user) {
-    return <RedirectToSignIn />;
-
-  }
-
 
   useEffect(() => {
     document.title = `All Posts | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -70,24 +65,55 @@ const AdminPostsPage = () => {
 
   const handleDelete = async (slug) => {
     if (!slug) return setError('Invalid post identifier');
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
 
-    try {
-      const response = await fetch(`/api/posts/${encodeURIComponent(slug)}`, {
-        method: 'DELETE'
-      });
+    // SweetAlert2 confirmation for delete
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete post');
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`/api/posts/${encodeURIComponent(slug)}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete post');
+        }
+
+        setPosts(posts.filter(post => post.slug !== slug));
+        Swal.fire('Deleted!', `Post "${slug}" deleted successfully`, 'success');
+      } catch (err) {
+        Swal.fire('Error!', err.message || 'Failed to delete post', 'error');
       }
+    }
+  };
 
-      setPosts(posts.filter(post => post.slug !== slug));
-      setSuccess(`Post "${slug}" deleted successfully`);
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(err.message);
-      setTimeout(() => setError(''), 5000);
+  const handleEdit = async (slug) => {
+    // SweetAlert2 confirmation for edit
+    const result = await Swal.fire({
+      title: 'Edit Post',
+      text: 'Are you sure you want to edit this post?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, edit it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
+
+    if (result.isConfirmed) {
+      router.push(`/blog/edit-post/${slug}`);
     }
   };
 
@@ -129,6 +155,10 @@ const AdminPostsPage = () => {
         </button>
       </div>
     );
+  }
+
+  if (!user) {
+    return <RedirectToSignIn />;
   }
 
   return (
@@ -275,7 +305,7 @@ const AdminPostsPage = () => {
                           </button>
                           <button
                             className="btn btn-square btn-sm text-primary hover:bg-base-200"
-                            onClick={() => alert('Edit feature coming soon!')}
+                            onClick={() => handleEdit(post.slug)}
                           >
                             <Edit size={18} />
                           </button>

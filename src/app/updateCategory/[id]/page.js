@@ -5,15 +5,14 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
-import { ArrowBigLeft } from 'lucide-react';
-import ConfirmationModal from '@/app/components/ConfirmationModal';
+import { ArrowBigLeft, Save, Trash2 } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 export default function UpdateCategory() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
   const [name, setName] = useState('');
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Loading state for update and delete
 
   useEffect(() => {
@@ -39,57 +38,84 @@ export default function UpdateCategory() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading
 
-    try {
-      const res = await fetch(`/api/categories/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-      });
+    // SweetAlert2 confirmation for update
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this category?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
 
-      if (res.ok) {
-        toast.success('Category updated successfully');
-        router.push('/allCategories');
-      } else {
-        const errorData = await res.json();
-        toast.error(errorData.error || 'Failed to update category');
+    if (result.isConfirmed) {
+      setIsLoading(true); // Start loading
+
+      try {
+        const res = await fetch(`/api/categories/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name }),
+        });
+
+        if (res.ok) {
+          Swal.fire('Updated!', 'Category updated successfully', 'success');
+          router.push('/allCategories');
+        } else {
+          const errorData = await res.json();
+          Swal.fire('Error!', errorData.error || 'Failed to update category', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating category:', error);
+        Swal.fire('Error!', 'An unexpected error occurred', 'error');
+      } finally {
+        setIsLoading(false); // Stop loading
       }
-    } catch (error) {
-      console.error('Error updating category:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false); // Stop loading
     }
   };
 
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     e.preventDefault();
-    setIsDeleteModalOpen(true); // Open the confirmation modal
-  };
 
-  const confirmDelete = async () => {
-    setIsLoading(true); // Start loading
-    try {
-      const res = await fetch(`/api/categories/${id}`, {
-        method: 'DELETE',
-      });
+    // SweetAlert2 confirmation for delete
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
 
-      if (res.ok) {
-        toast.success('Category deleted successfully');
-        router.push('/allCategories');
-      } else {
-        const errorData = await res.json();
-        toast.error(errorData.error || 'Failed to delete category');
+    if (result.isConfirmed) {
+      setIsLoading(true); // Start loading
+      try {
+        const res = await fetch(`/api/categories/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (res.ok) {
+          Swal.fire('Deleted!', 'Category deleted successfully', 'success');
+          router.push('/allCategories');
+        } else {
+          const errorData = await res.json();
+          Swal.fire('Error!', errorData.error || 'Failed to delete category', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting category:', error);
+        Swal.fire('Error!', 'An unexpected error occurred', 'error');
+      } finally {
+        setIsLoading(false); // Stop loading
       }
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false); // Stop loading
-      setIsDeleteModalOpen(false); // Close the modal
     }
   };
 
@@ -133,13 +159,12 @@ export default function UpdateCategory() {
           <div className="flex gap-3">
             <motion.button
               type="submit"
-              className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/95 focus:outline-none focus:ring-1 focus:border-black flex items-center justify-center"
+              className="w-full py-3 gap-2 bg-primary rounded-md text-white font-medium hover:bg-primary/95 focus:outline-none focus:ring-1 focus:border-black flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              disabled={isLoading} // Disable button during loading
+              disabled={isLoading}
             >
               {isLoading ? (
-                // Loading spinner SVG
                 <svg
                   className="animate-spin h-5 w-5 mr-3 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -161,19 +186,22 @@ export default function UpdateCategory() {
                   ></path>
                 </svg>
               ) : (
-                'Update Category'
+                <>
+                  <Save size={18} />
+                  Update Category
+                </>
               )}
             </motion.button>
             <motion.button
-              type="button" // Set type to "button" to prevent form submission
+              type="button"
               onClick={handleDelete}
-              className="w-full py-3 bg-red-500 rounded-md text-white font-medium hover:bg-red-600 focus:outline-none focus:ring-1 focus:border-black flex items-center justify-center"
+              className="w-full py-3 bg-red-500 gap-2 rounded-md text-white font-medium hover:bg-red-600 focus:outline-none focus:ring-1 focus:border-black flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              disabled={isLoading} // Disable button during loading
+              disabled={isLoading}
             >
               {isLoading ? (
-                // Loading spinner SVG
+
                 <svg
                   className="animate-spin h-5 w-5 mr-3 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -195,12 +223,15 @@ export default function UpdateCategory() {
                   ></path>
                 </svg>
               ) : (
-                'Delete Category'
+                <>
+                  <Trash2 size={18} />
+                  Delete Category
+                </>
               )}
             </motion.button>
           </div>
         </form>
-      </motion.div>
+      </motion.div >
 
       <motion.div
         className="w-full flex justify-center items-center my-10"
@@ -215,14 +246,6 @@ export default function UpdateCategory() {
           </button>
         </Link>
       </motion.div>
-
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        message="Are you sure you want to delete this category? 😥"
-      />
     </>
   );
 }

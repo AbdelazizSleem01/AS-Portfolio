@@ -14,6 +14,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import TextColor from '@tiptap/extension-color';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
+import Swal from 'sweetalert2';
 
 const fieldVariant = {
   hidden: { opacity: 0, x: -20 },
@@ -21,13 +22,12 @@ const fieldVariant = {
 };
 
 export default function UpdateProjectForm() {
-  const controls = useAnimation(); // Initialize animation controls
+  const controls = useAnimation();
   const { id } = useParams();
   const { user } = useUser();
   const router = useRouter();
   const [files, setFiles] = useState({ image: null, video: null });
   const [previews, setPreviews] = useState({ image: null, video: null });
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
   const [projectData, setProjectData] = useState({
@@ -38,9 +38,6 @@ export default function UpdateProjectForm() {
     githubLink: '',
     videoLink: ''
   });
-
-
-
 
   const editor = useEditor({
     extensions: [
@@ -63,7 +60,6 @@ export default function UpdateProjectForm() {
         'content',
         `Update your project details on ${process.env.NEXT_PUBLIC_META_TITLE}`
       );
-
 
     const fetchData = async () => {
       try {
@@ -122,6 +118,7 @@ export default function UpdateProjectForm() {
       setPreviews(prev => ({ ...prev, video: URL.createObjectURL(file) }));
     }
   }, []);
+
   const handleInputChange = useCallback((field, value) => {
     setProjectData(prev => ({
       ...prev,
@@ -131,50 +128,78 @@ export default function UpdateProjectForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      const formData = new FormData();
-      formData.append('title', projectData.title);
-      formData.append('description', editor.getHTML());
-      formData.append('category', projectData.category);
-      formData.append('liveLink', projectData.liveLink);
-      formData.append('githubLink', projectData.githubLink);
-      if (files.image) formData.append('image', files.image);
-      if (projectData.videoLink) {
-        formData.append('videoLink', projectData.videoLink);
-      } else if (files.video) {
-        formData.append('video', files.video);
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to update this project?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
+
+    if (result.isConfirmed) {
+      setIsSubmitting(true);
+
+      try {
+        const formData = new FormData();
+        formData.append('title', projectData.title);
+        formData.append('description', editor.getHTML());
+        formData.append('category', projectData.category);
+        formData.append('liveLink', projectData.liveLink);
+        formData.append('githubLink', projectData.githubLink);
+        if (files.image) formData.append('image', files.image);
+        if (projectData.videoLink) {
+          formData.append('videoLink', projectData.videoLink);
+        } else if (files.video) {
+          formData.append('video', files.video);
+        }
+
+        const response = await fetch(`/api/projects/${id}`, {
+          method: 'PUT',
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error('Update failed');
+        Swal.fire('Updated!', 'Your project has been updated.', 'success');
+        router.refresh();
+        router.push('/allProjects');
+      } catch (error) {
+        Swal.fire('Error!', error.message || 'Update failed', 'error');
+      } finally {
+        setIsSubmitting(false);
       }
-
-      const response = await fetch(`/api/projects/${id}`, {
-        method: 'PUT',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Update failed');
-      toast.success('Project updated!');
-      router.refresh();
-      router.push('/allProjects');
-    } catch (error) {
-      toast.error(error.message || 'Update failed');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
-    try {
-      setIsSubmitting(true);
-      const response = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Deletion failed');
-      toast.success('Project deleted');
-      router.push('/allProjects');
-    } catch (error) {
-      toast.error(error.message || 'Deletion failed');
-    } finally {
-      setIsSubmitting(false);
-      setShowDeleteModal(false);
+    const result = await Swal.fire({
+      title: 'Are you sure to delete project ?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true,
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setIsSubmitting(true);
+        const response = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Deletion failed');
+        Swal.fire('Deleted!', 'Your project has been deleted.', 'success');
+        router.push('/allProjects');
+      } catch (error) {
+        Swal.fire('Error!', error.message || 'Deletion failed', 'error');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -196,7 +221,7 @@ export default function UpdateProjectForm() {
         transition={{ staggerChildren: 0.1 }}
       >
         <motion.h2
-          className="text-2xl font-semibold text-center mb-6"
+          className="text-2xl font-semibold text-center mb-6 text-primary border-b-2 border-primary pb-2 w-[40%] mx-auto"
           variants={fieldVariant}
           transition={{ duration: 0.5 }}
         >
@@ -324,7 +349,7 @@ export default function UpdateProjectForm() {
         >
           <motion.button
             type="button"
-            onClick={() => setShowDeleteModal(true)}
+            onClick={handleDelete}
             className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 w-full mr-2 flex items-center justify-center gap-2"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -364,13 +389,6 @@ export default function UpdateProjectForm() {
           </motion.button>
         </motion.div>
       </motion.form>
-
-      <DeleteModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={handleDelete}
-        isDeleting={isSubmitting}
-      />
 
       <motion.div
         className="w-full flex justify-center items-center my-10"
@@ -414,7 +432,6 @@ const FormSection = ({ title, children, variants, transition }) => (
   </motion.div>
 );
 
-
 const FileUpload = ({ preview, onFileChange, accept, isVideo }) => (
   <>
     <input
@@ -441,44 +458,4 @@ const FileUpload = ({ preview, onFileChange, accept, isVideo }) => (
       </div>
     )}
   </>
-);
-
-const DeleteModal = ({ isOpen, onClose, onConfirm, isDeleting }) => (
-  <motion.div
-    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: isOpen ? 1 : 0 }}
-    transition={{ duration: 0.3 }}
-    style={{ display: isOpen ? 'flex' : 'none' }}
-  >
-    <motion.div
-      className="bg-gray-50 p-6 rounded-lg shadow-lg mx-auto text-center border border-gray-300"
-      initial={{ scale: 0.8 }}
-      animate={{ scale: isOpen ? 1 : 0.8 }}
-      transition={{ duration: 0.3 }}
-    >
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Are you sure you want to delete this project? 😢
-      </h2>
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={onClose}
-          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 w-full"
-        >
-          NO
-        </button>
-        <button
-          onClick={onConfirm}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-full"
-          disabled={isDeleting}
-        >
-          {isDeleting ? (
-            <div className="w-4 h-4 border-2 border-white rounded-full animate-spin mx-auto" />
-          ) : (
-            "YES"
-          )}
-        </button>
-      </div>
-    </motion.div>
-  </motion.div>
 );
