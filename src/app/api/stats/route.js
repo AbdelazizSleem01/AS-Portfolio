@@ -4,7 +4,6 @@ import Subscription from "../../../../models/Subscription";
 import Project from "../../../../models/Project";
 import Certificate from "../../../../models/Certificate";
 import Feedback from "../../../../models/Feedback";
-import Visit from "../../../../models/Visits";
 import Post from "../../../../models/Post";
 import Contact from "../../../../models/Contact";
 
@@ -19,7 +18,6 @@ export async function GET() {
       projectsCount,
       certificatesCount,
       feedbacksCount,
-      visitsCount,
       postCount,
       contactCount,
     ] = await Promise.all([
@@ -28,7 +26,6 @@ export async function GET() {
       Project.countDocuments(),
       Certificate.countDocuments(),
       Feedback.countDocuments(),
-      Visit.countDocuments(),
       Post.countDocuments(),
       Contact.countDocuments(),
     ]);
@@ -51,7 +48,6 @@ export async function GET() {
       subscriptionGrowth,
       feedbackGrowth,
       projectGrowth,
-      visitsGrowth,
       certificatesGrowth,
       postGrowth,
       contactGrowth,
@@ -60,7 +56,6 @@ export async function GET() {
       getGrowthData(Subscription),
       getGrowthData(Feedback),
       getGrowthData(Project),
-      getGrowthData(Visit),
       getGrowthData(Certificate),
       getGrowthData(Post),
       getGrowthData(Contact),
@@ -74,7 +69,6 @@ export async function GET() {
           projects: projectsCount,
           certificates: certificatesCount,
           feedbacks: feedbacksCount,
-          visits: visitsCount,
           posts: postCount,
           contacts: contactCount,
         },
@@ -83,7 +77,6 @@ export async function GET() {
           subscriptionGrowth,
           feedbackGrowth,
           projectGrowth,
-          visitsGrowth,
           certificatesGrowth,
           postGrowth,
           contactGrowth,

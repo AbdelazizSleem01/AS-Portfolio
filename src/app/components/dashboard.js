@@ -13,10 +13,7 @@ export default function Dashboard() {
 
   const { user } = useUser();
 
-  if (!user) {
-    return <RedirectToSignIn />;
 
-  }
 
 
   useEffect(() => {
@@ -34,7 +31,6 @@ export default function Dashboard() {
     subscription: useRef(null),
     feedback: useRef(null),
     project: useRef(null),
-    visits: useRef(null),
     certificates: useRef(null),
     posts: useRef(null),
     contacts: useRef(null),
@@ -71,14 +67,13 @@ export default function Dashboard() {
     };
 
     const chartConfigs = [
-      { ref: chartRefs.skill, type: 'doughnut', data: stats.growthData.skillsDistribution, label: 'Skills', backgroundColor: ['#3b82f6', '#06b6d4', '#6366f1', '#8b5cf6', '#d946ef'] },
-      { ref: chartRefs.subscription, type: 'bar', data: stats.growthData.subscriptionGrowth, label: 'Subscriptions', backgroundColor: '#A31D1D' },
-      { ref: chartRefs.feedback, type: 'bar', data: stats.growthData.feedbackGrowth, label: 'Feedback', backgroundColor: '#10b981' },
-      { ref: chartRefs.project, type: 'bar', data: stats.growthData.projectGrowth, label: 'Projects', backgroundColor: '#6366f1' },
-      { ref: chartRefs.visits, type: 'bar', data: stats.growthData.visitsGrowth, label: 'Visits', backgroundColor: '#6366f1' },
-      { ref: chartRefs.certificates, type: 'bar', data: stats.growthData.certificatesGrowth, label: 'Certificates', backgroundColor: '#8b5cf6' },
-      { ref: chartRefs.posts, type: 'bar', data: stats.growthData.postGrowth, label: 'Posts', backgroundColor: '#d946ef' },
-      { ref: chartRefs.contacts, type: 'bar', data: stats.growthData.contactGrowth, label: 'Contacts', backgroundColor: '#3b82f6' },
+      { ref: chartRefs.skill, type: 'pie', data: stats.growthData.skillsDistribution, label: 'Skills',  },
+      { ref: chartRefs.subscription, type: 'bar', data: stats.growthData.subscriptionGrowth, label: 'Subscriptions'},
+      { ref: chartRefs.feedback, type: 'bar', data: stats.growthData.feedbackGrowth, label: 'Feedback'},
+      { ref: chartRefs.project, type: 'line', data: stats.growthData.projectGrowth, label: 'Projects'},
+      { ref: chartRefs.certificates, type: 'bar', data: stats.growthData.certificatesGrowth, label: 'Certificates'},
+      { ref: chartRefs.posts, type: 'polarArea', data: stats.growthData.postGrowth, label: 'Posts',title:{display:true , text:"Posts Growth"}},
+      { ref: chartRefs.contacts, type: 'bar', data: stats.growthData.contactGrowth, label: 'Contacts' },
     ];
 
     chartConfigs.forEach((config) => {
@@ -88,7 +83,6 @@ export default function Dashboard() {
           datasets: [{
             label: config.label,
             data: config.data.map((item) => item.count),
-            backgroundColor: config.backgroundColor,
           }],
         });
       }
@@ -102,6 +96,10 @@ export default function Dashboard() {
   if (loading) return <div className="p-8 text-center text-lg font-semibold">Loading...</div>;
   if (error) return <div className="text-red-500 p-8 text-center">Error: {error}</div>;
 
+  if (!user) {
+    return <RedirectToSignIn />;
+
+  }
   return (
     <div className="p-8 bg-base-200 min-h-screen mt-20">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
