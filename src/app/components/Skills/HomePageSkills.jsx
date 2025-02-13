@@ -7,6 +7,7 @@ export default function HomePageSkills() {
     const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [displayCount, setDisplayCount] = useState(12);
 
     useEffect(() => {
         const fetchSkills = async () => {
@@ -27,6 +28,10 @@ export default function HomePageSkills() {
         fetchSkills();
     }, []);
 
+    const loadMore = () => {
+        setDisplayCount(prevCount => prevCount + 4);
+    };
+
     if (loading) {
         return (
             <motion.div
@@ -38,7 +43,7 @@ export default function HomePageSkills() {
                 <motion.div
                     className="w-12 h-12 border-4 border-t-4 border-primary rounded-full"
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                    transition={{ repeat: Infinity, duration: .7, ease: "linear" }}
                 />
                 <motion.span
                     className="text-primary text-lg"
@@ -78,7 +83,7 @@ export default function HomePageSkills() {
                     initial="hidden"
                     animate="visible"
                 >
-                    {skills.map((skill, index) => (
+                    {skills.slice(0, displayCount).map((skill, index) => (
                         <motion.div
                             key={skill._id}
                             className="bg-neutral rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
@@ -125,6 +130,21 @@ export default function HomePageSkills() {
                         </motion.div>
                     ))}
                 </motion.div>
+
+                {skills.length > displayCount && (
+                    <div className="flex justify-center mt-8">
+                        <motion.button
+                            onClick={loadMore}
+                            className="btn btn-primary px-8 py-3 text-lg"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            Load More Skills
+                        </motion.button>
+                    </div>
+                )}
             </div>
         </div>
     );
