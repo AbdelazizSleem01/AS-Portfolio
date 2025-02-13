@@ -115,7 +115,7 @@ export async function POST(req) {
             <td style="padding: 20px; background-color: #f8f9fa; text-align: center;">
               <p style="color: #636e72; font-size: 0.8em; margin: 0;">
                 © ${new Date().getFullYear()} AS Portfolio. All rights reserved.<br>
-                <a href="https://as-portfolio-ten.vercel.app/privacy" style="color: #0984e3; text-decoration: none;">Privacy Policy</a> | 
+                <a href="https://as-portfolio-ten.vercel.app/privacy-policy" style="color: #0984e3; text-decoration: none;">Privacy Policy</a> | 
                 <a href="https://as-portfolio-ten.vercel.app/unsubscribe?token=${newSub.unsubscribeToken}" style="color: #0984e3; text-decoration: none;">Unsubscribe</a>
               </p>
             </td>

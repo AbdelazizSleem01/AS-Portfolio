@@ -34,8 +34,8 @@ export default function FeedbackList({ feedbacks }) {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-4 w-full">
+    <div className="flex flex-col items-center ">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
         {feedbacks.slice(0, visibleCount).map((feedback, index) => (
           <motion.div
             key={feedback._id}
@@ -49,10 +49,10 @@ export default function FeedbackList({ feedbacks }) {
             }}
             whileHover={{ scale: 1.02 }}
             transition={{ delay: index * 0.1 }}
-            className="card bg-neutral shadow-xl cursor-pointer pr-5 text-wrap"
+            className="card bg-neutral shadow-xl cursor-pointer  text-wrap"
           >
-            <div className="card-body">
-              <div className="flex items-center space-x-4 w-full">
+            <div className="card-body w-full">
+              <div className="flex items-center space-x-2 w-full">
                 <motion.img
                   src={feedback.imageUrl}
                   alt={feedback.name}

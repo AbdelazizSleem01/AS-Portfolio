@@ -91,7 +91,7 @@ export default function FeedbackForm({ setFeedbacks }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="input input-bordered input-primary focus:input-primary"
-          placeholder="your@email.com"
+          placeholder="this email not appear for all clients"
           required
         />
       </div>
