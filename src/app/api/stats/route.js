@@ -30,12 +30,27 @@ export async function GET() {
       Contact.countDocuments(),
     ]);
 
-    // Get growth data for all collections
+    // Helper function to group data by 5-day intervals
     const getGrowthData = async (Model) => {
       return Model.aggregate([
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: {
+                  $subtract: [
+                    "$createdAt",
+                    {
+                      $mod: [
+                        { $toLong: "$createdAt" },
+                        5 * 24 * 60 * 60 * 1000, // 5 days in milliseconds
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
             count: { $sum: 1 },
           },
         },

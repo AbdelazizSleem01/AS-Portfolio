@@ -1,51 +1,45 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Chart from 'chart.js/auto';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import { Bar, Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [performanceScore, setPerformanceScore] = useState(0);
 
-  const { user } = useUser();
-
-
-
-
+  // Fetch stats data
   useEffect(() => {
-    document.title = `Dashboard of ${process.env.NEXT_PUBLIC_META_TITLE}`;
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        'content',
-        `Dashboard of ${process.env.NEXT_PUBLIC_META_TITLE}. View your website's performance, analytics, and insights.`
-      );
-  }, []);
-
-  const chartRefs = {
-    skill: useRef(null),
-    subscription: useRef(null),
-    feedback: useRef(null),
-    project: useRef(null),
-    certificates: useRef(null),
-    posts: useRef(null),
-    contacts: useRef(null),
-  };
-
-  const chartInstances = useRef([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
+    const fetchStats = async () => {
       try {
         const response = await fetch('/api/stats');
-        if (!response.ok) throw new Error('Failed to fetch data');
+        if (!response.ok) throw new Error('Failed to fetch stats');
         const data = await response.json();
         setStats(data);
-        setPerformanceScore(data.performanceScore || 80);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -53,73 +47,140 @@ export default function Dashboard() {
       }
     };
 
-    fetchData();
+    fetchStats();
   }, []);
-
-  useEffect(() => {
-    if (!stats) return;
-
-    const createChart = (ref, type, data, options = {}) => {
-      if (!ref.current) return;
-      const ctx = ref.current.getContext('2d');
-      const chart = new Chart(ctx, { type, data, options: { responsive: true, maintainAspectRatio: false, ...options } });
-      chartInstances.current.push(chart);
-    };
-
-    const chartConfigs = [
-      { ref: chartRefs.skill, type: 'pie', data: stats.growthData.skillsDistribution, label: 'Skills',  },
-      { ref: chartRefs.subscription, type: 'bar', data: stats.growthData.subscriptionGrowth, label: 'Subscriptions'},
-      { ref: chartRefs.feedback, type: 'bar', data: stats.growthData.feedbackGrowth, label: 'Feedback'},
-      { ref: chartRefs.project, type: 'line', data: stats.growthData.projectGrowth, label: 'Projects'},
-      { ref: chartRefs.certificates, type: 'bar', data: stats.growthData.certificatesGrowth, label: 'Certificates'},
-      { ref: chartRefs.posts, type: 'polarArea', data: stats.growthData.postGrowth, label: 'Posts',title:{display:true , text:"Posts Growth"}},
-      { ref: chartRefs.contacts, type: 'bar', data: stats.growthData.contactGrowth, label: 'Contacts' },
-    ];
-
-    chartConfigs.forEach((config) => {
-      if (config.data) {
-        createChart(config.ref, config.type, {
-          labels: config.data.map((item) => item._id),
-          datasets: [{
-            label: config.label,
-            data: config.data.map((item) => item.count),
-          }],
-        });
-      }
-    });
-
-    return () => {
-      chartInstances.current.forEach((chart) => chart.destroy());
-    };
-  }, [stats]);
 
   if (loading) return <div className="p-8 text-center text-lg font-semibold">Loading...</div>;
   if (error) return <div className="text-red-500 p-8 text-center">Error: {error}</div>;
 
-  if (!user) {
-    return <RedirectToSignIn />;
+  // Helper function to generate colors with varying transparency
+  const generateColors = (data, baseColor1, baseColor2) => {
+    return data.map((_, index) => {
+      const transparency = 0.4 + (index * 0.1); 
+      const color = index % 2 === 0 ? baseColor1 : baseColor2; 
+      return color.replace(/[\d\.]+\)/, `${transparency})`); 
+    });
+  };
 
-  }
+  // Helper function to format growth data for charts
+  const formatGrowthData = (data, label) => {
+    const baseColor1 = 'rgba(54, 162, 235, 1)'; 
+    const baseColor2 = 'rgb(123, 0, 1,1)'; 
+    const colors = generateColors(data, baseColor1, baseColor2);
+
+    return {
+      labels: data.map((item) => item._id),
+      datasets: [
+        {
+          label: label,
+          data: data.map((item) => item.count),
+          backgroundColor: colors, 
+          borderColor: colors.map((color) => color.replace(/[\d\.]+\)/, '1)')), 
+          borderWidth: 2,
+        },
+      ],
+    };
+  };
+
   return (
     <div className="p-8 bg-base-200 min-h-screen mt-20">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-        className="mb-8 p-6 bg-base-100 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Website Performance</h2>
-        <div className="w-full bg-gray-200 rounded-full h-4">
-          <motion.div initial={{ width: 0 }} animate={{ width: `${performanceScore}%` }} transition={{ duration: 1 }}
-            className="h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8 p-6 bg-base-100 rounded-lg shadow-lg"
+      >
+        <h2 className="text-xl font-semibold mb-4">Dashboard Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Skills</h3>
+            <p>Total: {stats.counts.skills}</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Subscriptions</h3>
+            <p>Total: {stats.counts.subscriptions}</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Projects</h3>
+            <p>Total: {stats.counts.projects}</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Certificates</h3>
+            <p>Total: {stats.counts.certificates}</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Feedbacks</h3>
+            <p>Total: {stats.counts.feedbacks}</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Posts</h3>
+            <p>Total: {stats.counts.posts}</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold">Contacts</h3>
+            <p>Total: {stats.counts.contacts}</p>
+          </div>
         </div>
-        <p className="mt-2 text-sm text-gray-600">Score: {performanceScore}/100</p>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.entries(chartRefs).map(([key, ref]) => (
-          <div key={key} className="card bg-base-100 shadow-xl p-6 border rounded-lg h-96">
-            <h2 className="card-title mb-4 capitalize">{key} Growth</h2>
-            <div className="h-80"><canvas ref={ref}></canvas></div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8 p-6 bg-base-100 rounded-lg shadow-lg"
+      >
+        <h2 className="text-xl font-semibold mb-4">Growth Over Time (5-Day Intervals)</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Skills Growth</h3>
+            <Bar
+              data={formatGrowthData(stats.growthData.skillsDistribution, 'Skills')}
+              options={{ responsive: true }}
+            />
           </div>
-        ))}
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Subscription Growth</h3>
+            <Line
+              data={formatGrowthData(stats.growthData.subscriptionGrowth, 'Subscriptions')}
+              options={{ responsive: true }}
+            />
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Feedback Growth</h3>
+            <Bar
+              data={formatGrowthData(stats.growthData.feedbackGrowth, 'Feedbacks')}
+              options={{ responsive: true }}
+            />
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Project Growth</h3>
+            <Line
+              data={formatGrowthData(stats.growthData.projectGrowth, 'Projects')}
+              options={{ responsive: true }}
+            />
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Certificates Growth</h3>
+            <Bar
+              data={formatGrowthData(stats.growthData.certificatesGrowth, 'Certificates')}
+              options={{ responsive: true }}
+            />
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Post Growth</h3>
+            <Line
+              data={formatGrowthData(stats.growthData.postGrowth, 'Posts')}
+              options={{ responsive: true }}
+            />
+          </div>
+          <div className="card bg-base-100 shadow-xl p-4 border border-primary rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Contact Growth</h3>
+            <Bar
+              data={formatGrowthData(stats.growthData.contactGrowth, 'Contacts')}
+              options={{ responsive: true }}
+            />
+          </div>
+        </div>
       </motion.div>
     </div>
   );
