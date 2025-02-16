@@ -97,7 +97,7 @@ export default function HomePageCertificates() {
 
                                     {/* Title overlay */}
                                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3 bg-black/40 px-3 py-2 sm:px-6 sm:py-3 rounded-2xl backdrop-blur-sm">
-                                        <h3 className="text-lg sm:text-xl font-semibold text-white">
+                                        <h3 className="text-lg sm:text-xl font-semibold text-neutral">
                                             {certificate.title}
                                         </h3>
                                     </div>
@@ -107,14 +107,18 @@ export default function HomePageCertificates() {
                                         <a
                                             href={`#slide${index === 0 ? certificates.length - 1 : index - 1}`}
                                             className="btn btn-circle btn-sm sm:btn-md text-white btn-primary opacity-90 hover:opacity-100"
+                                            aria-label="Previous slide"
                                         >
-                                            <ArrowBigLeft />
+                                            <ArrowBigLeft aria-hidden="true" />
+                                            <span className="sr-only">Previous</span>
                                         </a>
                                         <a
                                             href={`#slide${index === certificates.length - 1 ? 0 : index + 1}`}
                                             className="btn btn-circle btn-sm sm:btn-md text-white btn-primary opacity-90 hover:opacity-100"
+                                            aria-label="Next slide"
                                         >
-                                            <ArrowBigRight />
+                                            <ArrowBigRight aria-hidden="true" />
+                                            <span className="sr-only">Next</span>
                                         </a>
                                     </div>
                                 </div>

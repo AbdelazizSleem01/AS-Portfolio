@@ -43,7 +43,7 @@ export default function HomePage() {
     title: "Hello, My name is Abdelaziz Sleem",
     description: "Experienced full-stack developer with 4+ years of expertise...",
     imageUrl: "/imgs/my-img.jpeg",
-    githubLink: "https://github.com/AbdelazizSleem01",   
+    githubLink: "https://github.com/AbdelazizSleem01",
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
   };
 
@@ -150,14 +150,14 @@ export default function HomePage() {
           {/* Animated Headers */}
           <motion.h1
             className="md:text-4xl sm:text-3xl text-2xl font-semibold font-serif"
-            whileHover={{ scale: 1.02 }}
+            whilehover={{ scale: 1.02 }}
           >
             {selectedHeader?.title || "Hello, My name is Abdelaziz Sleem"}
           </motion.h1>
 
           <motion.h3
             className="capitalize text-secondary font-semibold"
-            whileHover={{ x: 10 }}
+            whilehover={{ x: 10 }}
           >
             I'm <span className="typing text-primary"></span>
           </motion.h3>
@@ -169,7 +169,7 @@ export default function HomePage() {
                 "Experienced full-stack developer with 4+ years of expertise in Laravel, NestJS, Nuxt.js, Next.js, Android, and some Flutter experience.🥰.",
             }}
             variants={itemVariants}
-            whileHover={{ scale: 1.01 }}
+            whilehover={{ scale: 1.01 }}
           ></motion.p>
 
           {/* Interactive Buttons */}
@@ -178,78 +178,75 @@ export default function HomePage() {
             variants={containerVariants}
           >
             {selectedHeader?.githubLink && (
-              <motion.button
-                className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800"
-                whileHover={{
+              <Link
+                href={selectedHeader.githubLink}
+                target="_blank"
+                className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 flex items-center justify-center gap-2"
+                role="button"
+                component={motion.a}
+                whilehover={{
                   scale: 1.05,
                   boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
                 }}
-                whileTap={{ scale: 0.95 }}
+                whiletap={{ scale: 0.95 }}
               >
-                <Link
-                  href={selectedHeader.githubLink}
-                  target="_blank"
-                  className="flex items-center justify-center gap-2"
-                >
-                  Github 
-                  <motion.img
-                    className="w-8 h-8"
-                    src="/imgs/github.png"
-                    alt="github-icon"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </Link>
-              </motion.button>
+                Github
+                <motion.img
+                  className="w-8 h-8"
+                  src="/imgs/github.png"
+                  alt=""
+                  whilehover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                  aria-hidden="true"
+                />
+              </Link>
             )}
 
             {selectedHeader?.linkedInLink && (
-              <motion.button
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/95 transition"
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
-                }}
-                whileTap={{ scale: 0.95 }}
+              <Link
+                href={selectedHeader.linkedInLink}
+                target="_blank"
+                passHref
+                legacyBehavior
               >
-                <Link
-                  href={selectedHeader.linkedInLink}
-                  target="_blank"
-                  className="flex items-center justify-center gap-2"
+                <motion.a
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/95 transition flex items-center justify-center gap-2"
+                  whilehover={{
+                    scale: 1.05,
+                    boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
+                  }}
+                  whiletap={{ scale: 0.95 }}
+                  role="button"
                 >
-                  LinkedIn 
+                  LinkedIn
                   <motion.img
                     className="w-8 h-8"
                     src="/imgs/linkedin.png"
-                    alt="linkedin-icon"
-                    whileHover={{ rotate: 360 }}
+                    alt=""
+                    whilehover={{ rotate: 360 }}
                     transition={{ duration: 0.5 }}
+                    aria-hidden="true"
                   />
-                </Link>
-              </motion.button>
+                </motion.a>
+              </Link>
             )}
-
-            <motion.button
-              className="px-4 py-2 bg-error text-white rounded-md hover:bg-error/95 transition"
-              whileHover={{
+            <motion.a
+              href="/imgs/Abdelaziz-Sleem-CV.pdf"
+              download="Abdelaziz-Sleem-CV.pdf"
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition flex items-center justify-center gap-2"
+              whilehover={{
                 scale: 1.05,
                 boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
               }}
-              whileTap={{ scale: 0.95 }}
+              whiletap={{ scale: 0.95 }}
+              aria-label="Download CV document"
             >
-              <a
-                href="/imgs/Abdelaziz-Sleem-CV.pdf"
-                download="Abdelaziz-Sleem-CV.pdf"
-                className="flex items-center justify-center gap-2"
-              >
-                Download CV 
-                <Download
-                  className="w-7 h-7 rounded-sm"
-                  transition={{ duration: 0.5 }}
-                  
-                />
-              </a>
-            </motion.button>
+              Download CV
+              <Download
+                className="w-7 h-7 rounded-sm"
+                aria-hidden="true"
+              />
+            </motion.a>
           </motion.div>
         </motion.div>
       </div>
@@ -272,7 +269,7 @@ export default function HomePage() {
         }}
       />
       <motion.div
-       className="absolute w-4 h-4 bg-primary/20 rounded-full"
+        className="absolute w-4 h-4 bg-primary/20 rounded-full"
         style={{
           top: '20%',
           left: '50%'
@@ -287,9 +284,9 @@ export default function HomePage() {
           ease: 'easeInOut'
         }}
 
-        />
+      />
       <motion.div
-       className="absolute w-8 h-4 bg-primary/20 rounded-full"
+        className="absolute w-8 h-4 bg-primary/20 rounded-full"
         style={{
           top: '80%',
           left: '10%'
@@ -303,7 +300,7 @@ export default function HomePage() {
           repeat: Infinity,
           ease: 'easeInOut'
         }}
-        />
+      />
 
     </div>
   );

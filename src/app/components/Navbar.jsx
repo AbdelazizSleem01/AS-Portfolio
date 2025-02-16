@@ -82,9 +82,13 @@ function Navbar() {
       <motion.button
         className="lg:hidden text-primary"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
+        <span className="sr-only">
+          {isOpen ? "Close navigation menu" : "Open navigation menu"}
+        </span>
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </motion.button>
 
@@ -149,10 +153,10 @@ function Navbar() {
           closed: {
             opacity: 0,
             maxHeight: 0,
-            transition: { staggerChildren: 0.4 }, // ��� Stagger animation for children
+            transition: { staggerChildren: 0.4 },
           },
         }}
-        style={{ maxHeight: "1000px" }} // Fallback for older browsers
+        style={{ maxHeight: "1000px" }}
       >
         <div className="p-4 space-y-3 sm:space-y-4">
           {navLinks.map((link, index) => (

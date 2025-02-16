@@ -121,7 +121,6 @@ export default function FeedbackForm({ setFeedbacks }) {
             <motion.button
               key={star}
               type="button"
-              whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
               className={`w-6 h-6 mask mask-star-2  ${star <= rating
                 ? 'bg-primary hover:bg-primary-focus'
@@ -136,11 +135,13 @@ export default function FeedbackForm({ setFeedbacks }) {
 
       {/* Image Upload */}
       <div className="form-control">
-        <label className="label">
+        <label className="label" htmlFor='image'>
           <span className="label-text text-lg font-semibold text-base-content">Upload Image</span>
         </label>
         <div className="flex flex-col items-center gap-4">
           <input
+            id='image'
+            name='image'
             type="file"
             onChange={(e) => setImage(e.target.files[0])}
             className="file-input file-input-bordered file-input-primary w-full"
@@ -176,11 +177,11 @@ export default function FeedbackForm({ setFeedbacks }) {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className="btn btn-primary btn-block bg-primary btn-lg mt-8 shadow-md"
-        // disabled={loading} 
+      // disabled={loading} 
       >
         {loading ? (
           <>
-            Submit Feedback <Loader2 className="animate-spin" /> 
+            Submit Feedback <Loader2 className="animate-spin" />
           </>
         ) : (
           <>
