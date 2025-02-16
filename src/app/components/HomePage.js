@@ -163,7 +163,7 @@ export default function HomePage() {
           </motion.h3>
 
           <motion.p
-            className="text-neutral"
+            className="text-neutral text-justify"
             dangerouslySetInnerHTML={{
               __html: selectedHeader?.description ||
                 "Experienced full-stack developer with 4+ years of expertise in Laravel, NestJS, Nuxt.js, Next.js, Android, and some Flutter experience.🥰.",
