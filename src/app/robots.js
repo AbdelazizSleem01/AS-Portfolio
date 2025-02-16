@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: ["/admin"],
     },
-    sitemap: `${process.env.NEXT_PUBLIC_BASE_URL}/sitemap.xml`,
+    sitemap: `https://as-portfolio-ten.vercel.app/sitemap.xml`,
   }
 }
