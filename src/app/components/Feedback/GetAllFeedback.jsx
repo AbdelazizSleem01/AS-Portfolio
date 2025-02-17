@@ -53,11 +53,11 @@ export default function FeedbackList({ feedbacks }) {
           >
             <div className="card-body w-full">
               <div className="flex items-center space-x-2 w-full">
-                <motion.img
+                {/* <motion.img
                   src={feedback.imageUrl}
                   alt={feedback.name}
                   className="w-16 h-16 rounded-full object-contain border-2 border-primary p-0 shadow-md shadow-primary"
-                />
+                /> */}
                 <div>
                   <h2 className="card-title text-base-100 text-lg font-bold">{feedback.name}</h2>
                   {/* <p className="text-sm text-base-100/50">{feedback.email}</p> */}

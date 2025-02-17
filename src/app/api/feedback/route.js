@@ -10,21 +10,21 @@ export async function POST(req) {
     const email = formData.get('email');
     const comment = formData.get('comment');
     const rating = formData.get('rating');
-    const imageFile = formData.get('image');
+    // const imageFile = formData.get('image');
 
     // Validate required fields
-    if (!name || !email || !comment || !rating || !imageFile) {
-      throw new Error("All fields are required, including the image.");
+    if (!name || !email || !comment || !rating ) {
+      throw new Error("All fields are required");
     }
 
-    const { url: imageUrl } = await put(
-      `FeedbackImages/${Date.now()}-${imageFile.name}`, 
-      Buffer.from(await imageFile.arrayBuffer()), 
-      {
-        access: 'public', 
-        contentType: imageFile.type,
-      }
-    );
+    // const { url: imageUrl } = await put(
+    //   `FeedbackImages/${Date.now()}-${imageFile.name}`, 
+    //   Buffer.from(await imageFile.arrayBuffer()), 
+    //   {
+    //     access: 'public', 
+    //     contentType: imageFile.type,
+    //   }
+    // );
 
     // Connect to MongoDB and save feedback
     await connectDB();
@@ -32,7 +32,7 @@ export async function POST(req) {
       name,
       email,
       comment,
-      imageUrl,
+      // imageUrl,
       rating: parseInt(rating),
     });
 

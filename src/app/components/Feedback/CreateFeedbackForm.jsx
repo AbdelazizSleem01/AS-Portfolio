@@ -10,7 +10,7 @@ export default function FeedbackForm({ setFeedbacks }) {
   const [email, setEmail] = useState('');
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(5);
-  const [image, setImage] = useState(null);
+  // const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false); // Add loading state
   const fileInputRef = useRef(null);
 
@@ -23,7 +23,7 @@ export default function FeedbackForm({ setFeedbacks }) {
     formData.append('email', email);
     formData.append('comment', comment);
     formData.append('rating', rating);
-    formData.append('image', image);
+    // formData.append('image', image);
 
     try {
       const response = await fetch('/api/feedback', {
@@ -39,7 +39,7 @@ export default function FeedbackForm({ setFeedbacks }) {
         setEmail('');
         setComment('');
         setRating(5);
-        setImage(null);
+        // setImage(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -134,7 +134,7 @@ export default function FeedbackForm({ setFeedbacks }) {
       </div>
 
       {/* Image Upload */}
-      <div className="form-control">
+      {/* <div className="form-control">
         <label className="label" htmlFor='image'>
           <span className="label-text text-lg font-semibold text-base-content">Upload Image</span>
         </label>
@@ -169,7 +169,7 @@ export default function FeedbackForm({ setFeedbacks }) {
             </motion.div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Submit Button */}
       <motion.button
