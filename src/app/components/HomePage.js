@@ -231,8 +231,8 @@ export default function HomePage() {
               </Link>
             )}
             <motion.a
-              href="/imgs/Abdelaziz-Sleem-CV.pdf"
-              download="Abdelaziz-Sleem-CV.pdf"
+              href="/imgs/Abdelaziz-Sleem CV.pdf"
+              download="Abdelaziz-Sleem CV.pdf"
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition flex items-center justify-center gap-2"
               whilehover={{
                 scale: 1.05,
