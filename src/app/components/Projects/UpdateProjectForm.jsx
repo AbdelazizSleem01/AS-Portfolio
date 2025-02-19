@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { motion, useAnimation } from 'framer-motion';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
-import { ChevronDown, Shapes, Loader2, Trash2, Save, Link, MoveLeft } from 'lucide-react';
+import { ChevronDown, Trash2, Save, MoveLeft } from 'lucide-react';
 import StarterKit from '@tiptap/starter-kit';
 import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
@@ -15,6 +15,7 @@ import TextColor from '@tiptap/extension-color';
 import { FontSize } from '../FontSize';
 import TextToolbar from '../TextToolbar';
 import Swal from 'sweetalert2';
+import Link from 'next/link';
 
 const fieldVariant = {
   hidden: { opacity: 0, x: -20 },
@@ -391,7 +392,7 @@ export default function UpdateProjectForm() {
       </motion.form>
 
       <motion.div
-        className="w-full flex justify-center items-center my-10"
+        className="w-full flex justify-center items-center mt-24"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.5 }}

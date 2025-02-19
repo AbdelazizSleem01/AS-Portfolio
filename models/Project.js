@@ -18,7 +18,8 @@ const projectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
     required: true,
-  }
+  },
+  order: { type: Number, default: 0 },
 }, { timestamps: true });
 
 const Project = mongoose.models.Project || mongoose.model('Project', projectSchema);

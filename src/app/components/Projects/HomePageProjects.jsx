@@ -114,7 +114,7 @@ const HomePageProjects = () => {
               <div className="flex flex-col flex-grow">
                 <h2 className="text-xl font-semibold text-base-100">{project.title}</h2>
                 <p
-                  className="mb-4 truncate h-[26px] text-base-100"
+                  className="mb-4 text-sm truncate h-[26px] text-base-100"
                   dangerouslySetInnerHTML={{
                     __html: project.description.split("<br>")[0],
                   }}
@@ -133,7 +133,6 @@ const HomePageProjects = () => {
                     </a>
                   )}
                 </div>
-                {/* category */}
                 <div className="flex justify-around items-center text-center mt-4">
                   {project.liveLink && (
                     <Link
