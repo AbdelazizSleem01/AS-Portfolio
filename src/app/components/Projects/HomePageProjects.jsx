@@ -112,13 +112,15 @@ const HomePageProjects = () => {
               }}
             >
               <div className="flex flex-col flex-grow">
-                <h2 className="text-xl font-semibold text-base-100">{project.title}</h2>
-                <p
-                  className="mb-4 text-sm truncate h-[26px] text-base-100"
-                  dangerouslySetInnerHTML={{
-                    __html: project.description.split("<br>")[0],
-                  }}
-                ></p>
+                <h2 className="text-xl font-semibold text-primary ">{project.title}</h2>
+                <motion.p
+                  dangerouslySetInnerHTML={{ __html: project.description }}
+                  className="mb-4 truncate h-[26px] text-base-100"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                </motion.p>
 
                 <div className="border border-primary shadow-md shadow-base-100 rounded-lg my-4 bg-white flex items-center justify-center h-60 overflow-hidden p-2">
                   {project.imageUrl && (
@@ -126,7 +128,7 @@ const HomePageProjects = () => {
                       <motion.img
                         src={project.imageUrl}
                         alt={project.title}
-                        className="rounded-md w-full h-full object-contain"
+                        className="rounded-md w-full h-full object-contain border-2 border-primary"
                         whileHover={{ scale: 1.02 }}
                         transition={{ duration: 0.3 }}
                       />

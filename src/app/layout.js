@@ -11,8 +11,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
 export const metadata = {
   title: {
-    default:"Abdelaziz Sleem | Fullstack Developer",
-    template:"Abdelaziz Sleem | Fullstack Developer",
+    default: "Abdelaziz Sleem | Fullstack Developer",
+    template: "Abdelaziz Sleem | Fullstack Developer",
   },
   description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB. Freelance Developer creating responsive, user-friendly websites.",
   applicationName: "Abdelaziz Sleem Portfolio",
@@ -103,7 +103,14 @@ export default function RootLayout({ children }) {
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={
+              // loading spinner
+              <div className="flex justify-center items-center h-screen w-screen bg-gray-100 text-gray-600">
+                <svg className="animate-spin h-10 w-10 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                </svg>
+                <p className="mt-2 text-gray-500">Loading...</p>
+              </div>
+            }>
               <Navbar />
               {children}
               <ToastContainer />

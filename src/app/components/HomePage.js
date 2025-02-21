@@ -174,7 +174,7 @@ export default function HomePage() {
 
           {/* Interactive Buttons */}
           <motion.div
-            className="sm:mt-4 mt-2 flex flex-col md:flex-row gap-4 font-serif"
+            className=" flex flex-col md:flex-row gap-4 font-serif"
             variants={containerVariants}
           >
             {selectedHeader?.githubLink && (
