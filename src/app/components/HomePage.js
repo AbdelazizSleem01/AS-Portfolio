@@ -155,12 +155,12 @@ export default function HomePage() {
             {selectedHeader?.title || "Hello, My name is Abdelaziz Sleem"}
           </motion.h1>
 
-          <motion.h3
+          <motion.h2
             className="capitalize text-secondary font-semibold"
             whilehover={{ x: 10 }}
           >
             I'm <span className="typing text-primary"></span>
-          </motion.h3>
+          </motion.h2>
 
           <motion.p
             className="text-neutral text-justify"
