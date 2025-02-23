@@ -105,7 +105,7 @@ const GetProjects = () => {
             className="bg-base-100 min-h-screen p-6 mt-16"
         >
             <div className="Heading w-full flex justify-center items-center" >
-                <h1 className="text-2xl sm:text-3xl w-full font-bold text-center sm:mb-8 text-primary ">
+                <h1 className="text-2xl semiHead sm:text-3xl w-full font-bold text-center sm:mb-8 text-primary ">
                     Projects
                 </h1>
             </div>
@@ -157,7 +157,7 @@ const GetProjects = () => {
                                             alt={project.title}
                                             width={300}
                                             height={200}
-                                            className="object-contain rounded-md w-full h-full"
+                                            className="object-contain rounded-md w-full h-full border-2 border-primary"
                                         />
                                     </motion.div>
                                 )}

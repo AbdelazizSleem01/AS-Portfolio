@@ -117,7 +117,7 @@ const ContactsPage = () => {
         <motion.h1
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-4xl font-bold mb-8 text-center text-primary"
+          className="text-3xl semiHead font-bold mb-8 text-center text-primary"
         >
           Contact Messages
         </motion.h1>

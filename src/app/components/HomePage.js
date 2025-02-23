@@ -179,6 +179,7 @@ export default function HomePage() {
           >
             {selectedHeader?.githubLink && (
               <Link
+                title="Visit Abdelaziz Sleem's GitHub Profile"
                 href={selectedHeader.githubLink}
                 target="_blank"
                 className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 flex items-center justify-center gap-2"
@@ -206,6 +207,7 @@ export default function HomePage() {
               <Link
                 href={selectedHeader.linkedInLink}
                 target="_blank"
+                title="Visit Abdelaziz Sleem's LinkedIn Profile"
                 passHref
                 legacyBehavior
               >
@@ -231,6 +233,7 @@ export default function HomePage() {
               </Link>
             )}
             <motion.a
+              title="Download Abdelaziz Sleem's CV"
               href="/imgs/Abdelaziz Sleem CV.pdf"
               download="Abdelaziz Sleem CV.pdf"
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition flex items-center justify-center gap-2"

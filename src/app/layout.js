@@ -1,14 +1,14 @@
 import { ToastContainer } from "react-toastify";
 import "./globals.css";
-import "../app/components/AdminStyle.css"
+import "../app/components/AdminStyle.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { ThemeProvider } from "next-themes";
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: {
@@ -93,8 +93,6 @@ export const metadata = {
     },
   },
 };
-
-
 
 export default function RootLayout({ children }) {
   return (

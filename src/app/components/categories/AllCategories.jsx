@@ -31,9 +31,9 @@ export default function CategoriesList() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto mt-32 mb-5 p-6 border border-primary shadow-lg rounded-lg">
+    <div className="Heading max-w-4xl mx-auto mt-24 mb-5  shadow-lg rounded-lg">
       <motion.h2
-        className="text-2xl font-semibold text-center mb-6 text-primary"
+        className="text-2xl semiHead font-semibold text-center mb-6 text-primary"
         initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
@@ -41,7 +41,7 @@ export default function CategoriesList() {
         Categories
       </motion.h2>
       {categories.length > 0 ? (
-        <ul className="space-y-5">
+        <ul className="space-y-5 p-6 border border-primary rounded-md">
           {categories.map((cat) => (
             <motion.li
               key={cat._id}

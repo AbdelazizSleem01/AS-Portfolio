@@ -72,14 +72,14 @@ const HomePageProjects = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 p-8" id="projects">
       <div className="Heading w-full flex justify-center items-center">
-        <motion.h1
-          className="text-3xl font-bold w-full text-primary text-center"
+        <motion.h3
+          className="text-3xl semiHead font-bold w-full text-primary text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           All Projects
-        </motion.h1>
+        </motion.h3>
       </div>
 
       <div className="max-w-7xl mx-auto">
@@ -139,6 +139,7 @@ const HomePageProjects = () => {
                   {project.liveLink && (
                     <Link
                       href={project.liveLink}
+                      title={'Visit this project'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm w-full bg-primary text-white mr-2 px-2 py-1 flex items-center justify-center gap-2 rounded"
@@ -149,6 +150,7 @@ const HomePageProjects = () => {
                   {project.githubLink && (
                     <Link
                       href={project.githubLink}
+                      title={'Visit Github page for this project'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm w-full text-white bg-gray-700 ml-2 px-2 py-1 flex items-center justify-center gap-2 rounded hover:bg-gray-700/80"
@@ -163,6 +165,7 @@ const HomePageProjects = () => {
                     onClick={() => handleDetails(project)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    title = 'Details for this projects'
                   >
                     Details <img className="w-6 h-6" src="/imgs/details.png" alt="details-icon" />
                   </motion.button>

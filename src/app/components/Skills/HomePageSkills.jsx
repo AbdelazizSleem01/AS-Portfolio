@@ -67,14 +67,14 @@ export default function HomePageSkills() {
     return (
         <div className="min-h-screen bg-base-100 mt-14 p-8">
             <div className="Heading w-full flex justify-center items-center">
-                <motion.h1
-                    className="text-3xl font-bold w-full text-primary text-center"
+                <motion.h4
+                    className="text-3xl semiHead font-bold w-full text-primary text-center"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
                     All Skills
-                </motion.h1>
+                </motion.h4>
             </div>
 
             <div className="max-w-7xl mx-auto">

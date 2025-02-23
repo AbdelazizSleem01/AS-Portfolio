@@ -44,18 +44,18 @@ function Navbar() {
   };
 
   const navLinks = [
-    { href: '/about-page', text: 'About Me' },
-    { href: '/projects-page', text: 'Projects' },
-    { href: '/ContactMe', text: 'Contact' },
-    { href: '/privacy-policy', text: 'Privacy Policy' },
-    { href: '/blog', text: 'Blog' },
-    { href: '/My-Service', text: 'My Service' }
+    { href: '/about-page', text: 'About Me', title: "About Abdelaziz Sleem" },
+    { href: '/projects-page', text: 'Projects', title: "View Abdelaziz Sleem's Projects" },
+    { href: '/ContactMe', text: 'Contact', title: "Contact Abdelaziz Sleem" },
+    { href: '/privacy-policy', text: 'Privacy Policy', title: "Privacy Policy of Abdelaziz Sleem" },
+    { href: '/blog', text: 'Blog', title: "Read Abdelaziz Sleem's Blog" },
+    { href: '/My-Service', text: 'My Service', title: "View Abdelaziz Sleem's Services" }
   ];
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-base-100 shadow-lg px-4 sm:px-6 py-3 flex items-center justify-between">
       <div className="flex items-center gap-2 sm:gap-4">
-        <Link href={'/'} className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-primary">
+        <Link href={'/'} title="My Logo" className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-primary">
           {theme === 'dark' ? (
             <motion.img
               src="/imgs/Logo.png"
@@ -102,6 +102,7 @@ function Navbar() {
             onHoverEnd={() => setActiveLink('')}
           >
             <Link
+              title={link.title}
               href={link.href}
               className="relative px-1 mx-1 py-1 text-sm xl:text-[16px] font-semibold text-primary hover:bg-primary/20 rounded-md transition"
             >
@@ -127,7 +128,7 @@ function Navbar() {
           data-tip="For admins only"
           whileHover={{ scale: 1.05 }}
         >
-          <Link href={'/admin'}>
+          <Link href={'/admin'} title="For Admin Only">
             <motion.button
               className="btn bg-primary hover:bg-primary/80 text-white flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md text-sm sm:text-base"
               whileHover={{ scale: 1.05 }}
@@ -184,8 +185,8 @@ function Navbar() {
 
           {/* Admin Panel Button with animation */}
           <motion.div variants={{ open: { opacity: 1, transition: { delay: 0.6 } }, closed: { opacity: 0 } }} className="pt-2">
-            <Link href={'/admin'} onClick={() => setIsOpen(false)}>
-              <button className="w-full btn bg-primary hover:bg-primary/80 text-white flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm sm:text-base">
+            <Link href={'/admin'} title="For Admin Only" onClick={() => setIsOpen(false)} >
+              <button title="For Admin Only" className="w-full btn bg-primary hover:bg-primary/80 text-white flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm sm:text-base">
                 Admin Panel <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </Link>

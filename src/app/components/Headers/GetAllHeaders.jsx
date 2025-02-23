@@ -99,7 +99,7 @@ const GetAllHeader = () => {
       className="bg-base-100 min-h-screen "
     >
       <div className="Heading w-full flex justify-center items-center mt-10 sm:mt-20">
-        <h1 className="text-2xl w-2/3 sm:text-3xl lg:text-4xl font-bold text-center text-primary">
+        <h1 className="text-2xl semiHead w-2/3 sm:text-3xl lg:text-4xl font-bold text-center text-primary">
           Headers
         </h1>
       </div>

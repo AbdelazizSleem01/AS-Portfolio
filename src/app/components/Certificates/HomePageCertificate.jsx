@@ -72,9 +72,9 @@ export default function HomePageCertificates() {
                 animate={{ y: 0, opacity: 1 }}
                 className="max-w-7xl mx-auto Heading"
             >
-                <h1 className="text-4xl font-bold text-primary text-center">
-                    Manage Certificates
-                </h1>
+                <h5 className="semiHead text-4xl font-bold text-primary text-center">
+                    My Certificates
+                </h5>
 
                 {certificates.length > 0 && (
                     <div className="relative group mx-auto flex justify-center mt-8">
@@ -97,9 +97,9 @@ export default function HomePageCertificates() {
 
                                     {/* Title overlay */}
                                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3 bg-black/40 px-3 py-2 sm:px-6 sm:py-3 rounded-2xl backdrop-blur-sm">
-                                        <h3 className="text-lg sm:text-xl font-semibold text-neutral">
+                                        <h6 className="text-lg sm:text-xl font-semibold text-neutral">
                                             {certificate.title}
-                                        </h3>
+                                        </h6>
                                     </div>
 
                                     {/* Navigation arrows */}

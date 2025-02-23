@@ -7,7 +7,7 @@ import FeedbackList from './GetAllFeedback';
 export default function FeedbackPage() {
   const [feedbacks, setFeedbacks] = useState([]);
 
- 
+
 
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="Heading container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">What People Say</h1>
+      <h6 className="text-3xl semiHead font-bold mb-8 text-center">What People Say</h6>
       <FeedbackForm setFeedbacks={setFeedbacks} />
       <FeedbackList feedbacks={feedbacks} />
     </div>

@@ -80,13 +80,13 @@ export default function GetAllSCertificates() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             <motion.div
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="max-w-7xl mx-auto Heading"
             >
-                <h1 className=" text-4xl font-bold text-primary text-center ">
+                <h1 className="semiHead text-4xl font-bold text-primary text-center ">
                     Manage Certificates
                 </h1>
                 <span className="flex justify-center text-2xl mx-auto text-neutral font-normal mb-8">({certificates.length} entries)</span>

@@ -84,7 +84,7 @@ export default function GetAllSkills() {
     return (
         <div className="min-h-screen bg-base-100 mt-14 p-8">
             <div className="Heading w-full flex justify-center items-center ">
-                <h1 className="text-3xl font-bold w-full text-primary text-center">All Skills</h1>
+                <h1 className="text-3xl semiHead font-bold w-full text-primary text-center">All Skills</h1>
             </div>
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

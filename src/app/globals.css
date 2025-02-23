@@ -34,7 +34,7 @@ html {
 }
 
 /* Heading Style */
-.Heading h1 {
+.Heading .semiHead {
   font-size: 24px;
   text-align: center;
   line-height: 2.5em;
@@ -48,7 +48,7 @@ html {
   position: relative;
 }
 
-.Heading h1:before {
+.Heading .semiHead:before {
   position: absolute;
   bottom: 15px;
   width: 50%;
@@ -60,7 +60,7 @@ html {
   z-index: 4;
 }
 
-.Heading h1:after {
+.Heading .semiHead:after {
   position: absolute;
   width: 50px;
   height: 50px;
@@ -81,16 +81,16 @@ html {
 }
 
 @media (max-width: 768px) {
-  .Heading h1 {
+  .Heading .semiHead {
     font-size: 30px;
     padding-bottom: 45px;
   }
 
-  .Heading h1:before {
+  .Heading .semiHead:before {
     bottom: 20px;
   }
 
-  .Heading h1:after {
+  .Heading .semiHead:after {
     width: 50px;
     height: 50px;
     font-size: 30px;
@@ -99,12 +99,12 @@ html {
 
 
 @media (max-width: 480px) {
-  .Heading h1 {
+  .Heading .semiHead {
     font-size: 1.3rem;
     margin-bottom: 2rem;
   }
 
-  .Heading h1:after {
+  .Heading .semiHead:after {
     font-size: 0.9rem;
     border-width: 1.5px;
   }

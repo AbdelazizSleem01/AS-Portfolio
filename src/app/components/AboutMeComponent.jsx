@@ -39,12 +39,12 @@ const AboutMeComponent = () => {
   return (
     <div id="about" className="w-full lg:h-screen h-full m-auto flex items-center justify-center mt-4 py-12 bg-base-100">
       <div className="Heading w-full h-full flex flex-col justify-center items-center sm:px-4 px-2">
-        <motion.h1
-          className="text-3xl w-full text-center text-primary font-bold px-4 py-1 md:mt-0 mt-8"
+        <motion.h2
+          className=" semiHead text-3xl w-full text-center text-primary font-bold px-4 py-1 md:mt-0 mt-8"
           variants={itemVariants}
         >
           About Me
-        </motion.h1>
+        </motion.h2>
         <motion.div
           className="lg:w-[90%] w-full mx-auto flex flex-col lg:gap-24 lg:flex-row items-center justify-center"
           variants={containerVariants}
@@ -142,7 +142,7 @@ const AboutMeComponent = () => {
             </motion.p>
 
             {/* Button */}
-            <Link href={'/ContactMe'}>
+            <Link href={'/ContactMe'} title='Contact Me'>
               <motion.button
                 className="lg:mt-4 lg:px-5 px-3 lg:py-3 py-2 bg-primary rounded-md lg:text-lg text-base text-white font-semibold"
                 variants={itemVariants}

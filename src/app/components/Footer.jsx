@@ -74,9 +74,9 @@ const Footer = () => {
     };
 
     const socialLinks = [
-        { name: 'github', url: 'https://github.com/AbdelazizSleem01', icon: '/imgs/github-f.png' },
-        { name: 'linkedin', url: 'https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/', icon: '/imgs/linkedIn-f.png' },
-        { name: 'facebook', url: 'https://www.facebook.com/profile.php?id=100028557526450', icon: '/imgs/facebook-f.png' }
+        { name: 'github', url: 'https://github.com/AbdelazizSleem01', icon: '/imgs/github-f.png', title: "Visit Abdelaziz Sleem's GitHub Profile" },
+        { name: 'linkedin', url: 'https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/', icon: '/imgs/linkedIn-f.png', title: "Visit Abdelaziz Sleem's LinkedIn Profile" },
+        { name: 'facebook', url: 'https://www.facebook.com/profile.php?id=100028557526450', icon: '/imgs/facebook-f.png', title: "Visit Abdelaziz Sleem's Facebook Profile" }
     ];
 
     return (
@@ -109,7 +109,7 @@ const Footer = () => {
                             className="text-white font-extrabold"
                         >
                             <div className="flex items-center gap-4">
-                                <Link href={'/'} className="flex items-center gap-2 text-xl font-semibold text-base-100 bg-neutral rounded-lg px-2 hover:bg-neutral/90 transition-all">
+                                <Link href={'/'} title="My LOGO" className="flex items-center gap-2 text-xl font-semibold text-base-100 bg-neutral rounded-lg px-2 hover:bg-neutral/90 transition-all">
                                     <motion.img
                                         src="/imgs/Logo.png"
                                         alt="logo"
@@ -137,6 +137,7 @@ const Footer = () => {
                             {socialLinks.map((social) => (
                                 <motion.a
                                     key={social.name}
+                                    title={social.title}
                                     whileHover={{ y: -5, scale: 1.1, rotate: [0, 15, -15, 0] }}
                                     whileTap={{ scale: 0.9 }}
                                     transition={{ type: 'spring', stiffness: 300 }}
@@ -165,9 +166,9 @@ const Footer = () => {
                         transition={{ type: 'spring' }}
                     >
                         {[
-                            { icon: <Phone />, text: '+20 01119268163', subtitle: 'Support Number', href: 'tel:+20 01119268163' },
-                            { icon: <Mail />, text: 'abdelazizsleem957@gmail.com', subtitle: 'Support Email', href: 'mailto:abdelazizsleem957@gmail.com' },
-                            { icon: <MapPin />, text: 'Benha, Qalubia, Egypt', subtitle: 'Address', href: '#' }
+                            { icon: <Phone />, text: '+20 01119268163', subtitle: 'Support Number', href: 'tel:+20 01119268163', title: 'Contact Me' },
+                            { icon: <Mail />, text: 'abdelazizsleem957@gmail.com', subtitle: 'Support Email', href: 'mailto:abdelazizsleem957@gmail.com', title: 'Contact Me Via Email' },
+                            { icon: <MapPin />, text: 'Benha, Qalubia, Egypt', subtitle: 'Address', href: '#', title: 'My Location' }
                         ].map((item, index) => (
                             <motion.div
                                 key={index}
@@ -182,7 +183,7 @@ const Footer = () => {
                                     {item.icon}
                                 </motion.div>
                                 <div className="ml-4">
-                                    <a href={item.href} className="block font-Inter text-[14px] font-medium text-white hover:text-white/80 transition-colors">
+                                    <a href={item.href} title={item.title} className="block font-Inter text-[14px] font-medium text-white hover:text-white/80 transition-colors">
                                         {item.text}
                                     </a>
                                     <p className="font-Inter text-[12px] font-medium text-white/60">{item.subtitle}</p>
@@ -205,12 +206,12 @@ const Footer = () => {
                         </motion.p>
                         <ul className="space-y-3">
                             {[
-                                ['Home', '/'],
-                                ['Projects', '/projects-page'],
-                                ['Blog', '/blog'],
-                                ['Contact', '/ContactMe'],
-                                ['Services', '/My-Service'],
-                            ].map(([title, url], index) => (
+                                ['Home', '/', 'Home page'],
+                                ['Projects', '/projects-page', 'My Projects page'],
+                                ['Blog', '/blog', 'Posts '],
+                                ['Contact', '/ContactMe', 'Contact Me'],
+                                ['Services', '/My-Service', 'My Services '],
+                            ].map(([title, url, titleDes], index) => (
                                 <motion.li
                                     key={title}
                                     variants={itemVariants}
@@ -220,6 +221,7 @@ const Footer = () => {
                                 >
                                     <Link
                                         href={url}
+                                        title={titleDes}
                                         className="text-white hover:text-white/80 font-inter text-[15px] font-normal hover:font-semibold block transition-all"
                                     >
                                         {title}
