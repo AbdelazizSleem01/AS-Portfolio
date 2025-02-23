@@ -9,30 +9,28 @@ import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
+
 export const metadata = {
   title: {
-    default: "Abdelaziz Sleem | Fullstack Developer",
-    template: "Abdelaziz Sleem | Fullstack Developer",
+    default: "Abdelaziz Sleem | Fullstack Developer | React, Next.js, Node.js Expert",
+    template: "Abdelaziz Sleem | %s | Fullstack Developer",
   },
-  description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB. Freelance Developer creating responsive, user-friendly websites.",
+  description: "Abdelaziz Sleem: Fullstack Developer specializing in React, Next.js, and Node.js. Discover my portfolio and hire a freelance developer today!",
   applicationName: "Abdelaziz Sleem Portfolio",
   metadataBase: new URL("https://as-portfolio-ten.vercel.app/"),
   keywords: [
     "Fullstack Developer",
     "Freelance Developer",
     "Frontend Development",
+    "React Developer",
+    "Next.js Developer",
     "Node.js Developer",
     "MongoDB Developer",
-    "React",
-    "Next.js",
-    "Node.js",
-    "MongoDB",
+    "JavaScript Developer",
     "Tailwind CSS",
     "Web Development",
-    "Web Application Development",
     "Freelance Developer Egypt",
     "Responsive Web Design",
-    "JavaScript Developer"
   ],
   authors: [{
     name: "Abdelaziz Sleem",
@@ -59,15 +57,16 @@ export const metadata = {
     ],
   },
   openGraph: {
-    title: "Abdelaziz Sleem | Fullstack Developer",
-    description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB.",
+    title: "Abdelaziz Sleem | Fullstack Developer | React, Next.js, Node.js Expert",
+    description: "Passionate Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB. Hire a freelance developer for your next project!",
     url: "https://as-portfolio-ten.vercel.app/",
     siteName: "Abdelaziz Sleem Portfolio",
     images: [
       {
-        url: "/favicon.ico",
+        url: "https://as-portfolio-ten.vercel.app/og-image.png",
         width: 1200,
         height: 630,
+        alt: "Abdelaziz Sleem - Fullstack Developer",
       },
     ],
     locale: "en_US",
@@ -75,11 +74,10 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Abdelaziz Sleem | Fullstack Developer",
-    description: "Passionate Fullstack Developer specializing in Frontend Development. Expertise in React, Next.js, Node.js, and MongoDB.",
-    creator: "@Abdelaziz Sleem",
-    images: ["/favicon.ico"],
-
+    title: "Abdelaziz Sleem | Fullstack Developer | React, Next.js, Node.js Expert",
+    description: "Passionate Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB. Hire a freelance developer for your next project!",
+    creator: "@AbdelazizSleem",
+    images: ["https://as-portfolio-ten.vercel.app/twitter-image.png"],
   },
   robots: {
     index: true,
@@ -94,16 +92,52 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-
 };
 
 
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning >
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="canonical" href="https://as-portfolio-ten.vercel.app/" />
+
+        {/* Person Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Abdelaziz Sleem",
+            "url": "https://as-portfolio-ten.vercel.app/",
+            "jobTitle": "Fullstack Developer",
+            "description": "Passionate Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB. Freelance Developer creating responsive, user-friendly websites.",
+            "skills": [
+              "React",
+              "Next.js",
+              "Node.js",
+              "MongoDB",
+              "JavaScript",
+              "Tailwind CSS",
+              "Web Development"
+            ],
+            "sameAs": [
+              "https://github.com/AbdelazizSleem01",
+              "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/",
+            ],
+            "image": "https://as-portfolio-ten.vercel.app/imgs/my-img.jpeg"
+          })}
+        </script>
+
+        {/* Website Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Abdelaziz Sleem Portfolio",
+            "url": "https://as-portfolio-ten.vercel.app/",
+            "description": "Portfolio of Abdelaziz Sleem, a Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB.",
+          })}
+        </script>
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
