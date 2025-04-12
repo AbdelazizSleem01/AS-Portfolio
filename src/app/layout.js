@@ -99,7 +99,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="canonical" href="https://as-portfolio-ten.vercel.app/" />
-
+        <meta name="google-adsense-account" content="ca-pub-1270698221637999" />
         {/* Person Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -136,7 +136,6 @@ export default function RootLayout({ children }) {
             "description": "Portfolio of Abdelaziz Sleem, a Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB.",
           })}
         </script>
-          <meta name="google-adsense-account" content="ca-pub-1270698221637999">
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
