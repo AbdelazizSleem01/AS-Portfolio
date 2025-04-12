@@ -41,7 +41,7 @@ export default function HomePage() {
 
   const defaultHeader = {
     title: "Hello, My name is Abdelaziz Sleem",
-    description: "Experienced full-stack developer with 4+ years of expertise...",
+    description: "👋 Hi, I’m Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences. I also enhance UI/UX with libraries like DaisyUI and ShadCn UI, ensuring every project is both visually stunning and functionally robust. As a freelance developer, I’m committed to delivering high-quality solutions that solve real-world problems while continuously pushing the boundaries of what’s possible in web development. My goal is to become a leading influencer in the freelance market, sharing knowledge and empowering others through open-source contributions and mentorship. 🌍✨",
     imageUrl: "/imgs/my-img.jpeg",
     githubLink: "https://github.com/AbdelazizSleem01",
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
