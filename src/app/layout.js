@@ -100,6 +100,9 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="canonical" href="https://as-portfolio-ten.vercel.app/" />
         <meta name="google-adsense-account" content="ca-pub-1270698221637999" />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1270698221637999"
+          crossorigin="anonymous">
+        </script>
         {/* Person Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
