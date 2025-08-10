@@ -166,7 +166,7 @@ const Footer = () => {
                         transition={{ type: 'spring' }}
                     >
                         {[
-                            { icon: <Phone />, text: '+20 01119268163', subtitle: 'Support Number', href: 'tel:+20 01119268163', title: 'Contact Me' },
+                            { icon: <Phone />, text: '+20 01012105407', subtitle: 'Support Number', href: 'tel:+20 01119268163', title: 'Contact Me' },
                             { icon: <Mail />, text: 'abdelazizsleem957@gmail.com', subtitle: 'Support Email', href: 'mailto:abdelazizsleem957@gmail.com', title: 'Contact Me Via Email' },
                             { icon: <MapPin />, text: 'Benha, Qalubia, Egypt', subtitle: 'Address', href: '#', title: 'My Location' }
                         ].map((item, index) => (
@@ -330,5 +330,6 @@ const Footer = () => {
         </motion.div>
     );
 };
+
 
 export default Footer;
