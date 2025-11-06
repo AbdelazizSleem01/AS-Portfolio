@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Edit } from 'lucide-react';
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Edit } from "lucide-react";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function CategoriesList() {
   const [categories, setCategories] = useState([]);
@@ -11,20 +11,16 @@ export default function CategoriesList() {
   const { user } = useUser();
 
   if (!user) {
-      return <RedirectToSignIn />;
-
+    return <RedirectToSignIn />;
   }
-
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch('/api/categories');
+        const res = await fetch("/api/categories");
         const data = await res.json();
         setCategories(data.categories);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
+      } catch (error) {}
     };
 
     fetchCategories();
@@ -50,14 +46,20 @@ export default function CategoriesList() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className='text-neutral'>{cat.name}</span>
-              <Link href={`/updateCategory/${cat._id}`} className="btn btn-primary text-white hover:btn-primary/80">
+              <span className="text-neutral">{cat.name}</span>
+              <Link
+                href={`/updateCategory/${cat._id}`}
+                className="btn btn-primary text-white hover:btn-primary/80"
+              >
                 Edit
-                <Edit/>
+                <Edit />
               </Link>
             </motion.li>
           ))}
-          <Link href="/addCategory" className="flex items-center justify-center my-4 text-center bg-primary hover:btn-primary/80 text-white py-3 rounded">
+          <Link
+            href="/addCategory"
+            className="flex items-center justify-center my-4 text-center bg-primary hover:btn-primary/80 text-white py-3 rounded"
+          >
             Create New Category
           </Link>
         </ul>

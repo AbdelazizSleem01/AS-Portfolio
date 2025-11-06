@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob'; // Import Vercel Blob's put method
-import connectDB from '../../../../lib/mongodb';
-import Post from '../../../../models/Post';
+import { NextResponse } from "next/server";
+import { put } from "@vercel/blob"; // Import Vercel Blob's put method
+import connectDB from "../../../../lib/mongodb";
+import Post from "../../../../models/Post";
 
 export async function POST(req) {
   try {
@@ -9,46 +9,48 @@ export async function POST(req) {
 
     // Function to handle image uploads to Vercel Blob
     const handleImageUpload = async (file) => {
-      if (!file) return '';
+      if (!file) return "";
 
       try {
         const { url } = await put(
           `posts/${Date.now()}-${file.name}`,
-          Buffer.from(await file.arrayBuffer()), 
+          Buffer.from(await file.arrayBuffer()),
           {
-            access: 'public', 
-            contentType: file.type, 
+            access: "public",
+            contentType: file.type,
           }
         );
 
-        return url; 
+        return url;
       } catch (error) {
-        console.error('File upload error:', error);
-        throw new Error('Failed to upload image');
+        throw new Error("Failed to upload image");
       }
     };
 
     // Extract form data
     const postData = {
-      name: formData.get('name'),
-      title: formData.get('title'),
-      content: formData.get('content'),
-      slug: formData.get('slug'),
-      excerpt: formData.get('excerpt'),
-      tags: formData.get('tags')
-        ? formData.get('tags').split(',').map((tag) => tag.trim())
+      name: formData.get("name"),
+      title: formData.get("title"),
+      content: formData.get("content"),
+      slug: formData.get("slug"),
+      excerpt: formData.get("excerpt"),
+      tags: formData.get("tags")
+        ? formData
+            .get("tags")
+            .split(",")
+            .map((tag) => tag.trim())
         : [],
-      coverImage: await handleImageUpload(formData.get('coverImage')),
-      userImage: await handleImageUpload(formData.get('userImage')),
+      coverImage: await handleImageUpload(formData.get("coverImage")),
+      userImage: await handleImageUpload(formData.get("userImage")),
     };
 
     // Validate required fields
-    const requiredFields = [ 'name','title', 'slug', 'content'];
+    const requiredFields = ["name", "title", "slug", "content"];
     const missingFields = requiredFields.filter((field) => !postData[field]);
 
     if (missingFields.length > 0) {
       return NextResponse.json(
-        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { error: `Missing required fields: ${missingFields.join(", ")}` },
         { status: 400 }
       );
     }
@@ -60,7 +62,7 @@ export async function POST(req) {
     const existingPost = await Post.findOne({ slug: postData.slug });
     if (existingPost) {
       return NextResponse.json(
-        { error: 'Slug already exists' },
+        { error: "Slug already exists" },
         { status: 409 }
       );
     }
@@ -78,10 +80,9 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Post creation error:', error);
     return NextResponse.json(
       {
-        error: error.message || 'Failed to create post',
+        error: error.message || "Failed to create post",
         details: error.details || null,
       },
       { status: 500 }
@@ -96,7 +97,7 @@ export async function GET() {
     return NextResponse.json(posts);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch posts' },
+      { error: "Failed to fetch posts" },
       { status: 500 }
     );
   }

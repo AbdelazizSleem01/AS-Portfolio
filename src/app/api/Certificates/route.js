@@ -1,25 +1,27 @@
-import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob'; 
-import connectDB from '../../../../lib/mongodb';
-import Certificate from '../../../../models/Certificate';
+import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
+import connectDB from "../../../../lib/mongodb";
+import Certificate from "../../../../models/Certificate";
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const title = formData.get('title');
-    const imageFile = formData.get('image');
+    const title = formData.get("title");
+    const imageFile = formData.get("image");
 
     if (!imageFile) {
-      throw new Error('Image upload failed. Make sure an image file is provided.');
+      throw new Error(
+        "Image upload failed. Make sure an image file is provided."
+      );
     }
 
     // Handle Image Upload to Vercel Blob
     const { url: imageUrl } = await put(
       `CertificatesImages/${Date.now()}-${imageFile.name}`,
-      Buffer.from(await imageFile.arrayBuffer()), 
+      Buffer.from(await imageFile.arrayBuffer()),
       {
-        access: 'public',
-        contentType: imageFile.type, 
+        access: "public",
+        contentType: imageFile.type,
       }
     );
 
@@ -31,13 +33,15 @@ export async function POST(req) {
     });
 
     return NextResponse.json(
-      { message: 'Certificate Created Successfully', Certificate: newCertificate },
+      {
+        message: "Certificate Created Successfully",
+        Certificate: newCertificate,
+      },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error in POST /api/Certificates:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create Certificate' },
+      { error: error.message || "Failed to create Certificate" },
       { status: 500 }
     );
   }
@@ -52,9 +56,8 @@ export async function GET(req) {
 
     return NextResponse.json(certificates);
   } catch (error) {
-    console.error('Error in GET /api/Certificates:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch certificates' },
+      { error: error.message || "Failed to fetch certificates" },
       { status: 500 }
     );
   }

@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
-import { toast } from 'react-toastify';
-import { motion } from 'framer-motion';
-import { ArrowBigLeft, Save, Trash2 } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { ArrowBigLeft, Save, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function UpdateCategory() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false); // Loading state for update and delete
 
   useEffect(() => {
@@ -23,11 +23,10 @@ export default function UpdateCategory() {
           const data = await res.json();
           setName(data.category.name); // Ensure the response structure matches
         } else {
-          toast.error('Failed to load category');
+          toast.error("Failed to load category");
         }
       } catch (error) {
-        console.error('Error fetching category:', error);
-        toast.error('An unexpected error occurred');
+        toast.error("An unexpected error occurred");
       }
     };
 
@@ -41,14 +40,14 @@ export default function UpdateCategory() {
 
     // SweetAlert2 confirmation for update
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to update this category?',
-      icon: 'question',
+      title: "Are you sure?",
+      text: "Do you want to update this category?",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, update it!',
-      cancelButtonText: 'No, cancel!',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, update it!",
+      cancelButtonText: "No, cancel!",
       reverseButtons: true,
     });
 
@@ -57,23 +56,26 @@ export default function UpdateCategory() {
 
       try {
         const res = await fetch(`/api/categories/${id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ name }),
         });
 
         if (res.ok) {
-          Swal.fire('Updated!', 'Category updated successfully', 'success');
-          router.push('/allCategories');
+          Swal.fire("Updated!", "Category updated successfully", "success");
+          router.push("/allCategories");
         } else {
           const errorData = await res.json();
-          Swal.fire('Error!', errorData.error || 'Failed to update category', 'error');
+          Swal.fire(
+            "Error!",
+            errorData.error || "Failed to update category",
+            "error"
+          );
         }
       } catch (error) {
-        console.error('Error updating category:', error);
-        Swal.fire('Error!', 'An unexpected error occurred', 'error');
+        Swal.fire("Error!", "An unexpected error occurred", "error");
       } finally {
         setIsLoading(false); // Stop loading
       }
@@ -85,14 +87,14 @@ export default function UpdateCategory() {
 
     // SweetAlert2 confirmation for delete
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'You won\'t be able to revert this!',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
       reverseButtons: true,
     });
 
@@ -100,19 +102,22 @@ export default function UpdateCategory() {
       setIsLoading(true); // Start loading
       try {
         const res = await fetch(`/api/categories/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
 
         if (res.ok) {
-          Swal.fire('Deleted!', 'Category deleted successfully', 'success');
-          router.push('/allCategories');
+          Swal.fire("Deleted!", "Category deleted successfully", "success");
+          router.push("/allCategories");
         } else {
           const errorData = await res.json();
-          Swal.fire('Error!', errorData.error || 'Failed to delete category', 'error');
+          Swal.fire(
+            "Error!",
+            errorData.error || "Failed to delete category",
+            "error"
+          );
         }
       } catch (error) {
-        console.error('Error deleting category:', error);
-        Swal.fire('Error!', 'An unexpected error occurred', 'error');
+        Swal.fire("Error!", "An unexpected error occurred", "error");
       } finally {
         setIsLoading(false); // Stop loading
       }
@@ -201,7 +206,6 @@ export default function UpdateCategory() {
               disabled={isLoading}
             >
               {isLoading ? (
-
                 <svg
                   className="animate-spin h-5 w-5 mr-3 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -231,7 +235,7 @@ export default function UpdateCategory() {
             </motion.button>
           </div>
         </form>
-      </motion.div >
+      </motion.div>
 
       <motion.div
         className="w-full flex justify-center items-center my-10"

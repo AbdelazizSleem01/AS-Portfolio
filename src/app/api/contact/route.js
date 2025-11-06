@@ -8,13 +8,12 @@ export async function GET(request) {
     const contacts = await Contact.find({}).sort({ createdAt: -1 });
     return new Response(JSON.stringify(contacts), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error('Error fetching contacts:', error);
-    return new Response(JSON.stringify({ message: 'Internal server error' }), {
+    return new Response(JSON.stringify({ message: "Internal server error" }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
@@ -27,8 +26,8 @@ export async function POST(request) {
   // Validate required fields
   if (!name || !email || !subject || !message) {
     return new Response(
-      JSON.stringify({ message: 'Missing required fields' }),
-      { status: 422, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ message: "Missing required fields" }),
+      { status: 422, headers: { "Content-Type": "application/json" } }
     );
   }
 
@@ -38,16 +37,15 @@ export async function POST(request) {
 
     return new Response(
       JSON.stringify({
-        message: 'Contact message saved successfully!',
+        message: "Contact message saved successfully!",
         contactId: newContact._id,
       }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
+      { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error('Error saving contact message:', error);
-    return new Response(
-      JSON.stringify({ message: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ message: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

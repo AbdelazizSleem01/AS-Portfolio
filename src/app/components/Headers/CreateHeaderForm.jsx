@@ -21,13 +21,12 @@ export default function CreateHeaderForm() {
   const [githubLink, setGithubLink] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); 
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const { user } = useUser();
 
   if (!user) {
-      return <RedirectToSignIn />;
-
+    return <RedirectToSignIn />;
   }
 
   useEffect(() => {
@@ -35,7 +34,7 @@ export default function CreateHeaderForm() {
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
-        'content',
+        "content",
         `Create a professional header for your portfolio using ${process.env.NEXT_PUBLIC_META_TITLE}. Share your skills, experience, and achievements with potential employers and clients.`
       );
   }, []);
@@ -90,15 +89,13 @@ export default function CreateHeaderForm() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Header Created:", data);
+
         toast.success("Header created successfully!");
         router.push("/allHeaders");
       } else {
-        console.error("Error creating header");
         toast.error("Failed to create header!");
       }
     } catch (error) {
-      console.error("Error creating header:", error);
       toast.error("An unexpected error occurred!");
     } finally {
       setIsLoading(false); // Stop loading
@@ -169,7 +166,10 @@ export default function CreateHeaderForm() {
             variants={fieldVariant}
             transition={{ delay: 0.1 }}
           >
-            <label htmlFor="description" className="block text-sm label font-medium">
+            <label
+              htmlFor="description"
+              className="block text-sm label font-medium"
+            >
               Header Description
             </label>
             <EditorContent
@@ -186,7 +186,10 @@ export default function CreateHeaderForm() {
             variants={fieldVariant}
             transition={{ delay: 0.2 }}
           >
-            <label htmlFor="linkedInLink" className="block text-sm label font-medium">
+            <label
+              htmlFor="linkedInLink"
+              className="block text-sm label font-medium"
+            >
               LinkedIn Link
             </label>
             <input
@@ -205,7 +208,10 @@ export default function CreateHeaderForm() {
             variants={fieldVariant}
             transition={{ delay: 0.3 }}
           >
-            <label htmlFor="githubLink" className="block text-sm label font-medium">
+            <label
+              htmlFor="githubLink"
+              className="block text-sm label font-medium"
+            >
               GitHub Link
             </label>
             <input
@@ -248,10 +254,7 @@ export default function CreateHeaderForm() {
           </motion.div>
 
           {/* Submit Button */}
-          <motion.div
-            variants={fieldVariant}
-            transition={{ delay: 0.5 }}
-          >
+          <motion.div variants={fieldVariant} transition={{ delay: 0.5 }}>
             <button
               type="submit"
               className="w-full py-3 bg-primary rounded-md text-white font-medium hover:bg-primary/80 flex items-center justify-center gap-2"

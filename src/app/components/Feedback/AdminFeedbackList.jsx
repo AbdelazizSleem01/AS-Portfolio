@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import { Trash2 } from "lucide-react";
 
 export default function AdminFeedbackList() {
@@ -14,14 +14,12 @@ export default function AdminFeedbackList() {
 
   const { user } = useUser();
 
-
-
   useEffect(() => {
     document.title = `All Feedbacks | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
-        'content',
+        "content",
         `See all feedbacks submitted by visitors on ${process.env.NEXT_PUBLIC_META_TITLE}.`
       );
   }, []);
@@ -34,7 +32,6 @@ export default function AdminFeedbackList() {
         const data = await res.json();
         setFeedbacks(data);
       } catch (error) {
-        console.error(error);
       } finally {
         setIsLoading(false);
       }
@@ -47,14 +44,14 @@ export default function AdminFeedbackList() {
 
     // SweetAlert2 confirmation for delete
     Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: `Are you sure you want to delete feedback from ${feedback.name}?`,
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
@@ -76,10 +73,9 @@ export default function AdminFeedbackList() {
       }
 
       setFeedbacks((prev) => prev.filter((f) => f._id !== feedbackId));
-      Swal.fire('Deleted!', 'Feedback deleted successfully! 🌟', 'success');
+      Swal.fire("Deleted!", "Feedback deleted successfully! 🌟", "success");
     } catch (err) {
-      console.error("Error deleting feedback:", err);
-      Swal.fire('Error!', err.message || 'Failed to delete feedback', 'error');
+      Swal.fire("Error!", err.message || "Failed to delete feedback", "error");
     } finally {
       setIsDeleting(false);
       setSelectedFeedback(null);
@@ -90,7 +86,9 @@ export default function AdminFeedbackList() {
   }
   return (
     <div className="Heading flex flex-col items-center p-4 mt-20">
-      <h1 className="text-2xl semiHead w-full font-bold mb-4">Manage Feedback</h1>
+      <h1 className="text-2xl semiHead w-full font-bold mb-4">
+        Manage Feedback
+      </h1>
 
       {isLoading ? (
         <motion.div
@@ -112,7 +110,6 @@ export default function AdminFeedbackList() {
             Loading Feedbacks...
           </motion.span>
         </motion.div>
-
       ) : feedbacks.length === 0 ? (
         <p>No feedback available.</p>
       ) : (
@@ -133,7 +130,9 @@ export default function AdminFeedbackList() {
                     className="w-16 h-16 rounded-full object-cover border-2 border-primary shadow-md"
                   />
                   <div>
-                    <h2 className="text-lg font-bold text-base-100">{feedback.name}</h2>
+                    <h2 className="text-lg font-bold text-base-100">
+                      {feedback.name}
+                    </h2>
                     <p className="text-sm text-base-100/50">{feedback.email}</p>
                   </div>
                 </div>
@@ -143,7 +142,9 @@ export default function AdminFeedbackList() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span
                       key={i}
-                      className={`text-3xl ${i < feedback.rating ? "text-primary" : "text-gray-500"}`}
+                      className={`text-3xl ${
+                        i < feedback.rating ? "text-primary" : "text-gray-500"
+                      }`}
                     >
                       ★
                     </span>

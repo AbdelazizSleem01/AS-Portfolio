@@ -23,10 +23,10 @@ export async function PATCH(request, { params }) {
     );
 
     if (!updatedContact) {
-      return new Response(
-        JSON.stringify({ message: "Contact not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ message: "Contact not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const transporter = nodemailer.createTransport({
@@ -75,7 +75,9 @@ export async function PATCH(request, { params }) {
             <!-- Signature -->
             <p style="font-size: 16px; margin-bottom: 20px;">
               Best regards,<br>
-              <strong style="color: #A31D1D;">${process.env.EMAIL_FROM_NAME || "Abdelaziz Sleem Portfolio"}</strong>
+              <strong style="color: #A31D1D;">${
+                process.env.EMAIL_FROM_NAME || "Abdelaziz Sleem Portfolio"
+              }</strong>
             </p>
           </div>
     
@@ -85,7 +87,9 @@ export async function PATCH(request, { params }) {
               This is an automated message. Please do not reply directly to this email.
             </p>
             <p>
-              &copy; ${new Date().getFullYear()} ${process.env.EMAIL_FROM_NAME || "Abdelaziz Sleem Portfolio"}. All rights reserved.
+              &copy; ${new Date().getFullYear()} ${
+        process.env.EMAIL_FROM_NAME || "Abdelaziz Sleem Portfolio"
+      }. All rights reserved.
             </p>
           </div>
         </div>
@@ -99,10 +103,9 @@ export async function PATCH(request, { params }) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error updating response and sending email:", error);
-    return new Response(
-      JSON.stringify({ message: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ message: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

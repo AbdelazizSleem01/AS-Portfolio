@@ -1,22 +1,21 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { toast } from 'react-toastify';
-import { motion } from 'framer-motion';
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function CreateCategory() {
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const { user } = useUser();
 
   if (!user) {
-      return <RedirectToSignIn />;
-
+    return <RedirectToSignIn />;
   }
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export default function CreateCategory() {
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
-        'content',
+        "content",
         `Create a new category on my portfolio. | ${process.env.NEXT_PUBLIC_META_TITLE}`
       );
   }, []);
@@ -34,25 +33,23 @@ export default function CreateCategory() {
     setIsLoading(true);
 
     try {
-
-      const res = await fetch('/api/categories', {
-        method: 'POST',
+      const res = await fetch("/api/categories", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name }),
       });
 
       if (res.ok) {
-        toast.success('Category created successfully');
-        router.push('/allCategories');
+        toast.success("Category created successfully");
+        router.push("/allCategories");
       } else {
         const errorData = await res.json();
-        toast.error(errorData.error || 'Failed to create category');
+        toast.error(errorData.error || "Failed to create category");
       }
     } catch (error) {
-      console.error('Error creating category:', error);
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false); // Stop loading in any case
     }
@@ -125,7 +122,7 @@ export default function CreateCategory() {
                 ></path>
               </svg>
             ) : (
-              'Create Category'
+              "Create Category"
             )}
           </motion.button>
         </form>

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { put, del } from '@vercel/blob'; // Import Vercel Blob methods
-import connectDB from '../../../../../lib/mongodb';
-import Certificate from '../../../../../models/Certificate';
+import { NextResponse } from "next/server";
+import { put, del } from "@vercel/blob"; // Import Vercel Blob methods
+import connectDB from "../../../../../lib/mongodb";
+import Certificate from "../../../../../models/Certificate";
 
 export async function GET(req, { params }) {
   try {
@@ -11,16 +11,15 @@ export async function GET(req, { params }) {
     const certificate = await Certificate.findById(id);
     if (!certificate) {
       return NextResponse.json(
-        { error: 'Certificate not found' },
+        { error: "Certificate not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(certificate, { status: 200 });
   } catch (error) {
-    console.error('Error fetching Certificate:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch Certificate' },
+      { error: "Failed to fetch Certificate" },
       { status: 500 }
     );
   }
@@ -32,8 +31,8 @@ export async function PUT(req, { params }) {
     await connectDB();
 
     const formData = await req.formData();
-    const title = formData.get('title');
-    const imageFile = formData.get('image');
+    const title = formData.get("title");
+    const imageFile = formData.get("image");
 
     const updateData = { title };
 
@@ -41,7 +40,7 @@ export async function PUT(req, { params }) {
     const existingCertificate = await Certificate.findById(id);
     if (!existingCertificate) {
       return NextResponse.json(
-        { error: 'Certificate not found' },
+        { error: "Certificate not found" },
         { status: 404 }
       );
     }
@@ -52,7 +51,7 @@ export async function PUT(req, { params }) {
         `CertificatesImages/${Date.now()}-${imageFile.name}`,
         Buffer.from(await imageFile.arrayBuffer()),
         {
-          access: 'public',
+          access: "public",
           contentType: imageFile.type,
         }
       );
@@ -72,13 +71,15 @@ export async function PUT(req, { params }) {
     );
 
     return NextResponse.json(
-      { message: 'Certificate updated successfully', certificate: updatedCertificate },
+      {
+        message: "Certificate updated successfully",
+        certificate: updatedCertificate,
+      },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error updating Certificate:', error);
     return NextResponse.json(
-      { error: 'Failed to update Certificate' },
+      { error: "Failed to update Certificate" },
       { status: 500 }
     );
   }
@@ -94,7 +95,7 @@ export async function DELETE(req, { params }) {
 
     if (!deletedCertificate) {
       return NextResponse.json(
-        { error: 'Certificate not found' },
+        { error: "Certificate not found" },
         { status: 404 }
       );
     }
@@ -105,13 +106,12 @@ export async function DELETE(req, { params }) {
     }
 
     return NextResponse.json(
-      { message: 'Certificate deleted successfully' },
+      { message: "Certificate deleted successfully" },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error deleting certificate:', error);
     return NextResponse.json(
-      { error: 'Failed to delete certificate' },
+      { error: "Failed to delete certificate" },
       { status: 500 }
     );
   }

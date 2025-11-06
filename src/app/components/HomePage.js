@@ -1,18 +1,40 @@
 'use client';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Download } from 'lucide-react';
+import { 
+  FiDownload, 
+  FiGithub, 
+  FiLinkedin, 
+  FiCode,
+  FiServer,
+  FiLayout,
+  FiStar,
+  FiAward,
+  FiGlobe
+} from 'react-icons/fi';
+import { 
+  RiReactjsLine, 
+  RiNextjsLine, 
+  RiNodejsLine,
+} from 'react-icons/ri';
+import { 
+  SiMongodb, 
+  SiTailwindcss,
+  SiTypescript,
+  SiJavascript
+} from 'react-icons/si';
 
 export default function HomePage() {
   const [selectedHeader, setSelectedHeader] = useState(null);
   const [themeColor, setThemeColor] = useState("#418aff");
+  const [typingText, setTypingText] = useState("Full-Stack Developer");
   const controls = useAnimation();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const [cursorScale, setCursorScale] = useState(1);
+  const typingRef = useRef(null);
 
-  // Smooth spring values for cursor movement
   const smoothX = useSpring(mouseX, { stiffness: 500, damping: 30 });
   const smoothY = useSpring(mouseY, { stiffness: 500, damping: 30 });
 
@@ -40,32 +62,44 @@ export default function HomePage() {
   }, []);
 
   const defaultHeader = {
-    title: "Hello, My name is Abdelaziz Sleem",
-    description: "👋 Hi, I’m Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences. I also enhance UI/UX with libraries like DaisyUI and ShadCn UI, ensuring every project is both visually stunning and functionally robust. As a freelance developer, I’m committed to delivering high-quality solutions that solve real-world problems while continuously pushing the boundaries of what’s possible in web development. My goal is to become a leading influencer in the freelance market, sharing knowledge and empowering others through open-source contributions and mentorship. 🌍✨",
+    title: "Hello, I'm Abdelaziz Sleem",
+    description: "👋 Hi, I'm Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences.",
     imageUrl: "/imgs/my-img.jpeg",
     githubLink: "https://github.com/AbdelazizSleem01",
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
   };
 
-
   useEffect(() => {
-
     const savedHeader = localStorage.getItem('selectedHeader');
     if (savedHeader) {
       setSelectedHeader(JSON.parse(savedHeader));
     } else {
       setSelectedHeader(defaultHeader);
     }
+  }, []);
 
-    if (typeof window !== 'undefined') {
+  // Typed.js animation effect
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typingRef.current) {
       const Typed = require('typed.js');
-      const typed = new Typed('.typing', {
-        strings: ['FullStack Developer,', 'Frontend Developer,', 'Backend Developer,'],
-        typeSpeed: 120,
-        backSpeed: 60,
+      
+      const options = {
+        strings: ['Full-Stack Developer', 'Frontend Developer', 'Backend Developer'],
+        typeSpeed: 80,
+        backSpeed: 50,
+        backDelay: 1500,
+        startDelay: 500,
         loop: true,
-      });
-      return () => typed.destroy();
+        showCursor: true,
+        cursorChar: '|',
+        smartBackspace: true
+      };
+
+      const typed = new Typed(typingRef.current, options);
+
+      return () => {
+        typed.destroy();
+      };
     }
   }, []);
 
@@ -82,7 +116,7 @@ export default function HomePage() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 1, y: 20, rotate: -5 },
+    hidden: { opacity: 0, y: 20, rotate: -5 },
     visible: {
       opacity: 1,
       y: 0,
@@ -91,11 +125,19 @@ export default function HomePage() {
     }
   };
 
+  const techIcons = [
+    { icon: RiReactjsLine, name: 'React', color: '#61DAFB' },
+    { icon: RiNextjsLine, name: 'Next.js', color: '#000000' },
+    { icon: RiNodejsLine, name: 'Node.js', color: '#339933' },
+    { icon: SiMongodb, name: 'MongoDB', color: '#47A248' },
+    { icon: SiTailwindcss, name: 'Tailwind', color: '#06B6D4' },
+    { icon: SiTypescript, name: 'TypeScript', color: '#3178C6' },
+  ];
+
   return (
     <div className="w-full h-full bg-base-100 text-base-content overflow-hidden pt-20">
-      {/* Animated Mouse Cursor */}
       <motion.div
-        className="fixed w-10 h-10 bg-primary rounded-full pointer-events-none z-50"
+        className="fixed w-10 h-10 bg-primary rounded-full pointer-events-none z-50 overflow-hidden"
         style={{
           x: useTransform(smoothX, x => x - 10),
           y: useTransform(smoothY, y => y - 50),
@@ -111,70 +153,134 @@ export default function HomePage() {
       />
 
       <div className="h-full w-full mx-auto relative top-12 pb-[165px] xl:px-16 px-8 flex md:flex-row flex-col gap-8 justify-center items-center pb-10 pt-4">
+        {/* Left Section - Profile Image */}
         <motion.div
-          className="w-full md:w-1/2 relative"
+          className="w-full md:w-2/5 relative flex justify-center"
           variants={itemVariants}
           initial="hidden"
           animate={controls}
         >
           {selectedHeader?.imageUrl && (
-            <motion.img
-              className="relative z-10 rounded-full lg:max-w-[60%] max-w-[60%] mx-auto outline outline-[.7rem] outline-offset-[.1rem] outline-primary/60"
-              src={selectedHeader?.imageUrl}
-              alt={selectedHeader?.title}
-              animate={{
-                y: [0, -20, 0],
-                boxShadow: [
-                  '0px 0px 20px 0px var(--primary)',
-                  '0px 0px 35px 10px var(--primary)',
-                  '0px 0px 20px 0px var(--primary)',
-                ],
-                outlineColor: [`${themeColor}60`, `${themeColor}30`, `${themeColor}60`],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut'
-              }}
-            />
+            <div className="relative">
+              <motion.div
+                className="relative  z-10 rounded-full lg:max-w-[400px] max-w-[300px] mx-auto border-8 border-primary/20"
+                animate={{
+                  y: [0, -15, 0],
+                  boxShadow: [
+                    '0px 0px 30px 0px var(--primary)',
+                    '0px 0px 50px 15px var(--primary)',
+                    '0px 0px 30px 0px var(--primary)',
+                  ],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              >
+                <img
+                  className="rounded-full w-full h-auto"
+                  src={selectedHeader?.imageUrl}
+                  alt={selectedHeader?.title}
+                />
+              </motion.div>
+              
+              {/* Floating Tech Icons Around Image */}
+              {techIcons.map((tech, index) => (
+                <motion.div
+                  key={tech.name}
+                  className="absolute bg-base-100 p-3 rounded-full shadow-lg border"
+                  style={{
+                    top: `${35 + 60 * Math.sin((index * Math.PI) / 3)}%`,
+                    left: `${30 + 60 * Math.cos((index * Math.PI) / 3)}%`,
+                  }}
+                  animate={{
+                    y: [0, -10, 0],
+                    rotate: [0, 5, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: index * 0.2,
+                  }}
+                >
+                  <tech.icon 
+                    className="text-2xl" 
+                    style={{ color: tech.color }}
+                  />
+                </motion.div>
+              ))}
+            </div>
           )}
         </motion.div>
 
-        {/* Text Content Section */}
+        {/* Right Section - Content */}
         <motion.div
-          className="w-full md:w-1/2 flex flex-col justify-center gap-4 md:text-left text-center"
+          className="w-full md:w-3/5 flex flex-col justify-center gap-6 md:text-left text-center"
           variants={containerVariants}
           initial="hidden"
           animate={controls}
         >
-          {/* Animated Headers */}
-          <motion.h1
-            className="md:text-4xl sm:text-3xl text-2xl font-semibold font-serif"
-            whilehover={{ scale: 1.02 }}
+          <motion.div
+            className="flex items-center gap-3 mb-2 justify-center md:justify-start"
+            variants={itemVariants}
           >
-            {selectedHeader?.title || "Hello, My name is Abdelaziz Sleem"}
+            <FiAward className="text-2xl text-primary" />
+            <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+              Available for Freelance
+            </span>
+          </motion.div>
+
+          <motion.h1
+            className="md:text-5xl sm:text-4xl text-3xl font-bold font-serif leading-tight"
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+          >
+            {selectedHeader?.title || "Hello, I'm Abdelaziz Sleem"}
           </motion.h1>
 
           <motion.h2
-            className="capitalize text-secondary font-semibold"
-            whilehover={{ x: 10 }}
+            className="text-xl text-secondary font-semibold flex items-center gap-2 justify-center md:justify-start"
+            variants={itemVariants}
           >
-            I'm <span className="typing text-primary"></span>
+            <FiCode className="text-primary" />
+            I'm a{" "}
+            <span 
+              ref={typingRef}
+              className="text-primary font-bold min-h-[1.5em] inline-block"
+            />
           </motion.h2>
 
           <motion.p
-            className="text-neutral text-justify"
+            className="text-neutral text-lg leading-relaxed"
             dangerouslySetInnerHTML={{
               __html: selectedHeader?.description ||
-                "Experienced full-stack developer with 4+ years of expertise in Laravel, NestJS, Nuxt.js, Next.js, Android, and some Flutter experience.🥰.",
+                "Experienced full-stack developer with 4+ years of expertise in Laravel, NestJS, Nuxt.js, Next.js, Android, and some Flutter experience. 🥰",
             }}
             variants={itemVariants}
-            whilehover={{ scale: 1.01 }}
           ></motion.p>
 
-          {/* Interactive Buttons */}
+          {/* Tech Stack Overview */}
           <motion.div
-            className=" flex flex-col md:flex-row gap-4 font-serif"
+            className="flex flex-wrap gap-4 justify-center md:justify-start"
+            variants={itemVariants}
+          >
+            {techIcons.map((tech, index) => (
+              <motion.div
+                key={tech.name}
+                className="flex items-center gap-2 bg-base-200 px-3 py-2 rounded-lg"
+                whileHover={{ scale: 1.05, y: -2 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <tech.icon style={{ color: tech.color }} />
+                <span className="text-sm font-medium">{tech.name}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 font-serif mt-4"
             variants={containerVariants}
           >
             {selectedHeader?.githubLink && (
@@ -182,24 +288,11 @@ export default function HomePage() {
                 title="Visit Abdelaziz Sleem's GitHub Profile"
                 href={selectedHeader.githubLink}
                 target="_blank"
-                className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 flex items-center justify-center gap-2"
-                role="button"
-                component={motion.a}
-                whilehover={{
-                  scale: 1.05,
-                  boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
-                }}
-                whiletap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 flex items-center justify-center gap-3 transition-all duration-300"
+                data-cursor-hover
               >
-                Github
-                <motion.img
-                  className="w-8 h-8"
-                  src="/imgs/github.png"
-                  alt=""
-                  whilehover={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
-                  aria-hidden="true"
-                />
+                <FiGithub className="text-xl" />
+                <span>GitHub</span>
               </Link>
             )}
 
@@ -208,53 +301,72 @@ export default function HomePage() {
                 href={selectedHeader.linkedInLink}
                 target="_blank"
                 title="Visit Abdelaziz Sleem's LinkedIn Profile"
-                passHref
-                legacyBehavior
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-3 transition-all duration-300"
+                data-cursor-hover
               >
-                <motion.a
-                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/95 transition flex items-center justify-center gap-2"
-                  whilehover={{
-                    scale: 1.05,
-                    boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
-                  }}
-                  whiletap={{ scale: 0.95 }}
-                  role="button"
-                >
-                  LinkedIn
-                  <motion.img
-                    className="w-8 h-8"
-                    src="/imgs/linkedin.png"
-                    alt=""
-                    whilehover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                    aria-hidden="true"
-                  />
-                </motion.a>
+                <FiLinkedin className="text-xl" />
+                <span>LinkedIn</span>
               </Link>
             )}
+            
             <motion.a
               title="Download Abdelaziz Sleem's CV"
               href="/imgs/Abdelaziz Sleem CV.pdf"
               download="Abdelaziz Sleem CV.pdf"
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition flex items-center justify-center gap-2"
-              whilehover={{
+              className="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 flex items-center justify-center gap-3 transition-all duration-300"
+              data-cursor-hover
+              whileHover={{
                 scale: 1.05,
-                boxShadow: "0px 5px 15px rgba(0,0,0,0.3)"
+                boxShadow: "0px 8px 25px rgba(239, 68, 68, 0.3)"
               }}
-              whiletap={{ scale: 0.95 }}
-              aria-label="Download CV document"
             >
-              Download CV
-              <Download
-                className="w-7 h-7 rounded-sm"
-                aria-hidden="true"
-              />
+              <FiDownload className="text-xl" />
+              <span>Download CV</span>
             </motion.a>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"
+            variants={containerVariants}
+          >
+            <motion.div
+              className="text-center p-4 bg-base-200 rounded-lg"
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FiGlobe className="text-primary text-xl" />
+                <span className="text-2xl font-bold">2+</span>
+              </div>
+              <p className="text-sm text-neutral">Years Experience</p>
+            </motion.div>
+            
+            <motion.div
+              className="text-center p-4 bg-base-200 rounded-lg"
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FiLayout className="text-primary text-xl" />
+                <span className="text-2xl font-bold">30+</span>
+              </div>
+              <p className="text-sm text-neutral">Projects Done</p>
+            </motion.div>
+            
+            <motion.div
+              className="text-center p-4 bg-base-200 rounded-lg col-span-2 md:col-span-1"
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <FiStar className="text-primary text-xl" />
+                <span className="text-2xl font-bold">99%</span>
+              </div>
+              <p className="text-sm text-neutral">Client Satisfaction</p>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
 
-      {/* Floating Background Elements */}
+      {/* Background Animations */}
       <motion.div
         className="absolute w-4 h-4 bg-primary/20 rounded-full"
         style={{
@@ -286,7 +398,6 @@ export default function HomePage() {
           repeat: Infinity,
           ease: 'easeInOut'
         }}
-
       />
       <motion.div
         className="absolute w-8 h-4 bg-primary/20 rounded-full"
@@ -304,7 +415,6 @@ export default function HomePage() {
           ease: 'easeInOut'
         }}
       />
-
     </div>
   );
 }

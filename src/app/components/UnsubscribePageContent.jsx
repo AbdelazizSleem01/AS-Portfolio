@@ -20,8 +20,6 @@ export default function UnsubscribePageContent() {
         const response = await fetch(`/api/unsubscribe?token=${token}`);
         const data = await response.json();
 
-        console.log("API Response:", data);
-
         const elapsed = Date.now() - startTime;
         if (elapsed < minimumLoadingTime) {
           await new Promise((resolve) =>
@@ -31,14 +29,14 @@ export default function UnsubscribePageContent() {
 
         if (data.success) {
           setStatus("success");
-          setMessage(data.message || "You have been successfully unsubscribed.");
+          setMessage(
+            data.message || "You have been successfully unsubscribed."
+          );
         } else {
           setStatus("error");
           setMessage(data.error || "Invalid unsubscribe request.");
         }
       } catch (error) {
-        console.error("Unsubscribe error:", error);
-
         const elapsed = Date.now() - startTime;
         if (elapsed < minimumLoadingTime) {
           await new Promise((resolve) =>
@@ -108,7 +106,9 @@ export default function UnsubscribePageContent() {
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            <h1 className="text-2xl font-bold mb-4">Unsubscription Successful</h1>
+            <h1 className="text-2xl font-bold mb-4">
+              Unsubscription Successful
+            </h1>
             <p>{message}</p>
           </div>
         ) : (

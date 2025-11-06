@@ -1,26 +1,38 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import "../AdminStyle.css";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiExternalLink,
+  FiGithub,
+  FiInfo,
+  FiX,
+  FiPlus,
+  FiFolder,
+  FiCode
+} from "react-icons/fi";
 
 const HomePageProjects = () => {
   const [projects, setProjects] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
+  const [displayCount, setDisplayCount] = useState(6);
+  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch(`/api/projects`);
+        setLoading(true);
+        const response = await fetch('/api/projects');
         if (!response.ok) {
           throw new Error("Failed to fetch projects");
         }
         const data = await response.json();
-        setProjects(data.projects);
+        setAllProjects(data.projects || []);
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,203 +43,370 @@ const HomePageProjects = () => {
     fetchProjects();
   }, []);
 
+  // Update displayed projects when displayCount or allProjects changes
+  useEffect(() => {
+    setProjects(allProjects.slice(0, displayCount));
+    setHasMore(displayCount < allProjects.length);
+  }, [displayCount, allProjects]);
+
   const handleDetails = (project) => {
     setCurrentProject(project);
     setShowDetails(true);
+    document.body.style.overflow = "hidden";
   };
 
   const closeDetails = () => {
     setShowDetails(false);
     setCurrentProject(null);
+    document.body.style.overflow = "unset";
   };
 
+  const loadMore = () => {
+    setDisplayCount(prev => prev + 2);
+  };
+
+  // Loading Component
   if (loading) {
     return (
-      <motion.div
-        className="flex flex-col items-center justify-center h-screen gap-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
+      <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 flex items-center justify-center">
         <motion.div
-          className="w-12 h-12 border-4 border-t-4 border-primary rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-        />
-        <motion.span
-          className="text-primary text-lg"
+          className="flex flex-col items-center justify-center gap-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          Loading Projects...
-        </motion.span>
-      </motion.div>
+          <motion.div
+            className="relative"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+          >
+            <FiFolder className="text-6xl text-primary" />
+          </motion.div>
+          <motion.div
+            className="text-center space-y-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-xl font-semibold text-primary">Loading Projects</h3>
+            <p className="text-base-content/70">Fetching amazing projects...</p>
+          </motion.div>
+        </motion.div>
+      </div>
     );
   }
 
+  // Error Component
   if (error) {
-    return <div className="text-center text-error mt-10">Error: {error}</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 flex items-center justify-center">
+        <motion.div
+          className="text-center p-8 bg-error/10 rounded-3xl border border-error/20 max-w-md"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="text-error text-6xl mb-4">⚠️</div>
+          <h3 className="text-xl font-semibold text-error mb-2">Error Loading Projects</h3>
+          <p className="text-base-content/70 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Try Again
+          </button>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 p-8" id="projects">
-      <div className="Heading w-full flex justify-center items-center">
-        <motion.h3
-          className="text-3xl semiHead font-bold w-full text-primary text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-20 px-4 sm:px-6 lg:px-8" id="projects">
+      {/* Header */}
+      <motion.div
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div
+          className="inline-flex items-center gap-3 mb-4"
+          whileHover={{ scale: 1.05 }}
         >
-          All Projects
-        </motion.h3>
-      </div>
+          <FiCode className="text-4xl text-primary" />
+          <h2 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Featured Projects
+          </h2>
+        </motion.div>
+        <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
+          Here are some of my recent projects that showcase my skills and passion for development
+        </p>
+        <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-4 rounded-full" />
+      </motion.div>
 
+      {/* Projects Grid */}
       <div className="max-w-7xl mx-auto">
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          initial="hidden"
-          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
+          layout
         >
-          {projects.map((project, index) => (
-            <motion.div
-              key={project._id}
-              className="bg-neutral rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{
-                once: false,
-                margin: "0px 0px -100px 0px",
-                amount: 0.2
-              }}
-              transition={{
-                delay: index * 0.1,
-                type: "spring",
-                stiffness: 100,
-                damping: 20,
-                duration: 0.5
-              }}
-              whileHover={{
-                scale: 1.01,
-                transition: { duration: 0.2 }
-              }}
-            >
-              <div className="flex flex-col flex-grow">
-                <h2 className="text-xl font-semibold text-primary ">{project.title}</h2>
-                <motion.p
-                  dangerouslySetInnerHTML={{ __html: project.description }}
-                  className="mb-4 truncate h-[26px] text-base-100"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                </motion.p>
-
-                <div className="border border-primary shadow-md shadow-base-100 rounded-lg my-4 bg-white flex items-center justify-center h-60 overflow-hidden p-2">
+          <AnimatePresence>
+            {projects.map((project, index) => (
+              <motion.div
+                key={project._id}
+                className="group bg-base-100 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-base-300 overflow-hidden"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                whileHover={{ y: -8 }}
+                layout
+              >
+                {/* Project Image */}
+                <div className="relative h-48 overflow-hidden">
                   {project.imageUrl && (
-                    <a href={project.imageUrl} target="_blank" rel="noopener noreferrer">
-                      <motion.img
-                        src={project.imageUrl}
-                        alt={project.title}
-                        className="rounded-md w-full h-full object-contain border-2 border-primary"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </a>
+                    <motion.img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      whileHover={{ scale: 1.05 }}
+                    />
                   )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-base-100/80 to-transparent" />
+                  
+                  {/* Overlay Icons */}
+                  <div className="absolute top-4 right-4 flex gap-2">
+                    {project.liveLink && (
+                      <motion.a
+                        href={project.liveLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-primary/90 text-white p-2 rounded-lg backdrop-blur-sm hover:bg-primary transition-colors"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <FiExternalLink className="w-4 h-4" />
+                      </motion.a>
+                    )}
+                    {project.githubLink && (
+                      <motion.a
+                        href={project.githubLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-base-300/90 text-base-content p-2 rounded-lg backdrop-blur-sm hover:bg-base-300 transition-colors"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <FiGithub className="w-4 h-4" />
+                      </motion.a>
+                    )}
+                  </div>
                 </div>
-                <div className="flex justify-around items-center text-center mt-4">
-                  {project.liveLink && (
-                    <Link
-                      href={project.liveLink}
-                      title={'Visit this project'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm w-full bg-primary text-white mr-2 px-2 py-1 flex items-center justify-center gap-2 rounded"
-                    >
-                      Live Demo <img className="w-6 h-6" src="/imgs/live.png" alt="live-icon" />
-                    </Link>
-                  )}
-                  {project.githubLink && (
-                    <Link
-                      href={project.githubLink}
-                      title={'Visit Github page for this project'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm w-full text-white bg-gray-700 ml-2 px-2 py-1 flex items-center justify-center gap-2 rounded hover:bg-gray-700/80"
-                    >
-                      GitHub <img className="w-6 h-6" src="/imgs/github.png" alt="github-icon" />
-                    </Link>
-                  )}
-                </div>
-                <div className="flex justify-center w-full items-center mt-3">
-                  <motion.button
-                    className="text-sm bg-error w-full px-2 py-1 flex items-center text-white justify-center gap-2 rounded hover:bg-error/80"
-                    onClick={() => handleDetails(project)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    title = 'Details for this projects'
+
+                {/* Project Content */}
+                <div className="p-6">
+                  <motion.h3
+                    className="text-xl font-bold text-primary mb-3 line-clamp-1"
+                    layoutId={`title-${project._id}`}
                   >
-                    Details <img className="w-6 h-6" src="/imgs/details.png" alt="details-icon" />
-                  </motion.button>
+                    {project.title}
+                  </motion.h3>
+
+                  <motion.div
+                    className="text-base-content/70 mb-4 line-clamp-2 h-12"
+                    dangerouslySetInnerHTML={{ __html: project.description }}
+                  />
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <motion.button
+                      onClick={() => handleDetails(project)}
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-lg transition-all duration-300"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <FiInfo className="w-4 h-4" />
+                      View Details
+                    </motion.button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </motion.div>
+
+        {/* Load More Button */}
+        {hasMore && (
+          <motion.div
+            className="flex justify-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <motion.button
+              onClick={loadMore}
+              className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 hover:shadow-2xl transition-all duration-300 group"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FiPlus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+              Load More Projects
+              <span className="text-sm opacity-80">
+                ({allProjects.length - displayCount} remaining)
+              </span>
+            </motion.button>
+          </motion.div>
+        )}
+
+        {/* No More Projects Message */}
+        {!hasMore && projects.length > 0 && (
+          <motion.div
+            className="text-center mt-12 p-6 bg-base-200 rounded-3xl border border-base-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <p className="text-lg text-base-content/70">
+              🎉 You've seen all {allProjects.length} projects! 
+            </p>
+            <p className="text-base-content/60 mt-2">
+              Thank you for exploring my work
+            </p>
+          </motion.div>
+        )}
+
+        {/* No Projects Message */}
+        {projects.length === 0 && !loading && (
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <FiFolder className="text-6xl text-base-content/30 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-base-content/70 mb-2">
+              No Projects Found
+            </h3>
+            <p className="text-base-content/50">
+              Check back later for new projects!
+            </p>
+          </motion.div>
+        )}
       </div>
 
-      {showDetails && currentProject && (
-        <motion.div
-          className="fixed inset-0 py-4 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
+      {/* Project Details Modal */}
+      <AnimatePresence>
+        {showDetails && currentProject && (
           <motion.div
-            className="bg-[#FEF9E1] h-full rounded-lg w-11/12 sm:w-2/3 lg:w-1/2 overflow-scroll shadow-lg p-6 relative"
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeDetails}
           >
-            <button
-              onClick={closeDetails}
-              className="fixed top-10 right-[28%] bg-primary rounded-full"
+            <motion.div
+              className="bg-base-100 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <Image width={35} height={35} src={'/imgs/close.png'} alt="close-icon" className="close-img" />
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{currentProject.title}</h2>
-            <p className="text-gray-700 mb-4" dangerouslySetInnerHTML={{ __html: currentProject.description }}></p>
-
-            {currentProject.videoLink && (
-              <div className="aspect-video rounded-xl overflow-hidden mb-6">
-                <motion.iframe
-                  controls
-                  className="w-[90%] h-[100%] rounded-xl mx-auto mb-4 border-[3px] border-primary overflow-hidden"
-                  src={currentProject.videoLink}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  autoFocus
+              {/* Modal Header */}
+              <div className="relative p-6 border-b border-base-300">
+                <motion.h3
+                  className="text-2xl font-bold text-primary pr-12"
+                  layoutId={`title-${currentProject._id}`}
                 >
-                  Your browser does not support the video tag.
-                </motion.iframe>
+                  {currentProject.title}
+                </motion.h3>
+                <motion.button
+                  onClick={closeDetails}
+                  className="absolute top-6 right-6 text-base-content/70 hover:text-error transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <FiX className="w-6 h-6" />
+                </motion.button>
               </div>
-            )}
-            {currentProject.imageUrl && (
-              <Link href={currentProject.imageUrl} target="_blank" rel="noopener noreferrer">
-                <motion.img
-                  className="object-contain w-full sm:w-[90%] mx-auto rounded-lg border-[3px]  border-primary"
-                  src={currentProject.imageUrl}
-                  alt={currentProject.title}
+
+              {/* Modal Content */}
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+                {/* Description */}
+                <motion.div
+                  className="prose prose-lg max-w-none mb-6"
+                  dangerouslySetInnerHTML={{ __html: currentProject.description }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.1 }}
                 />
-              </Link>
-            )}
+
+                {/* Media */}
+                <div className="space-y-6">
+                  {currentProject.videoLink && (
+                    <motion.div
+                      className="aspect-video rounded-2xl overflow-hidden bg-black"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <iframe
+                        src={currentProject.videoLink}
+                        className="w-full h-full"
+                        allowFullScreen
+                        title={currentProject.title}
+                      />
+                    </motion.div>
+                  )}
+
+                  {currentProject.imageUrl && (
+                    <motion.div
+                      className="rounded-2xl overflow-hidden"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <img
+                        src={currentProject.imageUrl}
+                        alt={currentProject.title}
+                        className="w-full h-auto rounded-2xl border-2 border-base-300"
+                      />
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <motion.div
+                  className="flex gap-4 mt-8 pt-6 border-t border-base-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  {currentProject.liveLink && (
+                    <a
+                      href={currentProject.liveLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-3 hover:shadow-lg transition-all duration-300"
+                    >
+                      <FiExternalLink className="w-5 h-5" />
+                      Live Demo
+                    </a>
+                  )}
+                  {currentProject.githubLink && (
+                    <a
+                      href={currentProject.githubLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-base-300 text-base-content py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-3 hover:bg-base-400 transition-all duration-300"
+                    >
+                      <FiGithub className="w-5 h-5" />
+                      Source Code
+                    </a>
+                  )}
+                </motion.div>
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };

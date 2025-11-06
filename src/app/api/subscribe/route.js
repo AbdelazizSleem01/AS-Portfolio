@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import connectDB from "../../../../lib/mongodb";
 import Subscription from "../../../../models/Subscription";
-import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 export async function POST(req) {
   try {
@@ -25,8 +25,8 @@ export async function POST(req) {
     // Create new subscription
     const newSub = await Subscription.create({
       email,
-      verificationToken: crypto.randomBytes(20).toString('hex'),
-      unsubscribeToken: crypto.randomBytes(20).toString('hex'),
+      verificationToken: crypto.randomBytes(20).toString("hex"),
+      unsubscribeToken: crypto.randomBytes(20).toString("hex"),
       verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
 
@@ -116,14 +116,16 @@ export async function POST(req) {
               <p style="color: #636e72; font-size: 0.8em; margin: 0;">
                 © ${new Date().getFullYear()} AS Portfolio. All rights reserved.<br>
                 <a href="https://as-portfolio-ten.vercel.app/privacy-policy" style="color: #0984e3; text-decoration: none;">Privacy Policy</a> | 
-                <a href="https://as-portfolio-ten.vercel.app/unsubscribe?token=${newSub.unsubscribeToken}" style="color: #0984e3; text-decoration: none;">Unsubscribe</a>
+                <a href="https://as-portfolio-ten.vercel.app/unsubscribe?token=${
+                  newSub.unsubscribeToken
+                }" style="color: #0984e3; text-decoration: none;">Unsubscribe</a>
               </p>
             </td>
           </tr>
         </table>
       </body>
       </html>
-      `
+      `,
     });
 
     return NextResponse.json(
@@ -131,15 +133,11 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Subscription error:", error);
-    return NextResponse.json(
-      { error: "Subscription failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Subscription failed" }, { status: 500 });
   }
 }
 
-// get all subscribe 
+// get all subscribe
 
 export async function GET(req) {
   try {
@@ -147,7 +145,6 @@ export async function GET(req) {
     const subscriptions = await Subscription.find({});
     return NextResponse.json(subscriptions);
   } catch (error) {
-    console.error("Error in GET /api/subscriptions:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch subscriptions" },
       { status: 500 }

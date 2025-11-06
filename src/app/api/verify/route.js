@@ -2,11 +2,10 @@ import { NextResponse } from "next/server";
 import connectDB from "../../../../lib/mongodb";
 import Subscription from "../../../../models/Subscription";
 
-
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const token = searchParams.get('token');
+    const token = searchParams.get("token");
 
     await connectDB();
     const subscriber = await Subscription.findOne({ verificationToken: token });
@@ -26,7 +25,6 @@ export async function GET(req) {
       `https://as-portfolio-ten.vercel.app/verify/success`
     );
   } catch (error) {
-    console.error("Verification error:", error);
     return NextResponse.redirect(
       `https://as-portfolio-ten.vercel.app/verify/error?code=server_error`
     );

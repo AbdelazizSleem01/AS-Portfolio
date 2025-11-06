@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
-import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 const ContactsPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -14,7 +14,6 @@ const ContactsPage = () => {
 
   if (!user) {
     return <RedirectToSignIn />;
-
   }
 
   useEffect(() => {
@@ -22,11 +21,10 @@ const ContactsPage = () => {
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
-        'content',
+        "content",
         `View and manage my contact messages on ${process.env.NEXT_PUBLIC_META_TITLE}`
       );
   }, []);
-
 
   // Animation variants
   const containerVariants = {
@@ -35,37 +33,35 @@ const ContactsPage = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
+    exit: { opacity: 0, y: -20 },
   };
 
   const buttonVariants = {
     hover: { scale: 1.05 },
     tap: { scale: 0.95 },
-    disabled: { opacity: 0.7, scale: 0.98 }
+    disabled: { opacity: 0.7, scale: 0.98 },
   };
 
   // Fetch all contact messages on mount
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const res = await fetch('/api/contact');
+        const res = await fetch("/api/contact");
         if (res.ok) {
-          toast.success("Contact messages fetched successfully!")
+          toast.success("Contact messages fetched successfully!");
         }
-        if (!res.ok) throw new Error('Failed to fetch contacts');
+        if (!res.ok) throw new Error("Failed to fetch contacts");
         const data = await res.json();
         setContacts(data);
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
     };
 
     fetchContacts();
@@ -96,11 +92,10 @@ const ContactsPage = () => {
 
       const updatedContact = await res.json();
       setContacts((prev) =>
-        prev.map((contact) => contact._id === id ? updatedContact : contact)
+        prev.map((contact) => (contact._id === id ? updatedContact : contact))
       );
       setReplyTexts((prev) => ({ ...prev, [id]: "" }));
     } catch (error) {
-      console.error(error);
       alert(error.message);
     } finally {
       setLoadingId(null);
@@ -153,22 +148,32 @@ const ContactsPage = () => {
                         </span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-neutral">{contact.name}</h3>
+                        <h3 className="text-lg font-semibold text-neutral">
+                          {contact.name}
+                        </h3>
                         <p className="text-sm text-primary">{contact.email}</p>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <div>
-                        <span className="text-sm font-medium text-primary">Subject:</span>
+                        <span className="text-sm font-medium text-primary">
+                          Subject:
+                        </span>
                         <p className="text-neutral">{contact.subject}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-primary">Message:</span>
-                        <p className="text-neutral whitespace-pre-wrap">{contact.message}</p>
+                        <span className="text-sm font-medium text-primary">
+                          Message:
+                        </span>
+                        <p className="text-neutral whitespace-pre-wrap">
+                          {contact.message}
+                        </p>
                       </div>
                       <div>
-                        <span className="text-sm font-medium text-primary">Received:</span>
+                        <span className="text-sm font-medium text-primary">
+                          Received:
+                        </span>
                         <p className="text-sm text-neutral">
                           {new Date(contact.createdAt).toLocaleString()}
                         </p>
@@ -177,7 +182,9 @@ const ContactsPage = () => {
 
                     {contact.response ? (
                       <div className="mt-4 p-4 bg-accent/20 rounded-lg">
-                        <span className="text-sm font-medium text-success">Your Response:</span>
+                        <span className="text-sm font-medium text-success">
+                          Your Response:
+                        </span>
                         <p className="text-neutral mt-1 whitespace-pre-wrap">
                           {contact.response}
                         </p>
@@ -190,8 +197,10 @@ const ContactsPage = () => {
                           className="w-full p-4 border border-primary/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all bg-base-200"
                           placeholder="Type your response here..."
                           rows="4"
-                          value={replyTexts[contact._id] || ''}
-                          onChange={(e) => handleReplyChange(contact._id, e.target.value)}
+                          value={replyTexts[contact._id] || ""}
+                          onChange={(e) =>
+                            handleReplyChange(contact._id, e.target.value)
+                          }
                         />
 
                         <motion.button
@@ -199,7 +208,9 @@ const ContactsPage = () => {
                           whileHover="hover"
                           whileTap="tap"
                           disabled={loadingId === contact._id}
-                          animate={loadingId === contact._id ? "disabled" : "visible"}
+                          animate={
+                            loadingId === contact._id ? "disabled" : "visible"
+                          }
                           onClick={() => submitReply(contact._id)}
                           className="w-full py-3 px-6 bg-primary hover:bg-primary/90 text-base-100 font-medium rounded-lg disabled:opacity-70 disabled:cursor-not-allowed transition-colors"
                         >
@@ -209,7 +220,7 @@ const ContactsPage = () => {
                               <span>Submitting...</span>
                             </div>
                           ) : (
-                            'Submit Response'
+                            "Submit Response"
                           )}
                         </motion.button>
                       </div>

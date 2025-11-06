@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { put, del } from '@vercel/blob'; // Import Vercel Blob methods
-import connectDB from '../../../../../lib/mongodb';
-import sanitizeHtml from 'sanitize-html';
-import Header from '../../../../../models/Header';
+import { NextResponse } from "next/server";
+import { put, del } from "@vercel/blob"; // Import Vercel Blob methods
+import connectDB from "../../../../../lib/mongodb";
+import sanitizeHtml from "sanitize-html";
+import Header from "../../../../../models/Header";
 
 export async function GET(req, { params }) {
   const { id } = await params;
@@ -13,14 +13,13 @@ export async function GET(req, { params }) {
     const header = await Header.findById(id);
 
     if (!header) {
-      return NextResponse.json({ error: 'Header not found' }, { status: 404 });
+      return NextResponse.json({ error: "Header not found" }, { status: 404 });
     }
 
     return NextResponse.json(header, { status: 200 });
   } catch (error) {
-    console.error('Error fetching header:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch header' },
+      { error: "Failed to fetch header" },
       { status: 500 }
     );
   }
@@ -31,67 +30,67 @@ export async function PUT(req, { params }) {
 
   try {
     const formData = await req.formData();
-    const title = formData.get('title');
-    const rawDescription = formData.get('description');
-    const linkedInLink = formData.get('linkedInLink');
-    const githubLink = formData.get('githubLink');
-    const imageFile = formData.get('image');
+    const title = formData.get("title");
+    const rawDescription = formData.get("description");
+    const linkedInLink = formData.get("linkedInLink");
+    const githubLink = formData.get("githubLink");
+    const imageFile = formData.get("image");
 
     if (!id) {
-      throw new Error('Header ID is required for updating.');
+      throw new Error("Header ID is required for updating.");
     }
 
     // Sanitize HTML description
     const description = sanitizeHtml(rawDescription, {
       allowedTags: [
-        'b',
-        'i',
-        'em',
-        'strong',
-        'a',
-        'p',
-        'span',
-        'img',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'div',
-        'br',
-        'u',
-        'mark',
+        "b",
+        "i",
+        "em",
+        "strong",
+        "a",
+        "p",
+        "span",
+        "img",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "div",
+        "br",
+        "u",
+        "mark",
       ],
       allowedAttributes: {
-        span: ['style', 'class'],
-        a: ['href', 'target', 'rel'],
-        img: ['src', 'alt', 'width', 'height'],
-        p: ['style', 'class'],
-        h1: ['style', 'class'],
-        h2: ['style', 'class'],
-        h3: ['style', 'class'],
-        h4: ['style', 'class'],
-        h5: ['style', 'class'],
-        h6: ['style', 'class'],
-        div: ['style', 'class'],
-        mark: ['style', 'class'],
-        u: ['style', 'class'],
+        span: ["style", "class"],
+        a: ["href", "target", "rel"],
+        img: ["src", "alt", "width", "height"],
+        p: ["style", "class"],
+        h1: ["style", "class"],
+        h2: ["style", "class"],
+        h3: ["style", "class"],
+        h4: ["style", "class"],
+        h5: ["style", "class"],
+        h6: ["style", "class"],
+        div: ["style", "class"],
+        mark: ["style", "class"],
+        u: ["style", "class"],
       },
       allowedStyles: {
-        '*': {
-          'text-align': [/^left$/, /^right$/, /^center$/, /^justify$/],
-          'font-size': [/^[0-9]+(px|em|%)$/],
-          'line-height': [/^[0-9]+(px|em|%)$/],
+        "*": {
+          "text-align": [/^left$/, /^right$/, /^center$/, /^justify$/],
+          "font-size": [/^[0-9]+(px|em|%)$/],
+          "line-height": [/^[0-9]+(px|em|%)$/],
           color: [
             /^#[0-9A-Fa-f]{6}$/,
             /^rgb\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*\)$/,
           ],
-          'background-color': [
+          "background-color": [
             /^#[0-9A-Fa-f]{6}$/,
             /^rgb\(\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*,\s*(\d{1,3}%?)\s*\)$/,
           ],
-          'text-decoration': [/^underline$/],
+          "text-decoration": [/^underline$/],
         },
       },
     });
@@ -100,7 +99,7 @@ export async function PUT(req, { params }) {
 
     const existingHeader = await Header.findById(id);
     if (!existingHeader) {
-      throw new Error('Header not found.');
+      throw new Error("Header not found.");
     }
 
     let imageUrl = existingHeader.imageUrl;
@@ -108,18 +107,18 @@ export async function PUT(req, { params }) {
     if (imageFile) {
       // Upload new image to Vercel Blob
       const { url } = await put(
-        `HeadersImages/${Date.now()}-${imageFile.name}`, 
-        Buffer.from(await imageFile.arrayBuffer()), 
+        `HeadersImages/${Date.now()}-${imageFile.name}`,
+        Buffer.from(await imageFile.arrayBuffer()),
         {
-          access: 'public',
-          contentType: imageFile.type, 
+          access: "public",
+          contentType: imageFile.type,
         }
       );
 
       imageUrl = url;
 
       if (existingHeader.imageUrl) {
-        await del(existingHeader.imageUrl); 
+        await del(existingHeader.imageUrl);
       }
     }
 
@@ -136,20 +135,19 @@ export async function PUT(req, { params }) {
     );
 
     return NextResponse.json(
-      { message: 'Header Updated Successfully', Header: updatedHeader },
+      { message: "Header Updated Successfully", Header: updatedHeader },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error in PUT /api/Headers:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update Header' },
+      { error: error.message || "Failed to update Header" },
       { status: 500 }
     );
   }
 }
 
 export async function DELETE(req, { params }) {
-  const { id } =await params;
+  const { id } = await params;
 
   try {
     await connectDB();
@@ -157,10 +155,7 @@ export async function DELETE(req, { params }) {
     const deletedHeader = await Header.findByIdAndDelete(id);
 
     if (!deletedHeader) {
-      return NextResponse.json(
-        { error: 'Header not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Header not found" }, { status: 404 });
     }
 
     // Delete the associated image from Vercel Blob
@@ -169,13 +164,12 @@ export async function DELETE(req, { params }) {
     }
 
     return NextResponse.json(
-      { message: 'Header deleted successfully' },
+      { message: "Header deleted successfully" },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error deleting Header:', error);
     return NextResponse.json(
-      { error: 'Failed to delete Header' },
+      { error: "Failed to delete Header" },
       { status: 500 }
     );
   }

@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
-import { put, del } from '@vercel/blob'; // Import Vercel Blob methods
-import connectDB from '../../../../../lib/mongodb';
-import Skill from '../../../../../models/Skills';
-import nodemailer from 'nodemailer';
-import Subscription from '../../../../../models/Subscription';
+import { NextResponse } from "next/server";
+import { put, del } from "@vercel/blob"; // Import Vercel Blob methods
+import connectDB from "../../../../../lib/mongodb";
+import Skill from "../../../../../models/Skills";
+import nodemailer from "nodemailer";
+import Subscription from "../../../../../models/Subscription";
 
 export async function GET(req, { params }) {
   try {
@@ -12,14 +12,13 @@ export async function GET(req, { params }) {
 
     const skill = await Skill.findById(id);
     if (!skill) {
-      return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
+      return NextResponse.json({ error: "Skill not found" }, { status: 404 });
     }
 
     return NextResponse.json(skill, { status: 200 });
   } catch (error) {
-    console.error('Error fetching skill:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch skill' },
+      { error: "Failed to fetch skill" },
       { status: 500 }
     );
   }
@@ -31,8 +30,8 @@ export async function PUT(req, { params }) {
     await connectDB();
 
     const formData = await req.formData();
-    const name = formData.get('name');
-    const imageFile = formData.get('image');
+    const name = formData.get("name");
+    const imageFile = formData.get("image");
 
     const updateData = { name };
 
@@ -42,7 +41,7 @@ export async function PUT(req, { params }) {
         `SkillsImages/${Date.now()}-${imageFile.name}`, // Unique file path
         Buffer.from(await imageFile.arrayBuffer()), // File content
         {
-          access: 'public', // Make the file publicly accessible
+          access: "public", // Make the file publicly accessible
           contentType: imageFile.type, // Set the content type
         }
       );
@@ -50,14 +49,19 @@ export async function PUT(req, { params }) {
       updateData.imageUrl = imageUrl;
     }
 
-    const updatedSkill = await Skill.findByIdAndUpdate(id, updateData, { new: true });
+    const updatedSkill = await Skill.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!updatedSkill) {
-      return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
+      return NextResponse.json({ error: "Skill not found" }, { status: 404 });
     }
 
     // Respond immediately
-    const response = NextResponse.json({ message: 'Skill updated successfully', skill: updatedSkill }, { status: 200 });
+    const response = NextResponse.json(
+      { message: "Skill updated successfully", skill: updatedSkill },
+      { status: 200 }
+    );
 
     // Send email notifications in the background
     setTimeout(() => {
@@ -66,8 +70,10 @@ export async function PUT(req, { params }) {
 
     return response;
   } catch (error) {
-    console.error('Error updating skill:', error);
-    return NextResponse.json({ error: 'Failed to update skill' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update skill" },
+      { status: 500 }
+    );
   }
 }
 
@@ -78,7 +84,7 @@ export async function DELETE(req, { params }) {
     const skill = await Skill.findById(id);
 
     if (!skill) {
-      return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
+      return NextResponse.json({ error: "Skill not found" }, { status: 404 });
     }
 
     // Delete associated image from Vercel Blob
@@ -89,7 +95,10 @@ export async function DELETE(req, { params }) {
     await Skill.findByIdAndDelete(id);
 
     // Respond immediately
-    const response = NextResponse.json({ message: 'Skill deleted successfully' }, { status: 200 });
+    const response = NextResponse.json(
+      { message: "Skill deleted successfully" },
+      { status: 200 }
+    );
 
     // Send email notifications in the background
     setTimeout(() => {
@@ -98,8 +107,10 @@ export async function DELETE(req, { params }) {
 
     return response;
   } catch (error) {
-    console.error('Error deleting skill:', error);
-    return NextResponse.json({ error: 'Failed to delete skill' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete skill" },
+      { status: 500 }
+    );
   }
 }
 
@@ -109,11 +120,8 @@ const sendNotifications = async () => {
     const subscribers = await Subscription.find({ verified: true });
 
     if (subscribers.length === 0) {
-      console.log("No subscribers found.");
       return;
     }
-
-    console.log(`Sending emails to ${subscribers.length} subscribers...`);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -194,12 +202,8 @@ const sendNotifications = async () => {
             </table>
           </body>
           </html>
-        `
+        `,
       });
     }
-
-    console.log("Emails sent successfully!");
-  } catch (error) {
-    console.error("Notification error:", error);
-  }
+  } catch (error) {}
 };

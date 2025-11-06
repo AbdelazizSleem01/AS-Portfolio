@@ -102,7 +102,6 @@ export async function GET() {
       }
     );
   } catch (error) {
-    console.error("Stats API error:", error);
     return new Response(JSON.stringify({ error: "Failed to fetch stats" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

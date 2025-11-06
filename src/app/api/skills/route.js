@@ -1,18 +1,20 @@
-import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb';
-import { put } from '@vercel/blob';
-import Skill from '../../../../models/Skills';
-import Subscription from '../../../../models/Subscription';
-import nodemailer from 'nodemailer';
+import { NextResponse } from "next/server";
+import connectDB from "../../../../lib/mongodb";
+import { put } from "@vercel/blob";
+import Skill from "../../../../models/Skills";
+import Subscription from "../../../../models/Subscription";
+import nodemailer from "nodemailer";
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const name = formData.get('name');
-    const imageFile = formData.get('image');
+    const name = formData.get("name");
+    const imageFile = formData.get("image");
 
     if (!imageFile) {
-      throw new Error('Image upload failed. Make sure an image file is provided.');
+      throw new Error(
+        "Image upload failed. Make sure an image file is provided."
+      );
     }
 
     const imageBuffer = await imageFile.arrayBuffer();
@@ -21,7 +23,7 @@ export async function POST(req) {
       `SkillsImages/${Date.now()}-${imageFile.name}`,
       Buffer.from(imageBuffer),
       {
-        access: 'public',
+        access: "public",
         contentType: imageFile.type,
       }
     );
@@ -34,21 +36,17 @@ export async function POST(req) {
     });
 
     const response = NextResponse.json(
-      { message: 'Skill Created Successfully', Skill: newSkill },
+      { message: "Skill Created Successfully", Skill: newSkill },
       { status: 201 }
     );
 
     // Send email notifications
-    sendNotifications().catch(error => {
-      console.error('Background notification error:', error);
-    });
+    sendNotifications().catch((error) => {});
 
     return response;
-
   } catch (error) {
-    console.error('Error in POST /api/Skills:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create Skill' },
+      { error: error.message || "Failed to create Skill" },
       { status: 500 }
     );
   }
@@ -61,35 +59,32 @@ const sendNotifications = async () => {
     const subscribers = await Subscription.find({ verified: true });
 
     if (subscribers.length === 0) {
-      console.log('No subscribers found.');
       return;
     }
 
-    console.log(`Sending emails to ${subscribers.length} subscribers...`);
-
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: process.env.YANDEX_USER,
         pass: process.env.YANDEX_PASS,
       },
     });
 
-
-
-    await Promise.all(subscribers.map(async (sub) => {
-      try {
-        await transporter.sendMail({
-          from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
-          to: sub.email,
-          subject: 'New Skill Update: Explore My Latest Technical Enhancements',
-          text: `Dear Subscriber,
+    await Promise.all(
+      subscribers.map(async (sub) => {
+        try {
+          await transporter.sendMail({
+            from: `AS Portfolio Updates <${process.env.YANDEX_USER}>`,
+            to: sub.email,
+            subject:
+              "New Skill Update: Explore My Latest Technical Enhancements",
+            text: `Dear Subscriber,
     
     I'm excited to announce that I've recently updated my technical skills and portfolio with new capabilities and innovations. Discover the latest improvements in my skillset, including advancements in both front-end and back-end technologies. Visit ${process.env.NEXT_PUBLIC_BASE_URL} to see the new updates.
     
     Best Regards,
     AS Portfolio Team`,
-          html: `
+            html: `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -105,8 +100,12 @@ const sendNotifications = async () => {
                     <!-- Header Section -->
                     <tr>
                       <td style="padding: 40px 30px; background-color: #f8f9fa; border-bottom: 1px solid #eeeeee;">
-                        <a href="${process.env.NEXT_PUBLIC_BASE_URL}" target="_blank">
-                          <img src="${process.env.NEXT_PUBLIC_BASE_URL}/imgs/Logo.png" 
+                        <a href="${
+                          process.env.NEXT_PUBLIC_BASE_URL
+                        }" target="_blank">
+                          <img src="${
+                            process.env.NEXT_PUBLIC_BASE_URL
+                          }/imgs/Logo.png" 
                                alt="AS Portfolio Logo" 
                                width="150" 
                                style="display: block; margin: 0 auto;">
@@ -160,12 +159,16 @@ const sendNotifications = async () => {
                             This message was sent to ${sub.email}
                           </p>
                           <p style="margin: 0 0 10px 0;">
-                            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/unsubscribe?token=${sub.unsubscribeToken}" 
+                            <a href="${
+                              process.env.NEXT_PUBLIC_BASE_URL
+                            }/unsubscribe?token=${sub.unsubscribeToken}" 
                                style="color: #2563eb; text-decoration: none;">
                               Unsubscribe
                             </a> 
                             | 
-                            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/privacy-policy" 
+                            <a href="${
+                              process.env.NEXT_PUBLIC_BASE_URL
+                            }/privacy-policy" 
                                style="color: #2563eb; text-decoration: none;">
                               Privacy Policy
                             </a>
@@ -183,17 +186,11 @@ const sendNotifications = async () => {
           </body>
           </html>
         `,
-        });
-      }
-      catch (emailError) {
-        console.error(`Failed to send email to ${sub.email}:`, emailError);
-      }
-    }))
-
-    console.log('Email notifications processed');
-  } catch (error) {
-    console.error('Notification error:', error);
-  }
+          });
+        } catch (emailError) {}
+      })
+    );
+  } catch (error) {}
 };
 
 // GET function (unchanged)
@@ -205,9 +202,8 @@ export async function GET(req) {
 
     return NextResponse.json(skills);
   } catch (error) {
-    console.error('Error in GET /api/Skills:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch skills' },
+      { error: error.message || "Failed to fetch skills" },
       { status: 500 }
     );
   }
