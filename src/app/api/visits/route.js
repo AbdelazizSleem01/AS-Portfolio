@@ -3,7 +3,8 @@ import Visit from "../../../../models/Visits";
 
 const getLocationFromIP = async (ip) => {
   try {
-    if (ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')) {
+    // Skip for localhost/private IPs
+    if (ip === '127.0.0.1' || ip === '::1' || ip === 'unknown' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')) {
       return {
         country: 'Local',
         city: 'Local',
@@ -13,17 +14,35 @@ const getLocationFromIP = async (ip) => {
       };
     }
 
-    const response = await fetch(`http://ip-api.com/json/${ip}?fields=country,city,region,lat,lon`);
-    const data = await response.json();
+    // Try multiple geolocation services
+    const services = [
+      `https://ipapi.co/${ip}/json/`,
+      `https://ip-api.com/json/${ip}?fields=country,city,region,lat,lon`,
+      `https://api.ipgeolocation.io/ipgeo?apiKey=demo&ip=${ip}`, // Demo key for testing
+    ];
 
-    if (data.status === 'success') {
-      return {
-        country: data.country,
-        city: data.city,
-        region: data.region,
-        latitude: data.lat,
-        longitude: data.lon,
-      };
+    for (const serviceUrl of services) {
+      try {
+        console.log('Trying geolocation service:', serviceUrl);
+        const response = await fetch(serviceUrl, {
+          timeout: 5000, // 5 second timeout
+        });
+        const data = await response.json();
+
+        // Check for success based on different API responses
+        if (data.country && (data.city || data.region)) {
+          return {
+            country: data.country || data.country_name || 'Unknown',
+            city: data.city || 'Unknown',
+            region: data.region || data.region_name || 'Unknown',
+            latitude: data.latitude || data.lat || 0,
+            longitude: data.longitude || data.lon || 0,
+          };
+        }
+      } catch (error) {
+        console.error('Geolocation service failed:', serviceUrl, error);
+        continue;
+      }
     }
   } catch (error) {
     console.error('Error fetching location:', error);
