@@ -64,7 +64,7 @@ export default function HomePage() {
   const defaultHeader = {
     title: "Hello, I'm Abdelaziz Sleem",
     description: "👋 Hi, I'm Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences.",
-    imageUrl: "/imgs/my-img.jpeg",
+    imageUrl: "/imgs/my-img.jpg",
     githubLink: "https://github.com/AbdelazizSleem01",
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
   };
