@@ -4,6 +4,7 @@ import "../app/components/AdminStyle.css";
 import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import VisitTracker from "./components/VisitTracker";
 import { ThemeProvider } from "next-themes";
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
@@ -154,6 +155,7 @@ export default function RootLayout({ children }) {
                 <p className="mt-2 text-gray-500">Loading...</p>
               </div>
             }>
+              <VisitTracker />
               <Navbar />
               {children}
               <ToastContainer />
