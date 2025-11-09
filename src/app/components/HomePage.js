@@ -78,7 +78,6 @@ export default function HomePage() {
     }
   }, []);
 
-  // Typed.js animation effect
   useEffect(() => {
     if (typeof window !== 'undefined' && typingRef.current) {
       const Typed = require('typed.js');
