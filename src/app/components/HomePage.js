@@ -1,29 +1,31 @@
-'use client';
-import Link from 'next/link';
-import React, { useEffect, useState, useRef } from 'react';
-import { motion, useAnimation, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { 
-  FiDownload, 
-  FiGithub, 
-  FiLinkedin, 
+"use client";
+import Link from "next/link";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  motion,
+  useAnimation,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import {
+  FiDownload,
+  FiGithub,
+  FiLinkedin,
   FiCode,
   FiServer,
   FiLayout,
   FiStar,
   FiAward,
-  FiGlobe
-} from 'react-icons/fi';
-import { 
-  RiReactjsLine, 
-  RiNextjsLine, 
-  RiNodejsLine,
-} from 'react-icons/ri';
-import { 
-  SiMongodb, 
+  FiGlobe,
+} from "react-icons/fi";
+import { RiReactjsLine, RiNextjsLine, RiNodejsLine } from "react-icons/ri";
+import {
+  SiMongodb,
   SiTailwindcss,
   SiTypescript,
-  SiJavascript
-} from 'react-icons/si';
+  SiJavascript,
+} from "react-icons/si";
 
 export default function HomePage() {
   const [selectedHeader, setSelectedHeader] = useState(null);
@@ -42,12 +44,12 @@ export default function HomePage() {
     const handleMouseMove = (e) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      const hovered = e.target.closest('[data-cursor-hover]');
+      const hovered = e.target.closest("[data-cursor-hover]");
 
       setCursorScale(hovered ? 1.5 : 1);
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
 
   useEffect(() => {
@@ -56,21 +58,27 @@ export default function HomePage() {
       return root.getPropertyValue("--primary").trim() || "#418aff";
     };
     setThemeColor(getPrimaryColor());
-    const observer = new MutationObserver(() => setThemeColor(getPrimaryColor()));
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    const observer = new MutationObserver(() =>
+      setThemeColor(getPrimaryColor())
+    );
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
     return () => observer.disconnect();
   }, []);
 
   const defaultHeader = {
     title: "Hello, I'm Abdelaziz Sleem",
-    description: "👋 Hi, I'm Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences.",
+    description:
+      "👋 Hi, I'm Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences.",
     imageUrl: "/imgs/my-img.jpg",
     githubLink: "https://github.com/AbdelazizSleem01",
-    linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/"
+    linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/",
   };
 
   useEffect(() => {
-    const savedHeader = localStorage.getItem('selectedHeader');
+    const savedHeader = localStorage.getItem("selectedHeader");
     if (savedHeader) {
       setSelectedHeader(JSON.parse(savedHeader));
     } else {
@@ -79,19 +87,23 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && typingRef.current) {
-      const Typed = require('typed.js');
-      
+    if (typeof window !== "undefined" && typingRef.current) {
+      const Typed = require("typed.js");
+
       const options = {
-        strings: ['Full-Stack Developer', 'Frontend Developer', 'Backend Developer'],
+        strings: [
+          "Full-Stack Developer",
+          "Frontend Developer",
+          "Backend Developer",
+        ],
         typeSpeed: 80,
         backSpeed: 50,
         backDelay: 1500,
         startDelay: 500,
         loop: true,
         showCursor: true,
-        cursorChar: '|',
-        smartBackspace: true
+        cursorChar: "|",
+        smartBackspace: true,
       };
 
       const typed = new Typed(typingRef.current, options);
@@ -110,8 +122,8 @@ export default function HomePage() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.3 }
-    }
+      transition: { staggerChildren: 0.3 },
+    },
   };
 
   const itemVariants = {
@@ -120,17 +132,17 @@ export default function HomePage() {
       opacity: 1,
       y: 0,
       rotate: 0,
-      transition: { type: 'spring', stiffness: 150, damping: 15 }
-    }
+      transition: { type: "spring", stiffness: 150, damping: 15 },
+    },
   };
 
   const techIcons = [
-    { icon: RiReactjsLine, name: 'React', color: '#61DAFB' },
-    { icon: RiNextjsLine, name: 'Next.js', color: '#000000' },
-    { icon: RiNodejsLine, name: 'Node.js', color: '#339933' },
-    { icon: SiMongodb, name: 'MongoDB', color: '#47A248' },
-    { icon: SiTailwindcss, name: 'Tailwind', color: '#06B6D4' },
-    { icon: SiTypescript, name: 'TypeScript', color: '#3178C6' },
+    { icon: RiReactjsLine, name: "React", color: "#61DAFB" },
+    { icon: RiNextjsLine, name: "Next.js", color: "#000000" },
+    { icon: RiNodejsLine, name: "Node.js", color: "#339933" },
+    { icon: SiMongodb, name: "MongoDB", color: "#47A248" },
+    { icon: SiTailwindcss, name: "Tailwind", color: "#06B6D4" },
+    { icon: SiTypescript, name: "TypeScript", color: "#3178C6" },
   ];
 
   return (
@@ -138,11 +150,11 @@ export default function HomePage() {
       <motion.div
         className="fixed w-10 h-10 bg-primary rounded-full pointer-events-none z-50 overflow-hidden"
         style={{
-          x: useTransform(smoothX, x => x - 10),
-          y: useTransform(smoothY, y => y - 50),
+          x: useTransform(smoothX, (x) => x - 10),
+          y: useTransform(smoothY, (y) => y - 50),
           scale: cursorScale,
           background: `radial-gradient(circle at center, ${themeColor} 0%, transparent 70%)`,
-          filter: 'blur(9px)'
+          filter: "blur(9px)",
         }}
         animate={{
           opacity: [0.4, 0.5, 0.5],
@@ -166,15 +178,15 @@ export default function HomePage() {
                 animate={{
                   y: [0, -15, 0],
                   boxShadow: [
-                    '0px 0px 30px 0px var(--primary)',
-                    '0px 0px 50px 15px var(--primary)',
-                    '0px 0px 30px 0px var(--primary)',
+                    "0px 0px 30px 0px var(--primary)",
+                    "0px 0px 50px 15px var(--primary)",
+                    "0px 0px 30px 0px var(--primary)",
                   ],
                 }}
                 transition={{
                   duration: 3,
                   repeat: Infinity,
-                  ease: 'easeInOut'
+                  ease: "easeInOut",
                 }}
               >
                 <img
@@ -183,7 +195,7 @@ export default function HomePage() {
                   alt={selectedHeader?.title}
                 />
               </motion.div>
-              
+
               {/* Floating Tech Icons Around Image */}
               {techIcons.map((tech, index) => (
                 <motion.div
@@ -203,8 +215,8 @@ export default function HomePage() {
                     delay: index * 0.2,
                   }}
                 >
-                  <tech.icon 
-                    className="text-2xl" 
+                  <tech.icon
+                    className="text-2xl"
                     style={{ color: tech.color }}
                   />
                 </motion.div>
@@ -244,7 +256,7 @@ export default function HomePage() {
           >
             <FiCode className="text-primary" />
             I'm a{" "}
-            <span 
+            <span
               ref={typingRef}
               className="text-primary font-bold min-h-[1.5em] inline-block"
             />
@@ -253,7 +265,8 @@ export default function HomePage() {
           <motion.p
             className="text-neutral text-lg leading-relaxed"
             dangerouslySetInnerHTML={{
-              __html: selectedHeader?.description ||
+              __html:
+                selectedHeader?.description ||
                 "Experienced full-stack developer with 4+ years of expertise in Laravel, NestJS, Nuxt.js, Next.js, Android, and some Flutter experience. 🥰",
             }}
             variants={itemVariants}
@@ -307,7 +320,7 @@ export default function HomePage() {
                 <span>LinkedIn</span>
               </Link>
             )}
-            
+
             <motion.a
               title="Download Abdelaziz Sleem's CV"
               href="/imgs/Abdelaziz Sleem CV.pdf"
@@ -316,7 +329,7 @@ export default function HomePage() {
               data-cursor-hover
               whileHover={{
                 scale: 1.05,
-                boxShadow: "0px 8px 25px rgba(239, 68, 68, 0.3)"
+                boxShadow: "0px 8px 25px rgba(239, 68, 68, 0.3)",
               }}
             >
               <FiDownload className="text-xl" />
@@ -339,7 +352,7 @@ export default function HomePage() {
               </div>
               <p className="text-sm text-neutral">Years Experience</p>
             </motion.div>
-            
+
             <motion.div
               className="text-center p-4 bg-base-200 rounded-lg"
               whileHover={{ scale: 1.05 }}
@@ -350,7 +363,7 @@ export default function HomePage() {
               </div>
               <p className="text-sm text-neutral">Projects Done</p>
             </motion.div>
-            
+
             <motion.div
               className="text-center p-4 bg-base-200 rounded-lg col-span-2 md:col-span-1"
               whileHover={{ scale: 1.05 }}
@@ -369,8 +382,8 @@ export default function HomePage() {
       <motion.div
         className="absolute w-4 h-4 bg-primary/20 rounded-full"
         style={{
-          top: '20%',
-          left: '10%'
+          top: "20%",
+          left: "10%",
         }}
         animate={{
           y: [0, -40, 0],
@@ -379,14 +392,14 @@ export default function HomePage() {
         transition={{
           duration: 4,
           repeat: Infinity,
-          ease: 'easeInOut'
+          ease: "easeInOut",
         }}
       />
       <motion.div
         className="absolute w-4 h-4 bg-primary/20 rounded-full"
         style={{
-          top: '20%',
-          left: '50%'
+          top: "20%",
+          left: "50%",
         }}
         animate={{
           y: [0, -40, 0],
@@ -395,14 +408,14 @@ export default function HomePage() {
         transition={{
           duration: 3,
           repeat: Infinity,
-          ease: 'easeInOut'
+          ease: "easeInOut",
         }}
       />
       <motion.div
         className="absolute w-8 h-4 bg-primary/20 rounded-full"
         style={{
-          top: '80%',
-          left: '10%'
+          top: "80%",
+          left: "10%",
         }}
         animate={{
           x: [0, -80, 0],
@@ -411,7 +424,7 @@ export default function HomePage() {
         transition={{
           duration: 4,
           repeat: Infinity,
-          ease: 'easeInOut'
+          ease: "easeInOut",
         }}
       />
     </div>

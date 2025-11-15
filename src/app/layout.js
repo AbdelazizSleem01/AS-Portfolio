@@ -64,7 +64,7 @@ export const metadata = {
     siteName: "Abdelaziz Sleem Portfolio",
     images: [
       {
-        url: "https://as-portfolio-ten.vercel.app/og-image.png",
+        url: "https://as-portfolio-ten.vercel.app/imgs/my-img.jpg",
         width: 1200,
         height: 630,
         alt: "Abdelaziz Sleem - Fullstack Developer",
@@ -78,7 +78,7 @@ export const metadata = {
     title: "Abdelaziz Sleem | Fullstack Developer | React, Next.js, Node.js Expert",
     description: "Passionate Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB. Hire a freelance developer for your next project!",
     creator: "@AbdelazizSleem",
-    images: ["https://as-portfolio-ten.vercel.app/twitter-image.png"],
+    images: ["https://as-portfolio-ten.vercel.app/imgs/my-img.jpg"],
   },
   robots: {
     index: true,
@@ -122,7 +122,7 @@ export default function RootLayout({ children }) {
               "https://github.com/AbdelazizSleem01",
               "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/",
             ],
-            "image": "https://as-portfolio-ten.vercel.app/imgs/my-img.jpeg"
+            "image": "https://as-portfolio-ten.vercel.app/imgs/my-img.jpg"
           })}
         </script>
 

@@ -3,7 +3,6 @@ import Visit from "../../../../models/Visits";
 
 const getLocationFromIP = async (ip) => {
   try {
-    // Skip for localhost/private IPs
     if (ip === '127.0.0.1' || ip === '::1' || ip === 'unknown' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')) {
       return {
         country: 'Local',
@@ -14,7 +13,6 @@ const getLocationFromIP = async (ip) => {
       };
     }
 
-    // Try multiple geolocation services
     const services = [
       `https://ipapi.co/${ip}/json/`,
       `https://ip-api.com/json/${ip}?fields=country,city,region,lat,lon`,
@@ -25,11 +23,10 @@ const getLocationFromIP = async (ip) => {
       try {
         console.log('Trying geolocation service:', serviceUrl);
         const response = await fetch(serviceUrl, {
-          timeout: 5000, // 5 second timeout
+          timeout: 5000, 
         });
         const data = await response.json();
 
-        // Check for success based on different API responses
         if (data.country && (data.city || data.region)) {
           return {
             country: data.country || data.country_name || 'Unknown',
