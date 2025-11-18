@@ -29,7 +29,6 @@ const VisitTracker = () => {
           }),
         });
 
-        // Track session duration with multiple strategies
         const startTime = Date.now();
         let lastActivity = Date.now();
         let durationUpdateInterval;
@@ -46,22 +45,19 @@ const VisitTracker = () => {
                 sessionId,
                 duration,
               }),
-              keepalive: true, // This helps with page unload
+              keepalive: true, 
             });
           } catch (error) {
             console.error('Error updating duration:', error);
           }
         };
 
-        // Update duration every 30 seconds
         durationUpdateInterval = setInterval(updateDuration, 30000);
 
-        // Track user activity
         const updateActivity = () => {
           lastActivity = Date.now();
         };
 
-        // Activity events
         const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
         events.forEach(event => {
           document.addEventListener(event, updateActivity, { passive: true });
@@ -69,7 +65,6 @@ const VisitTracker = () => {
 
         const handleBeforeUnload = () => {
           const duration = Math.floor((Date.now() - startTime) / 1000);
-          // Use sendBeacon for reliable delivery on page unload
           navigator.sendBeacon('/api/visits/session-end', JSON.stringify({
             sessionId,
             duration,
@@ -78,10 +73,8 @@ const VisitTracker = () => {
 
         const handleVisibilityChange = () => {
           if (document.hidden) {
-            // Page is hidden, update duration
             updateDuration();
           } else {
-            // Page is visible again, reset activity
             lastActivity = Date.now();
           }
         };
