@@ -2,23 +2,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { useEditor, EditorContent } from "@tiptap/react";
 import { motion } from "framer-motion";
-import StarterKit from "@tiptap/starter-kit";
-import TextColor from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import Highlight from "@tiptap/extension-highlight";
-import Underline from "@tiptap/extension-underline";
-import TextAlign from "@tiptap/extension-text-align";
 import Link from "next/link";
-import TextToolbar from "../TextToolbar";
-import { FontSize } from "../FontSize";
+import SimpleEditor from "../SimpleEditor";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
 export default function CreateHeaderForm() {
   const [title, setTitle] = useState("");
   const [linkedInLink, setLinkedInLink] = useState("");
   const [githubLink, setGithubLink] = useState("");
+  const [description, setDescription] = useState("<p>Write description</p>");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,26 +34,6 @@ export default function CreateHeaderForm() {
 
   const router = useRouter();
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextColor,
-      TextStyle.configure({
-        HTMLAttributes: {
-          style: "font-size",
-        },
-      }),
-      Highlight.configure({ multicolor: true }),
-      Underline,
-      FontSize,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-    ],
-    content: "<p>Write description</p>",
-    immediatelyRender: false,
-  });
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -76,7 +49,7 @@ export default function CreateHeaderForm() {
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("description", editor.getHTML());
+    formData.append("description", description);
     formData.append("linkedInLink", linkedInLink);
     formData.append("githubLink", githubLink);
     formData.append("image", image);
@@ -172,12 +145,7 @@ export default function CreateHeaderForm() {
             >
               Header Description
             </label>
-            <EditorContent
-              id="description"
-              editor={editor}
-              className="w-full p-3 bg-neutral/10 mt-1  input-bordered rounded-md"
-            />
-            <TextToolbar editor={editor} />
+            <SimpleEditor value={description} onChange={setDescription} />
           </motion.div>
 
           {/* LinkedIn Link */}

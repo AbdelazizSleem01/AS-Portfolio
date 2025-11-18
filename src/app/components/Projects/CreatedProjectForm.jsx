@@ -4,25 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useEditor, EditorContent } from "@tiptap/react";
 import { motion } from "framer-motion";
-import StarterKit from "@tiptap/starter-kit";
-import TextColor from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import Highlight from "@tiptap/extension-highlight";
-import Underline from "@tiptap/extension-underline";
-import Text from "@tiptap/extension-text";
-import Paragraph from "@tiptap/extension-paragraph";
-import Document from "@tiptap/extension-document";
-import Heading from "@tiptap/extension-heading";
-import TextAlign from "@tiptap/extension-text-align";
-import { FontSize } from "../FontSize";
-import TextToolbar from "../TextToolbar";
 import { ChevronDown, MoveLeft, Shapes } from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import SimpleEditor from "../SimpleEditor";
 
 export default function CreatedProjectForm() {
-  // All state hooks are called unconditionally
   const [title, setTitle] = useState("");
   const [liveLink, setLiveLink] = useState("");
   const [githubLink, setGithubLink] = useState("");
@@ -32,6 +19,7 @@ export default function CreatedProjectForm() {
   const [videoPreview, setVideoPreview] = useState(null);
   const [videoLink, setVideoLink] = useState("");
   const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("<p> Write description </p>");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -50,32 +38,6 @@ export default function CreatedProjectForm() {
       );
   }, []);
 
-  const editor = useEditor({
-    extensions: [
-      Text,
-      Paragraph,
-      Document,
-      StarterKit,
-      TextColor.configure(),
-      TextStyle.configure({
-        HTMLAttributes: {
-          style: "font-size",
-        },
-      }),
-      FontSize,
-      Highlight.configure({ multicolor: true }),
-      Underline,
-      Heading.configure({
-        levels: [1, 2, 3, 4, 5, 6],
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-    ],
-    content: "<p> Write description </p>",
-    immediatelyRender: false,
-  });
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -88,25 +50,6 @@ export default function CreatedProjectForm() {
     fetchCategories();
   }, []);
 
-  if (!editor) {
-    return (
-      <motion.div
-        className="flex flex-col items-center justify-center h-screen gap-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.div
-          className="w-12 h-12 border-4 border-t-4 border-primary rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-        />
-        <motion.span className="text-primary text-lg">Loading...</motion.span>
-      </motion.div>
-    );
-  }
-
-  // Image change handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -115,7 +58,6 @@ export default function CreatedProjectForm() {
     }
   };
 
-  // Video file change handler
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -125,7 +67,6 @@ export default function CreatedProjectForm() {
     }
   };
 
-  // Video URL change handler
   const handleVideoUrlChange = (e) => {
     const url = e.target.value;
     setVideoLink(url);
@@ -140,7 +81,7 @@ export default function CreatedProjectForm() {
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("description", editor.getHTML());
+    formData.append("description", description);
     formData.append("liveLink", liveLink);
     formData.append("githubLink", githubLink);
     formData.append("category", category);
@@ -148,35 +89,33 @@ export default function CreatedProjectForm() {
     if (video) formData.append("video", video);
     if (videoLink) formData.append("videoLink", videoLink);
 
-    // Simulate progress bar
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 100);
+    const xhr = new XMLHttpRequest();
 
-    try {
-      const response = await fetch("/api/projects", {
-        method: "POST",
-        body: formData,
-      });
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        setProgress(percentComplete);
+      }
+    };
 
-      if (response.ok) {
+    xhr.onload = () => {
+      setProgress(100);
+      if (xhr.status === 200 || xhr.status === 201) {
         toast.success("Project created successfully!");
         router.push("/allProjects");
       } else {
         toast.error("Failed to create project!");
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred!");
-    } finally {
-      clearInterval(interval);
       setIsLoading(false);
-    }
+    };
+
+    xhr.onerror = () => {
+      toast.error("An unexpected error occurred!");
+      setIsLoading(false);
+    };
+
+    xhr.open("POST", "/api/projects");
+    xhr.send(formData);
   };
 
   const fieldVariant = {
@@ -250,12 +189,7 @@ export default function CreatedProjectForm() {
               >
                 Project Description
               </label>
-              <EditorContent
-                id="description"
-                editor={editor}
-                className="w-full p-3 bg-neutral/10 mt-1 input-bordered rounded-md"
-              />
-              <TextToolbar editor={editor} />
+              <SimpleEditor value={description} onChange={setDescription} />
             </motion.div>
 
             {/* Live Link */}

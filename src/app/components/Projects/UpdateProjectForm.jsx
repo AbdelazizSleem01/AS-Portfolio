@@ -2,18 +2,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { useEditor, EditorContent } from '@tiptap/react';
 import { motion, useAnimation } from 'framer-motion';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { ChevronDown, Trash2, Save, MoveLeft } from 'lucide-react';
-import StarterKit from '@tiptap/starter-kit';
-import TextStyle from '@tiptap/extension-text-style';
-import Highlight from '@tiptap/extension-highlight';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import TextColor from '@tiptap/extension-color';
-import { FontSize } from '../FontSize';
-import TextToolbar from '../TextToolbar';
+import SimpleEditor from '../SimpleEditor';
 import Swal from 'sweetalert2';
 import Link from 'next/link';
 
@@ -40,19 +32,6 @@ export default function UpdateProjectForm() {
     videoLink: ''
   });
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextColor,
-      TextStyle,
-      Highlight.configure({ multicolor: true }),
-      Underline,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      FontSize,
-    ],
-    content: '',
-  });
-
   useEffect(() => {
     document.title = `Update Project | ${process.env.NEXT_PUBLIC_META_TITLE}`;
     document
@@ -77,7 +56,6 @@ export default function UpdateProjectForm() {
           videoLink: project.videoLink || ''
         });
         setCategories(categoriesData.categories);
-        editor?.commands.setContent(project.description);
         setPreviews({
           image: project.imageUrl,
           video: project.videoLink || project.videoUrl
@@ -88,7 +66,7 @@ export default function UpdateProjectForm() {
     };
 
     fetchData();
-  }, [id, editor]);
+  }, [id]);
 
   const handleFile = useCallback((type, file) => {
     if (!file) return;
@@ -148,7 +126,7 @@ export default function UpdateProjectForm() {
       try {
         const formData = new FormData();
         formData.append('title', projectData.title);
-        formData.append('description', editor.getHTML());
+        formData.append('description', projectData.description);
         formData.append('category', projectData.category);
         formData.append('liveLink', projectData.liveLink);
         formData.append('githubLink', projectData.githubLink);
@@ -239,11 +217,7 @@ export default function UpdateProjectForm() {
         </FormSection>
 
         <FormSection title="Description" variants={fieldVariant} transition={{ delay: 0.2 }}>
-          <EditorContent
-            editor={editor}
-            className="w-full bg-neutral/10 p-3 mt-1 input-bordered rounded-md"
-          />
-          <TextToolbar editor={editor} />
+          <SimpleEditor value={projectData.description} onChange={(value) => handleInputChange('description', value)} />
         </FormSection>
 
         <FormSection title="Live Link" variants={fieldVariant} transition={{ delay: 0.3 }}>

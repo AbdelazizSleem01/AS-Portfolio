@@ -2,16 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import TextColor from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import Highlight from "@tiptap/extension-highlight";
-import Underline from "@tiptap/extension-underline";
-import TextAlign from "@tiptap/extension-text-align";
-import { FontSize } from "../FontSize";
-import TextToolbar from "../TextToolbar";
 import { motion } from "framer-motion";
+import SimpleEditor from "../SimpleEditor";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import Swal from "sweetalert2";
 import { Save, Trash2 } from "lucide-react";
@@ -28,7 +20,6 @@ export default function UpdateHeaderForm() {
 
   const { user } = useUser();
 
-  // Redirect if user is not logged in
   if (!user) {
     return <RedirectToSignIn />;
   }
@@ -50,22 +41,6 @@ export default function UpdateHeaderForm() {
       );
   }, []);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextColor,
-      TextStyle,
-      Highlight.configure({ multicolor: true }),
-      Underline,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      FontSize,
-    ],
-    content: "",
-    immediatelyRender: false,
-  });
-
   useEffect(() => {
     const fetchHeader = async () => {
       setLoading(true);
@@ -74,7 +49,6 @@ export default function UpdateHeaderForm() {
         if (!response.ok) throw new Error("Failed to fetch header");
         const data = await response.json();
         setHeader(data);
-        editor?.commands.setContent(data.description || "");
 
         if (data.imageUrl) {
           setImagePreview(data.imageUrl);
@@ -87,7 +61,7 @@ export default function UpdateHeaderForm() {
     };
 
     fetchHeader();
-  }, [id, editor]);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,7 +84,7 @@ export default function UpdateHeaderForm() {
       const formData = new FormData();
       formData.append("Id", id);
       formData.append("title", header.title);
-      formData.append("description", editor.getHTML());
+      formData.append("description", header.description);
       formData.append("githubLink", header.githubLink);
       formData.append("linkedInLink", header.linkedInLink);
       if (image) formData.append("image", image);
@@ -232,12 +206,7 @@ export default function UpdateHeaderForm() {
         >
           Description
         </label>
-        <EditorContent
-          id="description"
-          editor={editor}
-          className="w-full p-3 bg-neutral/10 mt-1  text-neutral  input-bordered rounded-md"
-        />
-        <TextToolbar editor={editor} />
+        <SimpleEditor value={header.description} onChange={(value) => setHeader({ ...header, description: value })} />
       </div>
 
       <div className="mb-4">

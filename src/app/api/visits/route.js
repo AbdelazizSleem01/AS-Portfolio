@@ -16,33 +16,57 @@ const getLocationFromIP = async (ip) => {
     const services = [
       `https://ipapi.co/${ip}/json/`,
       `https://ip-api.com/json/${ip}?fields=country,city,region,lat,lon`,
-      `https://api.ipgeolocation.io/ipgeo?apiKey=demo&ip=${ip}`, // Demo key for testing
+      `https://api.ipgeolocation.io/ipgeo?apiKey=demo&ip=${ip}`,
+      `https://api.ipify.org?format=json&ip=${ip}`,
+      `https://ipwho.is/${ip}?output=json`,
     ];
 
     for (const serviceUrl of services) {
       try {
-        console.log('Trying geolocation service:', serviceUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
         const response = await fetch(serviceUrl, {
-          timeout: 5000, 
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) continue;
+
         const data = await response.json();
 
-        if (data.country && (data.city || data.region)) {
+        let country = data.country || data.country_name || data.country_code;
+        let city = data.city;
+        let region = data.region || data.region_name;
+        let latitude = data.latitude || data.lat;
+        let longitude = data.longitude || data.lon;
+
+        if (data.country_code && !country) {
+          country = data.country_code;
+        }
+        if (data.region_code && !region) {
+          region = data.region_code;
+        }
+
+        if (country) {
           return {
-            country: data.country || data.country_name || 'Unknown',
-            city: data.city || 'Unknown',
-            region: data.region || data.region_name || 'Unknown',
-            latitude: data.latitude || data.lat || 0,
-            longitude: data.longitude || data.lon || 0,
+            country: country.toUpperCase(),
+            city: city || 'Unknown',
+            region: region || 'Unknown',
+            latitude: latitude || 0,
+            longitude: longitude || 0,
           };
         }
       } catch (error) {
-        console.error('Geolocation service failed:', serviceUrl, error);
+        console.log(`Geolocation service failed: ${serviceUrl} - ${error.message}`);
         continue;
       }
     }
+
+    console.log(`Failed to geolocate IP: ${ip}`);
   } catch (error) {
-    console.error('Error fetching location:', error);
+    console.error('Error in getLocationFromIP:', error);
   }
 
   return {
@@ -55,26 +79,75 @@ const getLocationFromIP = async (ip) => {
 };
 
 const parseUserAgent = (userAgent) => {
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-  const isTablet = /iPad|Android(?=.*\bMobile\b)(?!.*\bPhone\b)/i.test(userAgent);
+  const ua = userAgent.toLowerCase();
 
   let device = 'desktop';
-  if (isTablet) device = 'tablet';
-  else if (isMobile) device = 'mobile';
+
+  const tabletPatterns = [
+    /\bipad\b/,
+    /\bandroid\b.*\btablet\b/,
+    /\bkindle\b/,
+    /\bplaybook\b/,
+    /\bsilk\b/,
+    /\btouchpad\b/,
+    /\bxoom\b/,
+    /\btransformer\b/,
+    /\bnook\b/,
+    /\bslate\b/,
+    /\bsurface\b.*\bwindows\b/
+  ];
+
+  const isTablet = tabletPatterns.some(pattern => pattern.test(ua));
+  if (isTablet) {
+    device = 'tablet';
+  }
+
+  if (device !== 'tablet') {
+    const mobilePatterns = [
+      /\bandroid\b.*\bmobile\b/,
+      /\biphone\b/,
+      /\bipod\b/,
+      /\bblackberry\b/,
+      /\bie.*mobile\b/,
+      /\bopera.*mini\b/,
+      /\bmobile\b/,
+      /\bwebos\b/,
+      /\bsamsung\b.*\bphone\b/,
+      /\bhuawei\b.*\bphone\b/,
+      /\bmotorola\b/,
+      /\bnokia\b/,
+      /\bsony\b.*\bphone\b/,
+      /\blg\b.*\bphone\b/
+    ];
+
+    const isMobile = mobilePatterns.some(pattern => pattern.test(ua));
+    if (isMobile) {
+      device = 'mobile';
+    }
+  }
 
   let browser = 'Unknown';
-  if (userAgent.includes('Chrome')) browser = 'Chrome';
-  else if (userAgent.includes('Firefox')) browser = 'Firefox';
-  else if (userAgent.includes('Safari')) browser = 'Safari';
-  else if (userAgent.includes('Edge')) browser = 'Edge';
-  else if (userAgent.includes('Opera')) browser = 'Opera';
+  if (ua.includes('chrome') && !ua.includes('edg/') && !ua.includes('opr/')) {
+    browser = 'Chrome';
+  } else if (ua.includes('firefox') && !ua.includes('seamonkey')) {
+    browser = 'Firefox';
+  } else if (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android')) {
+    browser = 'Safari';
+  } else if (ua.includes('edg/')) {
+    browser = 'Edge';
+  } else if (ua.includes('opr/') || ua.includes('opera')) {
+    browser = 'Opera';
+  } else if (ua.includes('msie') || ua.includes('trident')) {
+    browser = 'Internet Explorer';
+  }
 
   let os = 'Unknown';
-  if (userAgent.includes('Windows')) os = 'Windows';
-  else if (userAgent.includes('Mac')) os = 'macOS';
-  else if (userAgent.includes('Linux')) os = 'Linux';
-  else if (userAgent.includes('Android')) os = 'Android';
-  else if (userAgent.includes('iOS')) os = 'iOS';
+  if (ua.includes('windows nt')) os = 'Windows';
+  else if (ua.includes('macintosh') || ua.includes('mac os x')) os = 'macOS';
+  else if (ua.includes('linux')) os = 'Linux';
+  else if (ua.includes('android')) os = 'Android';
+  else if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod')) os = 'iOS';
+  else if (ua.includes('cros')) os = 'Chrome OS';
 
   return { device, browser, os };
 };
@@ -83,7 +156,16 @@ export async function POST(request) {
   try {
     await connectDB();
 
-    const { sessionId, url, referrer, userAgent, ip } = await request.json();
+    const { sessionId, url, referrer, userAgent } = await request.json();
+
+    let ip = request.headers.get('x-forwarded-for') ||
+             request.headers.get('x-real-ip') ||
+             request.ip ||
+             'unknown';
+
+    if (ip.includes(',')) {
+      ip = ip.split(',')[0].trim();
+    }
 
     const location = await getLocationFromIP(ip);
 

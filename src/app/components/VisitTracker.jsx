@@ -16,29 +16,6 @@ const VisitTracker = () => {
         const referrer = document.referrer;
         const url = window.location.href;
 
-        // Get IP address using multiple services for better reliability
-        let ip = 'unknown';
-        try {
-          const services = [
-            'https://api.ipify.org?format=json',
-            'https://ipapi.co/json/',
-            'https://api.ip.sb/jsonip'
-          ];
-
-          for (const service of services) {
-            try {
-              const response = await fetch(service);
-              const data = await response.json();
-              ip = data.ip || data.query || 'unknown';
-              if (ip !== 'unknown') break;
-            } catch (e) {
-              continue;
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching IP:', error);
-        }
-
         await fetch('/api/visits', {
           method: 'POST',
           headers: {
@@ -49,7 +26,6 @@ const VisitTracker = () => {
             url,
             referrer,
             userAgent,
-            ip,
           }),
         });
 

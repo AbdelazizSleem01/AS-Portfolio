@@ -54,6 +54,23 @@ export default function Visits() {
             });
     };
 
+    const getFlagEmoji = (countryCode) => {
+        if (!countryCode || countryCode === 'Unknown') {
+            return '🌍'; 
+        }
+
+        if (countryCode === 'Local') {
+            return '🏠'; 
+        }
+
+        const codePoints = countryCode
+            .toUpperCase()
+            .split('')
+            .map(char => 0x1F1E6 - 65 + char.charCodeAt(0));
+
+        return String.fromCodePoint(...codePoints);
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-base-100 flex items-center justify-center">
@@ -217,7 +234,7 @@ export default function Visits() {
                             {analytics?.visitorsByCountry?.slice(0, 8).map((country, index) => (
                                 <div key={index} className="flex items-center justify-between p-3 bg-base-100 rounded-xl">
                                     <div className="flex items-center gap-3">
-                                        <span className="text-lg">🏴</span>
+                                        <span className="text-lg">{getFlagEmoji(country._id)}</span>
                                         <span className="font-medium text-base-content">{country._id || 'Unknown'}</span>
                                     </div>
                                     <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
@@ -289,12 +306,13 @@ export default function Visits() {
                                     <th className="text-left py-3 text-base-content font-semibold">Device</th>
                                     <th className="text-left py-3 text-base-content font-semibold">Duration</th>
                                     <th className="text-left py-3 text-base-content font-semibold">Date</th>
+                                    <th className="text-left py-3 text-base-content font-semibold">Time</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {analytics?.recentVisits?.slice(0, 8).map((visit, index) => (
-                                    <motion.tr 
-                                        key={index} 
+                                    <motion.tr
+                                        key={index}
                                         className="border-b border-base-300/50 hover:bg-base-300/50 transition-colors"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
@@ -305,18 +323,21 @@ export default function Visits() {
                                         </td>
                                         <td className="py-3 text-base-content capitalize">{visit.device}</td>
                                         <td className="py-3 text-base-content">
-                                            {visit.totalDuration ? 
-                                                `${Math.floor(visit.totalDuration / 60)}m ${visit.totalDuration % 60}s` : 
+                                            {visit.totalDuration ?
+                                                `${Math.floor(visit.totalDuration / 60)}m ${visit.totalDuration % 60}s` :
                                                 'N/A'
                                             }
                                         </td>
                                         <td className="py-3 text-base-content">
                                             {new Date(visit.sessionStart).toLocaleDateString()}
                                         </td>
+                                        <td className="py-3 text-base-content">
+                                            {new Date(visit.sessionStart).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                        </td>
                                     </motion.tr>
                                 )) || (
                                     <tr>
-                                        <td colSpan="4" className="py-8 text-center text-base-content/70">
+                                        <td colSpan="5" className="py-8 text-center text-base-content/70">
                                             No recent visits data available
                                         </td>
                                     </tr>
