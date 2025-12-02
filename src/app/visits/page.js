@@ -586,15 +586,15 @@ export default function Visits() {
                     className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="text-2xl">
-                        {country.flag || country.countryFlagEmoji || '🌍'}
+                      <div className="text-2xl min-w-[40px] flex justify-center">
+                        {getFlagEmoji(country._id)}
                       </div>
                       <div>
                         <span className="font-medium text-base-content block">
-                          {country.country}
+                          {country._id || 'Unknown'}
                         </span>
                         <span className="text-xs text-base-content/50">
-                          {country.countryCode}
+                          {country.count} visit{country.count !== 1 ? 's' : ''}
                         </span>
                       </div>
                     </div>
