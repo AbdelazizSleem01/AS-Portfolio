@@ -594,7 +594,7 @@ export default function Visits() {
                           width={24}
                           height={24}
                           className="w-6 h-6 object-contain"
-                          unoptimized 
+                          unoptimized
                         />
                       ) : (
                         <span className="text-2xl">
@@ -769,7 +769,6 @@ export default function Visits() {
             </div>
           </DataSection>
         </div>
-
         {/* Recent Visits */}
         <DataSection
           title="Recent Visits"
@@ -813,61 +812,134 @@ export default function Visits() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-base-300/30 hover:bg-base-300/30 transition-colors"
+                      className="border-b border-base-300/30 hover:bg-base-300/30 transition-colors group"
                     >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="text-2xl">
-                            {visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}
+                          <div className="relative w-10 h-6 flex items-center justify-center">
+                            {visit.location?.countryFlagImg ? (
+                              // استخدام img عادي لتجنب مشاكل Next.js Image
+                              <img
+                                src={visit.location.countryFlagImg}
+                                alt={visit.location.country || 'Country flag'}
+                                className="w-full h-full object-contain rounded shadow-sm group-hover:scale-110 transition-transform duration-200"
+                                loading="lazy"
+                                onError={(e) => {
+                                  // إذا فشل تحميل الصورة، استخدم الإيموجي
+                                  e.target.style.display = 'none';
+                                  e.target.parentElement.innerHTML =
+                                    `<span class="text-2xl">${visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}</span>`;
+                                }}
+                              />
+                            ) : (
+                              <span className="text-2xl">
+                                {visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}
+                              </span>
+                            )}
                           </div>
-                          <div>
-                            <div className="font-medium text-base-content">
-                              {visit.location?.city || 'Unknown'}, {visit.location?.country || 'Unknown'}
+                          <div className="min-w-0">
+                            <div className="font-medium text-base-content truncate max-w-[180px]">
+                              {visit.location?.city || 'Unknown'}
+                              {visit.location?.city && visit.location?.country && ', '}
+                              {visit.location?.country || ''}
+                              {!visit.location?.city && !visit.location?.country && 'Unknown Location'}
                             </div>
-                            <div className="text-xs text-base-content/50">
-                              {visit.ip?.slice(0, 15)}...
+                            <div className="text-xs text-base-content/50 truncate max-w-[180px]">
+                              {visit.ip ? (
+                                <>
+                                  {visit.ip.slice(0, 15)}...
+                                  <span className="ml-1 px-1.5 py-0.5 bg-base-300 rounded text-[10px]">
+                                    {visit.location?.countryCode || 'XX'}
+                                  </span>
+                                </>
+                              ) : (
+                                'IP not available'
+                              )}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${visit.device === 'mobile' ? 'bg-blue-500/10 text-blue-500' :
-                            visit.device === 'tablet' ? 'bg-green-500/10 text-green-500' :
-                              'bg-purple-500/10 text-purple-500'
+                          <div className={`p-2 rounded-lg ${visit.device === 'mobile' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+                            visit.device === 'tablet' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                              'bg-purple-500/10 text-purple-500 border border-purple-500/20'
                             }`}>
                             {visit.device === 'mobile' ? '📱' :
                               visit.device === 'tablet' ? '📟' : '💻'}
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <div className="font-medium text-base-content capitalize">
-                              {visit.device}
+                              {visit.device || 'Unknown'}
                             </div>
-                            <div className="text-xs text-base-content/50">
-                              {visit.browser} • {visit.os}
+                            <div className="text-xs text-base-content/50 truncate max-w-[140px]">
+                              <span className="font-medium">{visit.browser || 'Unknown'}</span>
+                              {visit.os && ` • ${visit.os}`}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <div className="font-medium text-base-content">
-                          {visit.totalDuration ?
-                            `${Math.floor(visit.totalDuration / 60)}m ${visit.totalDuration % 60}s` :
-                            'N/A'
-                          }
+                        <div className="flex flex-col">
+                          <div className="font-medium text-base-content">
+                            {visit.totalDuration ?
+                              `${Math.floor(visit.totalDuration / 60)}m ${Math.floor(visit.totalDuration % 60)}s` :
+                              '0m 0s'
+                            }
+                          </div>
+                          {visit.totalDuration > 0 && (
+                            <div className="w-24 bg-base-300 rounded-full h-1.5 mt-1">
+                              <div
+                                className="bg-gradient-to-r from-green-500 to-emerald-500 h-full rounded-full"
+                                style={{
+                                  width: `${Math.min(visit.totalDuration / 300 * 100, 100)}%`
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <div className="font-medium text-base-content">
-                          {new Date(visit.createdAt || visit.sessionStart).toLocaleDateString()}
+                        <div className="flex flex-col">
+                          <div className="font-medium text-base-content">
+                            {new Date(visit.createdAt || visit.sessionStart).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </div>
+                          <div className="text-xs text-base-content/50">
+                            {new Date(visit.createdAt || visit.sessionStart).toLocaleDateString('en-US', {
+                              weekday: 'short'
+                            })}
+                          </div>
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <div className="font-medium text-base-content">
-                          {new Date(visit.createdAt || visit.sessionStart).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                        <div className="flex flex-col">
+                          <div className="font-medium text-base-content">
+                            {new Date(visit.createdAt || visit.sessionStart).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
+                          </div>
+                          <div className="text-xs text-base-content/50">
+                            {(() => {
+                              const now = new Date();
+                              const visitTime = new Date(visit.createdAt || visit.sessionStart);
+                              const diffMs = now - visitTime;
+                              const diffMins = Math.floor(diffMs / 60000);
+                              const diffHours = Math.floor(diffMins / 60);
+                              const diffDays = Math.floor(diffHours / 24);
+
+                              if (diffMins < 1) return 'Just now';
+                              if (diffMins < 60) return `${diffMins}m ago`;
+                              if (diffHours < 24) return `${diffHours}h ago`;
+                              if (diffDays < 7) return `${diffDays}d ago`;
+                              return '';
+                            })()}
+                          </div>
                         </div>
                       </td>
                     </motion.tr>
@@ -876,93 +948,190 @@ export default function Visits() {
 
                 {(!currentVisits || currentVisits.length === 0) && (
                   <tr>
-                    <td colSpan="5" className="py-12 text-center">
-                      <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
-                      <p className="text-base-content/70">No recent visits found</p>
-                      <p className="text-sm text-base-content/50 mt-1">
-                        Try adjusting your filters
-                      </p>
+                    <td colSpan="5" className="py-16 text-center">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center"
+                      >
+                        <div className="p-4 bg-base-300/50 rounded-full mb-4">
+                          <AlertCircle className="w-12 h-12 text-base-content/30" />
+                        </div>
+                        <p className="text-base-content/70 text-lg font-medium mb-2">No recent visits found</p>
+                        <p className="text-sm text-base-content/50 max-w-md">
+                          {Object.values(filters).some(f => f !== 'all' && f !== 30)
+                            ? "No visits match your current filters. Try adjusting them to see more results."
+                            : "Your analytics dashboard is ready! Visits will appear here once users start visiting your site."}
+                        </p>
+                        {Object.values(filters).some(f => f !== 'all' && f !== 30) && (
+                          <button
+                            onClick={() => {
+                              handleFilterChange('country', 'all');
+                              handleFilterChange('device', 'all');
+                              handleFilterChange('days', 30);
+                            }}
+                            className="mt-4 px-4 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                          >
+                            Reset Filters
+                          </button>
+                        )}
+                      </motion.div>
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
 
-            {/* Pagination */}
+            {/* Pagination - محسّنة */}
             {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-base-100 border-t border-base-300">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-base-100 border-t border-base-300 rounded-b-2xl"
+              >
                 <div className="text-sm text-base-content/70 mb-4 sm:mb-0">
-                  Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalVisits)} of {totalVisits} visits
+                  <span className="font-medium">
+                    Showing {Math.min(((currentPage - 1) * itemsPerPage) + 1, totalVisits)} to {Math.min(currentPage * itemsPerPage, totalVisits)}
+                  </span>
+                  <span className="text-base-content/50"> of {totalVisits.toLocaleString()} visits</span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => goToPage(1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="First page"
-                  >
-                    <ChevronsLeft className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="Previous page"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => goToPage(pageNum)}
-                          className={`px-3 py-2 text-sm rounded-lg transition-colors min-w-[40px] ${currentPage === pageNum
-                            ? 'bg-primary text-primary-content font-semibold'
-                            : 'bg-base-200 text-base-content/70 hover:bg-base-300'
-                            }`}
-                          aria-label={`Page ${pageNum}`}
-                          aria-current={currentPage === pageNum ? 'page' : undefined}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
+                  {/* Page Size Selector */}
+                  <div className="hidden sm:flex items-center gap-2 mr-4">
+                    <span className="text-sm text-base-content/50">Show:</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        // يمكنك إضافة دالة لتغيير itemsPerPage إذا أردت
+                        // setItemsPerPage(parseInt(e.target.value));
+                        // setCurrentPage(1);
+                      }}
+                      className="bg-base-200 border border-base-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                    </select>
                   </div>
 
-                  <button
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="Next page"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => goToPage(1)}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors hover:scale-105 active:scale-95"
+                      aria-label="First page"
+                    >
+                      <ChevronsLeft className="w-4 h-4" />
+                    </button>
 
-                  <button
-                    onClick={() => goToPage(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="Last page"
-                  >
-                    <ChevronsRight className="w-4 h-4" />
-                  </button>
+                    <button
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors hover:scale-105 active:scale-95"
+                      aria-label="Previous page"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {(() => {
+                        const pages = [];
+                        let startPage = Math.max(1, currentPage - 2);
+                        let endPage = Math.min(totalPages, currentPage + 2);
+
+                        // تأكد من عرض 5 صفحات إن أمكن
+                        if (endPage - startPage < 4) {
+                          if (currentPage < 3) {
+                            endPage = Math.min(5, totalPages);
+                          } else if (currentPage > totalPages - 2) {
+                            startPage = Math.max(1, totalPages - 4);
+                          }
+                        }
+
+                        // إضافة "..." في البداية إذا لزم الأمر
+                        if (startPage > 1) {
+                          pages.push(
+                            <button
+                              key="start-ellipsis"
+                              onClick={() => goToPage(1)}
+                              className="px-3 py-2 text-sm rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 transition-colors min-w-[40px]"
+                            >
+                              1
+                            </button>
+                          );
+                          if (startPage > 2) {
+                            pages.push(
+                              <span key="ellipsis-start" className="px-2 text-base-content/30">
+                                ...
+                              </span>
+                            );
+                          }
+                        }
+
+                        // إضافة أرقام الصفحات
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(
+                            <button
+                              key={i}
+                              onClick={() => goToPage(i)}
+                              className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 min-w-[40px] ${currentPage === i
+                                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold shadow-lg'
+                                : 'bg-base-200 text-base-content/70 hover:bg-base-300 hover:scale-105'
+                                }`}
+                              aria-label={`Page ${i}`}
+                              aria-current={currentPage === i ? 'page' : undefined}
+                            >
+                              {i}
+                            </button>
+                          );
+                        }
+
+                        // إضافة "..." في النهاية إذا لزم الأمر
+                        if (endPage < totalPages) {
+                          if (endPage < totalPages - 1) {
+                            pages.push(
+                              <span key="ellipsis-end" className="px-2 text-base-content/30">
+                                ...
+                              </span>
+                            );
+                          }
+                          pages.push(
+                            <button
+                              key={totalPages}
+                              onClick={() => goToPage(totalPages)}
+                              className="px-3 py-2 text-sm rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 transition-colors min-w-[40px]"
+                            >
+                              {totalPages}
+                            </button>
+                          );
+                        }
+
+                        return pages;
+                      })()}
+                    </div>
+
+                    <button
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors hover:scale-105 active:scale-95"
+                      aria-label="Next page"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      onClick={() => goToPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors hover:scale-105 active:scale-95"
+                      aria-label="Last page"
+                    >
+                      <ChevronsRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         </DataSection>
@@ -1021,13 +1190,13 @@ export default function Visits() {
 const getFlagEmoji = (countryCode) => {
   if (!countryCode || countryCode === 'Unknown' || countryCode === 'unknown') return '🌍';
   if (countryCode === 'Local') return '🏠';
-  
+
   if (countryCode.length !== 2) return '🏴';
-  
+
   const codePoints = countryCode
     .toUpperCase()
     .split('')
     .map(char => 0x1F1E6 - 65 + char.charCodeAt(0));
-    
+
   return String.fromCodePoint(...codePoints);
 };
