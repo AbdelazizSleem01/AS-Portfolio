@@ -45,8 +45,7 @@ const getLocationFromIP = async (ip) => {
       };
     }
 
-    // استخدام خدمة مجانية وموثوقة
-    const response = await fetch(`https://ipapi.co/${ip}/json/`, {
+    const response = await fetch(`https://ipwho.is/${ip}`, {
       headers: {
         'User-Agent': 'WebsiteAnalytics/1.0'
       },
@@ -58,14 +57,14 @@ const getLocationFromIP = async (ip) => {
     const data = await response.json();
 
     return {
-      country: data.country_name || "Unknown",
+      country: data.country || "Unknown",
       city: data.city || "Unknown",
-      region: data.region || data.state || "Unknown",
+      region: data.region || "Unknown",
       latitude: data.latitude || 0,
       longitude: data.longitude || 0,
       countryCode: data.country_code || "Unknown",
-      countryFlagEmoji: getFlagEmoji(data.country_code),
-      countryFlagImg: `https://flagcdn.com/w40/${data.country_code?.toLowerCase() || 'xx'}.png`,
+      countryFlagEmoji: data.flag?.emoji || getFlagEmoji(data.country_code),
+      countryFlagImg: data.flag?.img || `https://flagcdn.com/w40/${data.country_code?.toLowerCase() || 'xx'}.png`,
     };
 
   } catch (error) {
