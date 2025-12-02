@@ -586,21 +586,9 @@ export default function Visits() {
                   className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 relative">
-                      {country.location?.countryFlagImg ? (
-                        <Image
-                          src={country.location.countryFlagImg}
-                          alt={country.location.country}
-                          width={24}
-                          height={24}
-                          className="rounded-full"
-                        />
-                      ) : (
-                        <span>{getFlagEmoji(country.location?.countryCode)}</span>  
-                      )}
+                    <div className="text-2xl min-w-[40px] flex justify-center">
+                      {country.flag || getFlagEmoji(country.countryCode)}
                     </div>
-
-
                     <div>
                       <span className="font-medium text-base-content block">
                         {country.country || 'Unknown'}
@@ -650,7 +638,7 @@ export default function Visits() {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">
                       {device._id === 'mobile' ? '📱' :
-                        device._id === 'tablet' ? '📟' : '💻'}
+                       device._id === 'tablet' ? '📟' : '💻'}
                     </span>
                     <div>
                       <span className="font-medium text-base-content capitalize block">
