@@ -587,11 +587,12 @@ export default function Visits() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="text-2xl min-w-[40px] flex justify-center">
-                        {getFlagEmoji(country._id)}
+                        {country.flag || country.countryFlagImg || getFlagEmoji(country._id) }
                       </div>
+
                       <div>
                         <span className="font-medium text-base-content block">
-                          {country._id || 'Unknown'}
+                          {country.country|| 'Unknown'}
                         </span>
                         <span className="text-xs text-base-content/50">
                           {country.count} visit{country.count !== 1 ? 's' : ''}
@@ -805,7 +806,7 @@ export default function Visits() {
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             <div className="text-2xl">
-                              {getFlagEmoji(visit.location?.countryCode)}
+                              {visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}
                             </div>
                             <div>
                               <div className="font-medium text-base-content">

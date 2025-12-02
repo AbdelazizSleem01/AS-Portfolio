@@ -64,7 +64,7 @@ const getLocationFromIP = async (ip) => {
       longitude: data.longitude || 0,
       countryCode: data.country_code || "Unknown",
       countryFlagEmoji: data.flag?.emoji || getFlagEmoji(data.country_code),
-      countryFlagImg: data.flag?.img || `https://flagcdn.com/w40/${data.country_code?.toLowerCase() || 'xx'}.png`,
+      countryFlagImg: data.flag?.img || `https://cdn.ipwhois.io/flags/${data.country_code?.toLowerCase() || 'xx'}`,
     };
 
   } catch (error) {
