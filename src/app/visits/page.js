@@ -593,7 +593,7 @@ export default function Visits() {
                           alt={country.country}
                           width={24}
                           height={24}
-                          className="w-6 h-6 object-contain"
+                          className="w-6 h-6 object-contain rounded-md"
                           unoptimized
                         />
                       ) : (
@@ -818,14 +818,12 @@ export default function Visits() {
                         <div className="flex items-center gap-3">
                           <div className="relative w-10 h-6 flex items-center justify-center">
                             {visit.location?.countryFlagImg ? (
-                              // استخدام img عادي لتجنب مشاكل Next.js Image
                               <img
                                 src={visit.location.countryFlagImg}
                                 alt={visit.location.country || 'Country flag'}
-                                className="w-full h-full object-contain rounded shadow-sm group-hover:scale-110 transition-transform duration-200"
+                                className="w-full h-full object-contain rounded-md shadow-sm group-hover:scale-110 transition-transform duration-200"
                                 loading="lazy"
                                 onError={(e) => {
-                                  // إذا فشل تحميل الصورة، استخدم الإيموجي
                                   e.target.style.display = 'none';
                                   e.target.parentElement.innerHTML =
                                     `<span class="text-2xl">${visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}</span>`;
@@ -1003,9 +1001,8 @@ export default function Visits() {
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
-                        // يمكنك إضافة دالة لتغيير itemsPerPage إذا أردت
-                        // setItemsPerPage(parseInt(e.target.value));
-                        // setCurrentPage(1);
+                         setItemsPerPage(parseInt(e.target.value));
+                         setCurrentPage(1);
                       }}
                       className="bg-base-200 border border-base-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     >
@@ -1041,7 +1038,6 @@ export default function Visits() {
                         let startPage = Math.max(1, currentPage - 2);
                         let endPage = Math.min(totalPages, currentPage + 2);
 
-                        // تأكد من عرض 5 صفحات إن أمكن
                         if (endPage - startPage < 4) {
                           if (currentPage < 3) {
                             endPage = Math.min(5, totalPages);
@@ -1050,7 +1046,6 @@ export default function Visits() {
                           }
                         }
 
-                        // إضافة "..." في البداية إذا لزم الأمر
                         if (startPage > 1) {
                           pages.push(
                             <button
@@ -1070,7 +1065,6 @@ export default function Visits() {
                           }
                         }
 
-                        // إضافة أرقام الصفحات
                         for (let i = startPage; i <= endPage; i++) {
                           pages.push(
                             <button
@@ -1088,7 +1082,6 @@ export default function Visits() {
                           );
                         }
 
-                        // إضافة "..." في النهاية إذا لزم الأمر
                         if (endPage < totalPages) {
                           if (endPage < totalPages - 1) {
                             pages.push(
