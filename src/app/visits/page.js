@@ -29,6 +29,7 @@ import {
   LineChart
 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import Image from 'next/image';
 
 const LoadingSkeleton = () => (
   <div className="space-y-8">
@@ -194,11 +195,10 @@ const FilterComponent = ({ filters, onFilterChange }) => {
                     <button
                       key={days}
                       onClick={() => onFilterChange('days', days)}
-                      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        filters.days === days
-                          ? 'bg-primary text-primary-content'
-                          : 'bg-base-100 text-base-content hover:bg-base-300'
-                      }`}
+                      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${filters.days === days
+                        ? 'bg-primary text-primary-content'
+                        : 'bg-base-100 text-base-content hover:bg-base-300'
+                        }`}
                     >
                       {days === 365 ? '1Y' : `${days}D`}
                     </button>
@@ -236,7 +236,7 @@ export default function Visits() {
     device: 'all',
     days: 30
   });
-  
+
   const itemsPerPage = 8;
 
   const totalVisits = analytics?.pagination?.totalItems || 0;
@@ -253,10 +253,10 @@ export default function Visits() {
       limit: itemsPerPage.toString(),
       days: filters.days.toString(),
     });
-    
+
     if (filters.country !== 'all') params.append('country', filters.country);
     if (filters.device !== 'all') params.append('device', filters.device);
-    
+
     return params.toString();
   }, [currentPage, filters, itemsPerPage]);
 
@@ -264,16 +264,16 @@ export default function Visits() {
     try {
       const queryString = buildQueryString();
       const response = await fetch(`/api/visits?${queryString}`);
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
-      
+
       const data = await response.json();
       setAnalytics(data);
       setError(null);
-      
+
       if (showToast) {
         Swal.fire({
           icon: 'success',
@@ -286,7 +286,7 @@ export default function Visits() {
     } catch (err) {
       console.error('Fetch error:', err);
       setError(err.message);
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Failed to Load Analytics',
@@ -416,594 +416,603 @@ export default function Visits() {
 
   return (
     <div className="min-h-screen bg-base-100 py-8 px-4 sm:px-6 lg:px-8 mt-20">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
-              <div className="text-center lg:text-left">
-                <div className="flex items-center justify-center lg:justify-start gap-4 mb-4">
-                  <div className="p-3 bg-gradient-to-r from-primary to-secondary rounded-2xl">
-                    <Eye className="w-8 h-8 text-base-100" />
-                  </div>
-                  <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Website Analytics
-                  </h1>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+            <div className="text-center lg:text-left">
+              <div className="flex items-center justify-center lg:justify-start gap-4 mb-4">
+                <div className="p-3 bg-gradient-to-r from-primary to-secondary rounded-2xl">
+                  <Eye className="w-8 h-8 text-base-100" />
                 </div>
-                <p className="text-xl text-base-content/70 max-w-2xl">
-                  Real-time insights into your website's performance and visitor behavior
-                </p>
-                <div className="w-32 h-1.5 bg-gradient-to-r from-primary to-secondary rounded-full mt-4" />
+                <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Website Analytics
+                </h1>
               </div>
-
-              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3">
-                <FilterComponent 
-                  filters={filters} 
-                  onFilterChange={handleFilterChange} 
-                />
-                
-                <button
-                  onClick={refreshData}
-                  disabled={refreshing}
-                  className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                  {refreshing ? 'Refreshing...' : 'Refresh'}
-                </button>
-
-                <button
-                  onClick={exportData}
-                  className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  Export
-                </button>
-
-                <button
-                  onClick={shareDashboard}
-                  className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Share
-                </button>
-              </div>
+              <p className="text-xl text-base-content/70 max-w-2xl">
+                Real-time insights into your website's performance and visitor behavior
+              </p>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-primary to-secondary rounded-full mt-4" />
             </div>
 
-            {/* Last Updated */}
-            {analytics?.lastUpdated && (
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-sm text-base-content/50">
-                <Clock className="w-4 h-4" />
-                Last updated: {new Date(analytics.lastUpdated).toLocaleString()}
-              </div>
-            )}
-          </motion.div>
+            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3">
+              <FilterComponent
+                filters={filters}
+                onFilterChange={handleFilterChange}
+              />
 
-          {/* Key Metrics */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-          >
-            <StatCard
-              icon={Users}
-              title="Total Visitors"
-              value={analytics?.totalVisitors?.toLocaleString() || '0'}
-              subtitle="Unique sessions"
-              color="from-blue-500 to-cyan-500"
-              trend={12.5}
-            />
-            
-            <StatCard
-              icon={Clock}
-              title="Avg Session"
-              value={analytics?.avgSessionDuration ?
-                `${Math.floor(analytics.avgSessionDuration / 60)}m ${Math.floor(analytics.avgSessionDuration % 60)}s` : '0m 0s'
-              }
-              subtitle="Average duration"
-              color="from-green-500 to-emerald-500"
-              trend={5.2}
-            />
-            
-            <StatCard
-              icon={MapPin}
-              title="Top Country"
-              value={analytics?.visitorsByCountry?.[0]?.country || 'N/A'}
-              subtitle={`${analytics?.visitorsByCountry?.[0]?.count?.toLocaleString() || 0} visitors`}
-              color="from-purple-500 to-pink-500"
-            />
-            
-            <StatCard
-              icon={Laptop}
-              title="Top Device"
-              value={analytics?.deviceBreakdown?.[0]?._id?.toUpperCase() || 'N/A'}
-              subtitle={`${analytics?.deviceBreakdown?.[0]?.count?.toLocaleString() || 0} users`}
-              color="from-orange-500 to-red-500"
-            />
-          </motion.div>
+              <button
+                onClick={refreshData}
+                disabled={refreshing}
+                className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </button>
 
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-base-200 rounded-3xl p-6 border border-base-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500">
-                  <BarChart3 className="w-5 h-5 text-base-100" />
-                </div>
-                <h3 className="font-bold text-base-content">Page Views</h3>
-              </div>
-              <p className="text-3xl font-bold text-primary">
-                {analytics?.stats?.totalPageViews?.toLocaleString() || '0'}
-              </p>
-            </div>
+              <button
+                onClick={exportData}
+                className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
 
-            <div className="bg-base-200 rounded-3xl p-6 border border-base-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
-                  <PieChart className="w-5 h-5 text-base-100" />
-                </div>
-                <h3 className="font-bold text-base-content">Bounce Rate</h3>
-              </div>
-              <p className="text-3xl font-bold text-primary">
-                {analytics?.stats?.bounceRate ? `${analytics.stats.bounceRate}%` : 'N/A'}
-              </p>
-            </div>
-
-            <div className="bg-base-200 rounded-3xl p-6 border border-base-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
-                  <LineChart className="w-5 h-5 text-base-100" />
-                </div>
-                <h3 className="font-bold text-base-content">Returning Users</h3>
-              </div>
-              <p className="text-3xl font-bold text-primary">
-                {analytics?.stats?.newVsReturning?.returning?.toLocaleString() || '0'}
-              </p>
+              <button
+                onClick={shareDashboard}
+                className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors"
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
             </div>
           </div>
 
-          {/* Charts and Tables */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <DataSection 
-              title="Visitors by Country" 
-              icon={Globe} 
-              color="from-blue-500 to-cyan-500"
-              action={
-                <span className="text-sm text-base-content/50">
-                  Top 20
-                </span>
-              }
-            >
-              <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-                {analytics?.visitorsByCountry?.map((country, index) => (
-                  <motion.div
-                    key={country.country}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl min-w-[40px] flex justify-center">
-                        {country.flag || country.countryFlagImg || getFlagEmoji(country._id) }
-                      </div>
+          {/* Last Updated */}
+          {analytics?.lastUpdated && (
+            <div className="flex items-center justify-center lg:justify-start gap-2 text-sm text-base-content/50">
+              <Clock className="w-4 h-4" />
+              Last updated: {new Date(analytics.lastUpdated).toLocaleString()}
+            </div>
+          )}
+        </motion.div>
 
-                      <div>
-                        <span className="font-medium text-base-content block">
-                          {country.country|| 'Unknown'}
-                        </span>
-                        <span className="text-xs text-base-content/50">
-                          {country.count} visit{country.count !== 1 ? 's' : ''}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-32 bg-base-300 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full"
-                          style={{ 
-                            width: `${(country.count / analytics.totalVisitors) * 100}%` 
-                          }}
+        {/* Key Metrics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+        >
+          <StatCard
+            icon={Users}
+            title="Total Visitors"
+            value={analytics?.totalVisitors?.toLocaleString() || '0'}
+            subtitle="Unique sessions"
+            color="from-blue-500 to-cyan-500"
+            trend={12.5}
+          />
+
+          <StatCard
+            icon={Clock}
+            title="Avg Session"
+            value={analytics?.avgSessionDuration ?
+              `${Math.floor(analytics.avgSessionDuration / 60)}m ${Math.floor(analytics.avgSessionDuration % 60)}s` : '0m 0s'
+            }
+            subtitle="Average duration"
+            color="from-green-500 to-emerald-500"
+            trend={5.2}
+          />
+
+          <StatCard
+            icon={MapPin}
+            title="Top Country"
+            value={analytics?.visitorsByCountry?.[0]?.country || 'N/A'}
+            subtitle={`${analytics?.visitorsByCountry?.[0]?.count?.toLocaleString() || 0} visitors`}
+            color="from-purple-500 to-pink-500"
+          />
+
+          <StatCard
+            icon={Laptop}
+            title="Top Device"
+            value={analytics?.deviceBreakdown?.[0]?._id?.toUpperCase() || 'N/A'}
+            subtitle={`${analytics?.deviceBreakdown?.[0]?.count?.toLocaleString() || 0} users`}
+            color="from-orange-500 to-red-500"
+          />
+        </motion.div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="bg-base-200 rounded-3xl p-6 border border-base-300">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500">
+                <BarChart3 className="w-5 h-5 text-base-100" />
+              </div>
+              <h3 className="font-bold text-base-content">Page Views</h3>
+            </div>
+            <p className="text-3xl font-bold text-primary">
+              {analytics?.stats?.totalPageViews?.toLocaleString() || '0'}
+            </p>
+          </div>
+
+          <div className="bg-base-200 rounded-3xl p-6 border border-base-300">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+                <PieChart className="w-5 h-5 text-base-100" />
+              </div>
+              <h3 className="font-bold text-base-content">Bounce Rate</h3>
+            </div>
+            <p className="text-3xl font-bold text-primary">
+              {analytics?.stats?.bounceRate ? `${analytics.stats.bounceRate}%` : 'N/A'}
+            </p>
+          </div>
+
+          <div className="bg-base-200 rounded-3xl p-6 border border-base-300">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                <LineChart className="w-5 h-5 text-base-100" />
+              </div>
+              <h3 className="font-bold text-base-content">Returning Users</h3>
+            </div>
+            <p className="text-3xl font-bold text-primary">
+              {analytics?.stats?.newVsReturning?.returning?.toLocaleString() || '0'}
+            </p>
+          </div>
+        </div>
+
+        {/* Charts and Tables */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <DataSection
+            title="Visitors by Country"
+            icon={Globe}
+            color="from-blue-500 to-cyan-500"
+            action={
+              <span className="text-sm text-base-content/50">
+                Top 20
+              </span>
+            }
+          >
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+              {analytics?.visitorsByCountry?.map((country, index) => (
+                <motion.div
+                  key={country.country}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 relative">
+                      {country.location?.countryFlagImg ? (
+                        <Image
+                          src={country.location.countryFlagImg}
+                          alt={country.location.country}
+                          width={24}
+                          height={24}
+                          className="rounded-full"
                         />
-                      </div>
-                      <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full min-w-[60px] text-center">
-                        {country.count.toLocaleString()}
+                      ) : (
+                        <span>{getFlagEmoji(country.location?.countryCode)}</span>  
+                      )}
+                    </div>
+
+
+                    <div>
+                      <span className="font-medium text-base-content block">
+                        {country.country || 'Unknown'}
+                      </span>
+                      <span className="text-xs text-base-content/50">
+                        {country.count} visit{country.count !== 1 ? 's' : ''}
                       </span>
                     </div>
-                  </motion.div>
-                )) || (
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-32 bg-base-300 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full"
+                        style={{
+                          width: `${(country.count / analytics.totalVisitors) * 100}%`
+                        }}
+                      />
+                    </div>
+                    <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full min-w-[60px] text-center">
+                      {country.count.toLocaleString()}
+                    </span>
+                  </div>
+                </motion.div>
+              )) || (
                   <div className="text-center py-8">
                     <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
                     <p className="text-base-content/70">No country data available</p>
                   </div>
                 )}
-              </div>
-            </DataSection>
+            </div>
+          </DataSection>
 
-            <DataSection 
-              title="Device Breakdown" 
-              icon={Smartphone} 
-              color="from-green-500 to-emerald-500"
-            >
-              <div className="space-y-3">
-                {analytics?.deviceBreakdown?.map((device, index) => (
-                  <motion.div
-                    key={device._id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">
-                        {device._id === 'mobile' ? '📱' : 
-                         device._id === 'tablet' ? '📟' : '💻'}
-                      </span>
-                      <div>
-                        <span className="font-medium text-base-content capitalize block">
-                          {device._id}
-                        </span>
-                        <span className="text-xs text-base-content/50">
-                          {((device.count / analytics.totalVisitors) * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                      {device.count.toLocaleString()}
+          <DataSection
+            title="Device Breakdown"
+            icon={Smartphone}
+            color="from-green-500 to-emerald-500"
+          >
+            <div className="space-y-3">
+              {analytics?.deviceBreakdown?.map((device, index) => (
+                <motion.div
+                  key={device._id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">
+                      {device._id === 'mobile' ? '📱' :
+                        device._id === 'tablet' ? '📟' : '💻'}
                     </span>
-                  </motion.div>
-                )) || (
+                    <div>
+                      <span className="font-medium text-base-content capitalize block">
+                        {device._id}
+                      </span>
+                      <span className="text-xs text-base-content/50">
+                        {((device.count / analytics.totalVisitors) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+                    {device.count.toLocaleString()}
+                  </span>
+                </motion.div>
+              )) || (
                   <div className="text-center py-8">
                     <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
                     <p className="text-base-content/70">No device data available</p>
                   </div>
                 )}
-              </div>
-            </DataSection>
-          </div>
+            </div>
+          </DataSection>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <DataSection 
-              title="Top Pages" 
-              icon={FileText} 
-              color="from-purple-500 to-pink-500"
-              action={
-                <span className="text-sm text-base-content/50">
-                  By views
-                </span>
-              }
-            >
-              <div className="space-y-3">
-                {analytics?.topPages?.slice(0, 6).map((page, index) => (
-                  <motion.div
-                    key={page._id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="text-lg text-base-content/50 group-hover:text-primary transition-colors">
-                        {index + 1}.
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <DataSection
+            title="Top Pages"
+            icon={FileText}
+            color="from-purple-500 to-pink-500"
+            action={
+              <span className="text-sm text-base-content/50">
+                By views
+              </span>
+            }
+          >
+            <div className="space-y-3">
+              {analytics?.topPages?.slice(0, 6).map((page, index) => (
+                <motion.div
+                  key={page._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="text-lg text-base-content/50 group-hover:text-primary transition-colors">
+                      {index + 1}.
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-base-content text-sm truncate font-medium">
+                        {page._id.split('/').pop() || '/'}
                       </div>
-                      <div className="min-w-0">
-                        <div className="text-base-content text-sm truncate font-medium">
-                          {page._id.split('/').pop() || '/'}
-                        </div>
-                        <div className="text-xs text-base-content/50 truncate">
-                          {page._id}
-                        </div>
+                      <div className="text-xs text-base-content/50 truncate">
+                        {page._id}
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      {page.avgDuration && (
-                        <span className="text-xs text-base-content/50">
-                          {Math.floor(page.avgDuration)}s avg
-                        </span>
-                      )}
-                      <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full text-sm whitespace-nowrap">
-                        {page.count.toLocaleString()} views
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {page.avgDuration && (
+                      <span className="text-xs text-base-content/50">
+                        {Math.floor(page.avgDuration)}s avg
                       </span>
-                    </div>
-                  </motion.div>
-                )) || (
+                    )}
+                    <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full text-sm whitespace-nowrap">
+                      {page.count.toLocaleString()} views
+                    </span>
+                  </div>
+                </motion.div>
+              )) || (
                   <div className="text-center py-8">
                     <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
                     <p className="text-base-content/70">No page data available</p>
                   </div>
                 )}
-              </div>
-            </DataSection>
+            </div>
+          </DataSection>
 
-            <DataSection 
-              title="Browser Usage" 
-              icon={Globe} 
-              color="from-orange-500 to-red-500"
-            >
-              <div className="space-y-3">
-                {analytics?.browserBreakdown?.slice(0, 6).map((browser, index) => (
-                  <motion.div
-                    key={browser._id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors"
-                  >
-                    <span className="font-medium text-base-content text-sm capitalize">
-                      {browser._id}
-                    </span>
-                    <div className="flex items-center gap-4">
-                      <div className="w-24 bg-base-300 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-full"
-                          style={{ 
-                            width: `${(browser.count / analytics.totalVisitors) * 100}%` 
-                          }}
-                        />
-                      </div>
-                      <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full text-sm">
-                        {browser.count.toLocaleString()}
-                      </span>
+          <DataSection
+            title="Browser Usage"
+            icon={Globe}
+            color="from-orange-500 to-red-500"
+          >
+            <div className="space-y-3">
+              {analytics?.browserBreakdown?.slice(0, 6).map((browser, index) => (
+                <motion.div
+                  key={browser._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors"
+                >
+                  <span className="font-medium text-base-content text-sm capitalize">
+                    {browser._id}
+                  </span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 bg-base-300 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-full"
+                        style={{
+                          width: `${(browser.count / analytics.totalVisitors) * 100}%`
+                        }}
+                      />
                     </div>
-                  </motion.div>
-                )) || (
+                    <span className="font-bold text-primary bg-primary/10 px-3 py-1 rounded-full text-sm">
+                      {browser.count.toLocaleString()}
+                    </span>
+                  </div>
+                </motion.div>
+              )) || (
                   <div className="text-center py-8">
                     <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
                     <p className="text-base-content/70">No browser data available</p>
                   </div>
                 )}
-              </div>
-            </DataSection>
-          </div>
-
-          {/* Recent Visits */}
-          <DataSection 
-            title="Recent Visits" 
-            icon={Eye} 
-            color="from-indigo-500 to-purple-500"
-            action={
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-base-content/50">
-                  Page {currentPage} of {totalPages}
-                </span>
-              </div>
-            }
-          >
-            <div className="overflow-x-auto rounded-2xl">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-base-300/50">
-                    <th className="text-left py-4 px-6 text-base-content font-semibold rounded-l-2xl">
-                      Location
-                    </th>
-                    <th className="text-left py-4 px-6 text-base-content font-semibold">
-                      Device & Browser
-                    </th>
-                    <th className="text-left py-4 px-6 text-base-content font-semibold">
-                      Duration
-                    </th>
-                    <th className="text-left py-4 px-6 text-base-content font-semibold">
-                      Date
-                    </th>
-                    <th className="text-left py-4 px-6 text-base-content font-semibold rounded-r-2xl">
-                      Time
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence>
-                    {currentVisits.map((visit, index) => (
-                      <motion.tr
-                        key={visit._id || visit.sessionId || index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="border-b border-base-300/30 hover:bg-base-300/30 transition-colors"
-                      >
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="text-2xl">
-                              {visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}
-                            </div>
-                            <div>
-                              <div className="font-medium text-base-content">
-                                {visit.location?.city || 'Unknown'}, {visit.location?.country || 'Unknown'}
-                              </div>
-                              <div className="text-xs text-base-content/50">
-                                {visit.ip?.slice(0, 15)}...
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg ${
-                              visit.device === 'mobile' ? 'bg-blue-500/10 text-blue-500' :
-                              visit.device === 'tablet' ? 'bg-green-500/10 text-green-500' :
-                              'bg-purple-500/10 text-purple-500'
-                            }`}>
-                              {visit.device === 'mobile' ? '📱' : 
-                               visit.device === 'tablet' ? '📟' : '💻'}
-                            </div>
-                            <div>
-                              <div className="font-medium text-base-content capitalize">
-                                {visit.device}
-                              </div>
-                              <div className="text-xs text-base-content/50">
-                                {visit.browser} • {visit.os}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="font-medium text-base-content">
-                            {visit.totalDuration ?
-                              `${Math.floor(visit.totalDuration / 60)}m ${visit.totalDuration % 60}s` :
-                              'N/A'
-                            }
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="font-medium text-base-content">
-                            {new Date(visit.createdAt || visit.sessionStart).toLocaleDateString()}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="font-medium text-base-content">
-                            {new Date(visit.createdAt || visit.sessionStart).toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </div>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </AnimatePresence>
-
-                  {(!currentVisits || currentVisits.length === 0) && (
-                    <tr>
-                      <td colSpan="5" className="py-12 text-center">
-                        <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
-                        <p className="text-base-content/70">No recent visits found</p>
-                        <p className="text-sm text-base-content/50 mt-1">
-                          Try adjusting your filters
-                        </p>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-base-100 border-t border-base-300">
-                  <div className="text-sm text-base-content/70 mb-4 sm:mb-0">
-                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalVisits)} of {totalVisits} visits
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => goToPage(1)}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      aria-label="First page"
-                    >
-                      <ChevronsLeft className="w-4 h-4" />
-                    </button>
-                    
-                    <button
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      aria-label="Previous page"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum;
-                        if (totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= totalPages - 2) {
-                          pageNum = totalPages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
-                        }
-
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => goToPage(pageNum)}
-                            className={`px-3 py-2 text-sm rounded-lg transition-colors min-w-[40px] ${
-                              currentPage === pageNum
-                                ? 'bg-primary text-primary-content font-semibold'
-                                : 'bg-base-200 text-base-content/70 hover:bg-base-300'
-                            }`}
-                            aria-label={`Page ${pageNum}`}
-                            aria-current={currentPage === pageNum ? 'page' : undefined}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      aria-label="Next page"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                    
-                    <button
-                      onClick={() => goToPage(totalPages)}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      aria-label="Last page"
-                    >
-                      <ChevronsRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </DataSection>
+        </div>
 
-          {/* Footer */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-12 pt-8 border-t border-base-300"
-          >
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-center md:text-left">
-                <h4 className="font-bold text-lg mb-2">Need More Insights?</h4>
-                <p className="text-base-content/70 max-w-md">
-                  Access detailed analytics, custom reports, and advanced segmentation on Vercel Analytics.
-                </p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="https://vercel.com/analytics"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-primary to-secondary text-base-100 px-6 py-3 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                >
-                  <TrendingUp className="w-5 h-5" />
-                  View Detailed Analytics
-                </a>
-                
-                <a
-                  href="/api/visits?format=json"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-3 bg-base-300 hover:bg-base-400 text-base-content px-6 py-3 rounded-xl font-semibold transition-colors"
-                >
-                  <FileText className="w-5 h-5" />
-                  Raw API Data
-                </a>
-              </div>
+        {/* Recent Visits */}
+        <DataSection
+          title="Recent Visits"
+          icon={Eye}
+          color="from-indigo-500 to-purple-500"
+          action={
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-base-content/50">
+                Page {currentPage} of {totalPages}
+              </span>
             </div>
-            
-            <div className="mt-8 text-center text-sm text-base-content/50">
-              <p>
-                Data is automatically updated every 5 minutes. 
-                Last fetch: {analytics?.lastUpdated ? new Date(analytics.lastUpdated).toLocaleTimeString() : 'N/A'}
+          }
+        >
+          <div className="overflow-x-auto rounded-2xl">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-base-300/50">
+                  <th className="text-left py-4 px-6 text-base-content font-semibold rounded-l-2xl">
+                    Location
+                  </th>
+                  <th className="text-left py-4 px-6 text-base-content font-semibold">
+                    Device & Browser
+                  </th>
+                  <th className="text-left py-4 px-6 text-base-content font-semibold">
+                    Duration
+                  </th>
+                  <th className="text-left py-4 px-6 text-base-content font-semibold">
+                    Date
+                  </th>
+                  <th className="text-left py-4 px-6 text-base-content font-semibold rounded-r-2xl">
+                    Time
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <AnimatePresence>
+                  {currentVisits.map((visit, index) => (
+                    <motion.tr
+                      key={visit._id || visit.sessionId || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="border-b border-base-300/30 hover:bg-base-300/30 transition-colors"
+                    >
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">
+                            {visit.location?.countryFlagEmoji || getFlagEmoji(visit.location?.countryCode)}
+                          </div>
+                          <div>
+                            <div className="font-medium text-base-content">
+                              {visit.location?.city || 'Unknown'}, {visit.location?.country || 'Unknown'}
+                            </div>
+                            <div className="text-xs text-base-content/50">
+                              {visit.ip?.slice(0, 15)}...
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${visit.device === 'mobile' ? 'bg-blue-500/10 text-blue-500' :
+                            visit.device === 'tablet' ? 'bg-green-500/10 text-green-500' :
+                              'bg-purple-500/10 text-purple-500'
+                            }`}>
+                            {visit.device === 'mobile' ? '📱' :
+                              visit.device === 'tablet' ? '📟' : '💻'}
+                          </div>
+                          <div>
+                            <div className="font-medium text-base-content capitalize">
+                              {visit.device}
+                            </div>
+                            <div className="text-xs text-base-content/50">
+                              {visit.browser} • {visit.os}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="font-medium text-base-content">
+                          {visit.totalDuration ?
+                            `${Math.floor(visit.totalDuration / 60)}m ${visit.totalDuration % 60}s` :
+                            'N/A'
+                          }
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="font-medium text-base-content">
+                          {new Date(visit.createdAt || visit.sessionStart).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="font-medium text-base-content">
+                          {new Date(visit.createdAt || visit.sessionStart).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+
+                {(!currentVisits || currentVisits.length === 0) && (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center">
+                      <AlertCircle className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
+                      <p className="text-base-content/70">No recent visits found</p>
+                      <p className="text-sm text-base-content/50 mt-1">
+                        Try adjusting your filters
+                      </p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-base-100 border-t border-base-300">
+                <div className="text-sm text-base-content/70 mb-4 sm:mb-0">
+                  Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalVisits)} of {totalVisits} visits
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => goToPage(1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="First page"
+                  >
+                    <ChevronsLeft className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => goToPage(pageNum)}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors min-w-[40px] ${currentPage === pageNum
+                            ? 'bg-primary text-primary-content font-semibold'
+                            : 'bg-base-200 text-base-content/70 hover:bg-base-300'
+                            }`}
+                          aria-label={`Page ${pageNum}`}
+                          aria-current={currentPage === pageNum ? 'page' : undefined}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => goToPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg bg-base-200 text-base-content/70 hover:bg-base-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Last page"
+                  >
+                    <ChevronsRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DataSection>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-12 pt-8 border-t border-base-300"
+        >
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h4 className="font-bold text-lg mb-2">Need More Insights?</h4>
+              <p className="text-base-content/70 max-w-md">
+                Access detailed analytics, custom reports, and advanced segmentation on Vercel Analytics.
               </p>
             </div>
-          </motion.div>
-        </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href="https://vercel.com/analytics"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-primary to-secondary text-base-100 px-6 py-3 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              >
+                <TrendingUp className="w-5 h-5" />
+                View Detailed Analytics
+              </a>
+
+              <a
+                href="/api/visits?format=json"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-3 bg-base-300 hover:bg-base-400 text-base-content px-6 py-3 rounded-xl font-semibold transition-colors"
+              >
+                <FileText className="w-5 h-5" />
+                Raw API Data
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center text-sm text-base-content/50">
+            <p>
+              Data is automatically updated every 5 minutes.
+              Last fetch: {analytics?.lastUpdated ? new Date(analytics.lastUpdated).toLocaleTimeString() : 'N/A'}
+            </p>
+          </div>
+        </motion.div>
       </div>
+    </div>
   );
 };
 
