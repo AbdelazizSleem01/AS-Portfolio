@@ -586,8 +586,21 @@ export default function Visits() {
                   className="flex items-center justify-between p-3 bg-base-100 rounded-xl hover:bg-base-300/50 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl min-w-[40px] flex justify-center">
-                      {country.flag || getFlagEmoji(country.countryCode)}
+                    <div className="min-w-[40px] flex justify-center">
+                      {country.countryFlagImg ? (
+                        <Image
+                          src={country.countryFlagImg}
+                          alt={country.country}
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain"
+                          unoptimized 
+                        />
+                      ) : (
+                        <span className="text-2xl">
+                          {country.flag || getFlagEmoji(country.countryCode)}
+                        </span>
+                      )}
                     </div>
                     <div>
                       <span className="font-medium text-base-content block">
@@ -638,7 +651,7 @@ export default function Visits() {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">
                       {device._id === 'mobile' ? '📱' :
-                       device._id === 'tablet' ? '📟' : '💻'}
+                        device._id === 'tablet' ? '📟' : '💻'}
                     </span>
                     <div>
                       <span className="font-medium text-base-content capitalize block">
@@ -1006,13 +1019,15 @@ export default function Visits() {
 
 
 const getFlagEmoji = (countryCode) => {
-  if (!countryCode || countryCode === 'Unknown') return '🌍';
+  if (!countryCode || countryCode === 'Unknown' || countryCode === 'unknown') return '🌍';
   if (countryCode === 'Local') return '🏠';
-
+  
+  if (countryCode.length !== 2) return '🏴';
+  
   const codePoints = countryCode
     .toUpperCase()
     .split('')
     .map(char => 0x1F1E6 - 65 + char.charCodeAt(0));
-
+    
   return String.fromCodePoint(...codePoints);
 };

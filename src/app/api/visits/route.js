@@ -4,7 +4,7 @@ import Visit from '../../../../models/Visits';
 import rateLimit from '../../../../lib/rateLimit';
 
 const limiter = rateLimit({
-  interval: 60 * 1000, 
+  interval: 60 * 1000,
   uniqueTokenPerInterval: 500,
 });
 
@@ -203,7 +203,7 @@ export async function OPTIONS() {
 export async function POST(request) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const isRateLimited = await limiter.check(ip, 10); 
+    const isRateLimited = await limiter.check(ip, 10);
 
     if (isRateLimited) {
       return NextResponse.json(
@@ -334,7 +334,7 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const isRateLimited = await limiter.check(ip, 30); 
+    const isRateLimited = await limiter.check(ip, 30);
 
     if (isRateLimited) {
       return NextResponse.json(
@@ -483,15 +483,16 @@ export async function GET(request) {
 
     const enhancedVisitorsByCountry = visitorsByCountry.map(country => ({
       ...country,
-      country: country._id,
-      flag: country.countryFlagEmoji || getFlagEmoji(country.countryCode)
+      country: country._id || 'Unknown',
+      flag: country.countryFlagEmoji || getFlagEmoji(country.countryCode),
+      countryFlagImg: country.countryFlagImg || null,
+      countryCode: country.countryCode || 'Unknown'
     }));
-
     const stats = {
       totalPageViews: topPages.reduce((sum, page) => sum + page.count, 0),
-      bounceRate: 0, 
+      bounceRate: 0,
       newVsReturning: {
-        new: Math.floor(totalVisitors * 0.7), 
+        new: Math.floor(totalVisitors * 0.7),
         returning: Math.floor(totalVisitors * 0.3)
       }
     };
