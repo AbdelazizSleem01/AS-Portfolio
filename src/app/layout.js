@@ -5,7 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import VisitTracker from "./components/VisitTracker";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "next-themes"; 
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -49,6 +49,7 @@ export const metadata = {
       { url: '/favicon.ico' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },

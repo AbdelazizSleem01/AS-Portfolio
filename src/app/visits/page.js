@@ -1001,8 +1001,8 @@ export default function Visits() {
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
-                         setItemsPerPage(parseInt(e.target.value));
-                         setCurrentPage(1);
+                        setItemsPerPage(parseInt(e.target.value));
+                        setCurrentPage(1);
                       }}
                       className="bg-base-200 border border-base-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     >
