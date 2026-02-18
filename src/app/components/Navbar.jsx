@@ -38,18 +38,6 @@ function Navbar() {
     hover: { scaleX: 1 },
   };
 
-  const mobileMenuVariants = {
-    open: { opacity: 1, maxHeight: "1000px" },
-    closed: { opacity: 0, maxHeight: 0 },
-  };
-
-  const mobileLinkVariants = {
-    open: { y: 0, opacity: 1 },
-    closed: { y: 20, opacity: 0 },
-    // duration
-    transition: { duration: 0.5 },
-  };
-
   const navLinks = [
     {
       href: "/about-page",
@@ -91,9 +79,10 @@ function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-base-100 shadow-lg px-4 sm:px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center pr-12 gap-2 sm:gap-4">
+      {/* Logo */}
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         <Link
-          href={"/"}
+          href="/"
           title="My Logo"
           className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-primary"
         >
@@ -133,89 +122,84 @@ function Navbar() {
       </motion.button>
 
       {/* Desktop Navigation */}
-      <div className="hidden lg:flex gap-2 items-center xl:gap-6">
-        {navLinks.map((link) => (
-          <motion.div
-            key={link.href}
-            className="relative"
-            onHoverStart={() => setActiveLink(link.href)}
-            onHoverEnd={() => setActiveLink("")}
-          >
-            <Link
-              title={link.title}
-              href={link.href}
-              className="relative flex items-center whitespace-nowrap gap-2 px-1 mx-1 py-1 text-sm xl:text-[16px] font-semibold text-primary hover:bg-primary/20 rounded-md transition"
+      <div className="hidden lg:flex flex-1 items-center justify-between ml-6 xl:ml-10">
+        {/* Nav Links */}
+        <div className="flex items-center gap-1 xl:gap-2">
+          {navLinks.map((link) => (
+            <motion.div
+              key={link.href}
+              className="relative group"
+              onHoverStart={() => setActiveLink(link.href)}
+              onHoverEnd={() => setActiveLink("")}
             >
-              <motion.span
-                variants={linkVariants}
-                animate={activeLink === link.href ? "hover" : ""}
-                className="relative z-10 hover:scale-105 "
+              <Link
+                href={link.href}
+                title={link.title}
+                className={`
+                  flex items-center gap-1.5 px-2 xl:px-3 py-2
+                  text-sm xl:text-base font-medium text-primary 
+                  hover:bg-primary/10 rounded-md transition-colors whitespace-nowrap
+                `}
               >
-                {link.text}
-
-              </motion.span>
                 {link.icon}
-              <motion.div
-                variants={underlineVariants}
-                className="absolute bottom-0 left-0 w-full h-[2px] bg-primary origin-left"
-              />
+                <span className="relative">
+                  {link.text}
+                  <motion.span
+                    variants={underlineVariants}
+                    initial="hidden"
+                    whileHover="hover"
+                    className="absolute -bottom-1 left-0 w-full h-[2px] bg-primary origin-left"
+                  />
+                </span>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Right side: ThemeToggle + Admin */}
+        <div className="flex items-center gap-3 xl:gap-4 shrink-0">
+          <ThemeToggle />
+
+          <div className="tooltip tooltip-bottom tooltip-primary" data-tip="For admins only">
+            <Link href="/admin" title="For Admin Only">
+              <motion.button
+                className="
+                  btn bg-primary hover:bg-primary/80 text-white 
+                  flex items-center gap-2 px-4 xl:px-5 py-2
+                  text-sm xl:text-base rounded-lg shadow-md whitespace-nowrap
+                "
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Admin <Lock className="w-4 h-4 xl:w-5 xl:h-5" />
+              </motion.button>
             </Link>
-          </motion.div>
-        ))}
-
-        <ThemeToggle />
-
-        <motion.div
-          className="tooltip tooltip-bottom tooltip-primary hidden md:block mr-4"
-          data-tip="For admins only"
-          whileHover={{ scale: 1.05 }}
-        >
-          <Link href={"/admin"} title="For Admin Only " className="flex gap-2">
-            <motion.button
-              className="btn bg-primary hover:bg-primary/80 text-white flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md text-sm sm:text-base"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Admin <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.button>
-          </Link>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
       <motion.div
-        className="lg:hidden absolute top-full left-0 w-full bg-base-100 overflow-hidden text-center shadow-lg"
+        className="lg:hidden absolute top-full left-0 w-full bg-base-100 overflow-hidden shadow-lg"
         initial="closed"
         animate={isOpen ? "open" : "closed"}
         variants={{
-          open: {
-            opacity: 1,
-            maxHeight: "1000px",
-          },
-          closed: {
-            opacity: 0,
-            maxHeight: 0,
-            transition: { staggerChildren: 0.4 },
-          },
+          open: { opacity: 1, maxHeight: "1000px" },
+          closed: { opacity: 0, maxHeight: 0 },
         }}
-        style={{ maxHeight: "1000px" }}
       >
-        <div className="p-4 space-y-3 sm:space-y-4">
+        <div className="p-5 space-y-4">
           {navLinks.map((link, index) => (
             <motion.div
               key={link.href}
               variants={{
-                open: {
-                  y: 0,
-                  opacity: 1,
-                  transition: { delay: index * 0.1, duration: 0.4 },
-                },
+                open: { y: 0, opacity: 1, transition: { delay: index * 0.08, duration: 0.4 } },
                 closed: { y: 20, opacity: 0 },
               }}
             >
               <Link
                 href={link.href}
-                className="block px-4 py-2 text-base sm:text-[17px] font-medium text-primary hover:bg-primary/20 rounded-lg transition-colors border-b-2 border-primary/50"
+                className="block px-5 py-3 text-base sm:text-lg font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors border-b border-primary/30 last:border-none"
                 onClick={() => setIsOpen(false)}
               >
                 {link.text}
@@ -223,35 +207,34 @@ function Navbar() {
             </motion.div>
           ))}
 
-          {/* Theme Toggle with animation */}
           <motion.div
             variants={{
               open: { opacity: 1, transition: { delay: 0.5 } },
               closed: { opacity: 0 },
             }}
-            className="flex justify-center pt-4"
+            className="flex justify-center pt-5"
           >
             <ThemeToggle />
           </motion.div>
 
-          {/* Admin Panel Button with animation */}
           <motion.div
             variants={{
               open: { opacity: 1, transition: { delay: 0.6 } },
               closed: { opacity: 0 },
             }}
-            className="pt-2"
+            className="pt-4"
           >
             <Link
-              href={"/admin"}
-              title="For Admin Only"
+              href="/admin"
               onClick={() => setIsOpen(false)}
             >
               <button
-                title="For Admin Only"
-                className="w-full btn bg-primary hover:bg-primary/80 text-white flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm sm:text-base"
+                className="
+                  w-full btn bg-primary hover:bg-primary/80 text-white 
+                  flex items-center justify-center gap-3 py-3 rounded-lg
+                "
               >
-                Admin Panel <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
+                Admin Panel <Lock className="w-5 h-5" />
               </button>
             </Link>
           </motion.div>

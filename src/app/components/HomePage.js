@@ -74,7 +74,7 @@ export default function HomePage() {
       "👋 Hi, I'm Abdelaziz Sleem, a passionate Full-Stack Developer specializing in crafting modern, user-friendly web experiences. With expertise in frontend technologies like React, Next.js, Tailwind CSS, and TypeScript, I build responsive, high-performance interfaces that delight users. On the backend, I work with Node.js and MongoDB to create scalable, efficient systems that power seamless digital experiences.",
     imageUrl: "/imgs/my-img.jpg",
     githubLink: "https://github.com/AbdelazizSleem01",
-    linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/",
+    linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-7ab4593b1/",
   };
 
   useEffect(() => {
@@ -202,8 +202,8 @@ export default function HomePage() {
                   key={tech.name}
                   className="absolute bg-base-100 p-3 rounded-full shadow-lg border"
                   style={{
-                    top: `${35 + 60 * Math.sin((index * Math.PI) / 3)}%`,
-                    left: `${30 + 60 * Math.cos((index * Math.PI) / 3)}%`,
+                    top: `${(45 + 60 * Math.sin((index * Math.PI) / 3)).toFixed(3)}%`,
+                    left: `${(43 + 60 * Math.cos((index * Math.PI) / 3)).toFixed(3)}%`,
                   }}
                   animate={{
                     y: [0, -10, 0],

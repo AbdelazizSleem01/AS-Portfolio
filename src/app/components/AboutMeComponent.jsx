@@ -143,8 +143,8 @@ const AboutMeComponent = () => {
                           key={skill.name}
                           className="absolute bg-base-100 p-1 rounded-xl shadow-lg border border-base-300"
                           style={{
-                            top: `${45 + 50 * Math.sin((index * Math.PI) / 3)}%`,
-                            left: `${45 + 50 * Math.cos((index * Math.PI) / 3)}%`,
+                            top: `${(45 + 50 * Math.sin((index * Math.PI) / 3)).toFixed(3)}%`,
+                            left: `${(45 + 50 * Math.cos((index * Math.PI) / 3)).toFixed(3)}%`,
                             transform: "translate(-50%, -50%)",
                           }}
                           variants={skillIconVariants}

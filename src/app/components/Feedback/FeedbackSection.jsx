@@ -13,15 +13,25 @@ export default function FeedbackPage() {
     fetch('/api/feedback')
       .then(res => res.json())
       .then(data => {
-        setFeedbacks(data);
-        calculateStats(data);
+        if (Array.isArray(data)) {
+          setFeedbacks(data);
+          calculateStats(data);
+        } else {
+          console.error("Expected array but got:", data);
+          setFeedbacks([]);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching feedback:", err);
+        setFeedbacks([]);
       });
   }, []);
 
-  const calculateStats = (feedbacks) => {
-    const total = feedbacks.length;
-    const averageRating = total > 0 
-      ? (feedbacks.reduce((sum, feedback) => sum + feedback.rating, 0) / total).toFixed(1)
+  const calculateStats = (feedbacksList) => {
+    if (!Array.isArray(feedbacksList)) return;
+    const total = feedbacksList.length;
+    const averageRating = total > 0
+      ? (feedbacksList.reduce((sum, feedback) => sum + feedback.rating, 0) / total).toFixed(1)
       : 0;
     setStats({ total, averageRating });
   };
@@ -54,7 +64,7 @@ export default function FeedbackPage() {
           <div className="lg:col-span-2">
             <FeedbackForm setFeedbacks={setFeedbacks} />
           </div>
-          
+
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -66,13 +76,13 @@ export default function FeedbackPage() {
                 <Users className="text-primary" />
                 Feedback Stats
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-base-100 rounded-2xl">
                   <span className="text-base-content/70">Total Reviews</span>
                   <span className="text-2xl font-bold text-primary">{stats.total}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-4 bg-base-100 rounded-2xl">
                   <span className="text-base-content/70">Average Rating</span>
                   <div className="flex items-center gap-2">
@@ -81,11 +91,10 @@ export default function FeedbackPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`w-4 h-4 ${
-                            star <= stats.averageRating 
-                              ? 'text-yellow-400 fill-current' 
+                          className={`w-4 h-4 ${star <= stats.averageRating
+                              ? 'text-yellow-400 fill-current'
                               : 'text-base-300'
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>

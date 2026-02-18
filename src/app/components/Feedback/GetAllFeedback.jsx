@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote, Calendar, Plus } from 'lucide-react';
 
-export default function FeedbackList({ feedbacks }) {
+export default function FeedbackList({ feedbacks = [] }) {
+  const safeFeedbacks = Array.isArray(feedbacks) ? feedbacks : [];
   const [visibleCount, setVisibleCount] = useState(6);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,15 +56,15 @@ export default function FeedbackList({ feedbacks }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence>
-          {feedbacks.slice(0, visibleCount).map((feedback, index) => (
+          {safeFeedbacks.slice(0, visibleCount).map((feedback, index) => (
             <motion.div
               key={feedback._id}
               variants={cardVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-50px" }}
-              whileHover={{ 
-                scale: 1.02, 
+              whileHover={{
+                scale: 1.02,
                 y: -5,
                 transition: { type: "spring", stiffness: 400, damping: 25 }
               }}
@@ -97,11 +98,10 @@ export default function FeedbackList({ feedbacks }) {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`w-4 h-4 ${
-                        star <= feedback.rating 
-                          ? 'text-yellow-400 fill-current' 
-                          : 'text-base-300'
-                      }`}
+                      className={`w-4 h-4 ${star <= feedback.rating
+                        ? 'text-yellow-400 fill-current'
+                        : 'text-base-300'
+                        }`}
                     />
                   ))}
                 </div>
@@ -114,7 +114,7 @@ export default function FeedbackList({ feedbacks }) {
         </AnimatePresence>
       </div>
 
-      {feedbacks.length > visibleCount && (
+      {safeFeedbacks.length > visibleCount && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -138,7 +138,7 @@ export default function FeedbackList({ feedbacks }) {
                 <Plus className="w-5 h-5" />
                 Load More Reviews
                 <span className="text-sm opacity-80">
-                  ({feedbacks.length - visibleCount} remaining)
+                  ({safeFeedbacks.length - visibleCount} remaining)
                 </span>
               </>
             )}
@@ -146,7 +146,7 @@ export default function FeedbackList({ feedbacks }) {
         </motion.div>
       )}
 
-      {feedbacks.length === 0 && (
+      {safeFeedbacks.length === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
