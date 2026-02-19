@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +11,34 @@ export default function AIChatWidget() {
   const [sessionId, setSessionId] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [hasNewNotification, setHasNewNotification] = useState(false);
+  const [lastReplyContent, setLastReplyContent] = useState('');
   const messagesEndRef = useRef(null);
+  const audioRef = useRef(null);
+
+  // Play notification sound
+  const playNotificationSound = useCallback(() => {
+    try {
+      // Create a simple notification tone using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+      console.log('Audio not supported');
+    }
+  }, []);
 
   // Initialize session
   useEffect(() => {
@@ -21,6 +48,12 @@ export default function AIChatWidget() {
       localStorage.setItem('chatSessionId', storedSession);
     }
     setSessionId(storedSession);
+
+    // Get stored email
+    const storedEmail = localStorage.getItem('chatUserEmail');
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
 
     // Fetch knowledge base
     fetch('/api/knowledge-base')
@@ -35,6 +68,11 @@ export default function AIChatWidget() {
         .then(data => {
           if (data.messages && data.messages.length > 0) {
             setMessages(data.messages);
+            // Get the last owner response content
+            const ownerMsg = data.messages.filter(m => m.role === 'admin').pop();
+            if (ownerMsg) {
+              setLastReplyContent(ownerMsg.content);
+            }
             // Check if there's a pending question that needs email
             const lastMsg = data.messages[data.messages.length - 1];
             if (lastMsg.isQuestion && !lastMsg.userEmail) {
@@ -50,6 +88,60 @@ export default function AIChatWidget() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Check for new owner replies and play sound
+  const checkForNewReplies = useCallback(async () => {
+    if (!sessionId) return;
+    
+    try {
+      const res = await fetch(`/api/chat/notification?sessionId=${sessionId}`);
+      const data = await res.json();
+      
+      if (data.hasNewReply && data.reply) {
+        // Check if this is a new reply we haven't shown yet
+        if (data.reply.content !== lastReplyContent) {
+          setLastReplyContent(data.reply.content);
+          setHasNewNotification(true);
+          
+          // Play notification sound
+          playNotificationSound();
+          
+          // If chat is open, fetch the new messages
+          if (isOpen) {
+            const messagesRes = await fetch(`/api/chat?sessionId=${sessionId}`);
+            const messagesData = await messagesRes.json();
+            setMessages(messagesData.messages || []);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Check replies error:', err);
+    }
+  }, [sessionId, lastReplyContent, isOpen, playNotificationSound]);
+
+  // Poll for new messages when chat is open
+  useEffect(() => {
+    if (!isOpen || !sessionId) return;
+
+    const interval = setInterval(checkForNewReplies, 5000);
+    return () => clearInterval(interval);
+  }, [isOpen, sessionId, checkForNewReplies]);
+
+  // Check for replies when chat is closed
+  useEffect(() => {
+    if (isOpen || !sessionId) return;
+
+    checkForNewReplies();
+    const interval = setInterval(checkForNewReplies, 10000);
+    return () => clearInterval(interval);
+  }, [isOpen, sessionId, checkForNewReplies]);
+
+  // Reset notification when opening chat
+  useEffect(() => {
+    if (isOpen) {
+      setHasNewNotification(false);
+    }
+  }, [isOpen]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -122,61 +214,6 @@ export default function AIChatWidget() {
     }
   };
 
-  // Poll for new messages (for when admin responds)
-  useEffect(() => {
-    if (!isOpen || !sessionId) return;
-
-    const interval = setInterval(async () => {
-      try {
-        const lastMsgTime = messages[messages.length - 1]?.createdAt;
-        const res = await fetch(`/api/chat/notification?sessionId=${sessionId}${lastMsgTime ? `&lastMessageTime=${lastMsgTime}` : ''}`);
-        const data = await res.json();
-        
-        if (data.hasNewReply) {
-          // Fetch full conversation to get the new reply
-          const messagesRes = await fetch(`/api/chat?sessionId=${sessionId}`);
-          const messagesData = await messagesRes.json();
-          setMessages(messagesData.messages || []);
-        }
-      } catch (err) {
-        console.error('Poll error:', err);
-      }
-    }, 5000); // Check every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [isOpen, sessionId, messages]);
-
-  // Notification badge when chat is closed
-  const [hasNewNotification, setHasNewNotification] = useState(false);
-  
-  useEffect(() => {
-    if (isOpen || !sessionId) return;
-
-    const checkForReplies = async () => {
-      try {
-        const res = await fetch(`/api/chat/notification?sessionId=${sessionId}`);
-        const data = await res.json();
-        if (data.hasNewReply) {
-          setHasNewNotification(true);
-        }
-      } catch (err) {
-        console.error('Notification check error:', err);
-      }
-    };
-
-    // Check on mount and periodically when chat is closed
-    checkForReplies();
-    const interval = setInterval(checkForReplies, 10000);
-    return () => clearInterval(interval);
-  }, [isOpen, sessionId]);
-
-  // Reset notification when opening chat
-  useEffect(() => {
-    if (isOpen) {
-      setHasNewNotification(false);
-    }
-  }, [isOpen]);
-
   return (
     <>
       {/* Chat Toggle Button */}
@@ -226,25 +263,40 @@ export default function AIChatWidget() {
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : msg.role === 'admin' ? 'justify-center' : 'justify-start'}`}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'admin' && (
-                  <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded-full mb-1">
-                    Owner Response
-                  </span>
+                  <div className="w-full mb-2">
+                    <div className="flex items-center justify-center">
+                      <span className="inline-flex items-center gap-1 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-full shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                        Owner Response
+                      </span>
+                    </div>
+                  </div>
                 )}
                 <div
-                  className={`max-w-[80%] p-3 rounded-2xl ${
+                  className={`max-w-[85%] p-4 rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-md'
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-md'
                       : msg.role === 'admin'
-                      ? 'bg-green-600 text-white rounded-bl-md'
+                      ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/40 text-gray-800 dark:text-gray-100 rounded-bl-md border border-amber-200 dark:border-amber-700'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-md'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  <span className="text-xs opacity-70 mt-1 block">
-                    {new Date(msg.createdAt).toLocaleTimeString()}
+                  {msg.role === 'admin' && (
+                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-amber-200 dark:border-amber-700">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">AS</span>
+                      </div>
+                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">Abdelaziz Sleem</span>
+                    </div>
+                  )}
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                  <span className="text-xs opacity-60 mt-2 block">
+                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
