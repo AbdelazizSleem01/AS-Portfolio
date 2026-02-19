@@ -32,6 +32,7 @@ export async function POST(req) {
     const imageFile = formData.get("image");
     const videoFile = formData.get("video");
     const videoLink = formData.get("videoLink");
+    const order = formData.get("order") ? parseInt(formData.get("order")) : 0;
 
     // Validate image file size and type
     let imageUrl = "";
@@ -144,6 +145,7 @@ export async function POST(req) {
       videoLink: uploadedVideoLink,
       liveLink,
       githubLink,
+      order,
     });
 
     return NextResponse.json(
@@ -163,7 +165,7 @@ export async function GET() {
   try {
     await connectDB();
     const projects = await Project.find()
-      .sort({ createdAt: -1 })
+      .sort({ order: 1, createdAt: -1 })
       .select("-__v")
       .lean();
     return NextResponse.json({ projects });

@@ -6,6 +6,7 @@ import Certificate from "../../../../models/Certificate";
 import Feedback from "../../../../models/Feedback";
 import Post from "../../../../models/Post";
 import Contact from "../../../../models/Contact";
+import ChatMessage from "../../../../models/ChatMessage";
 
 export async function GET() {
   try {
@@ -20,6 +21,7 @@ export async function GET() {
       feedbacksCount,
       postCount,
       contactCount,
+      pendingQuestionsCount,
     ] = await Promise.all([
       Skill.countDocuments(),
       Subscription.countDocuments(),
@@ -28,6 +30,7 @@ export async function GET() {
       Feedback.countDocuments(),
       Post.countDocuments(),
       Contact.countDocuments(),
+      ChatMessage.countDocuments({ isQuestion: true, status: 'pending' }),
     ]);
 
     // Helper function to group data by 5-day intervals
@@ -86,6 +89,7 @@ export async function GET() {
           feedbacks: feedbacksCount,
           posts: postCount,
           contacts: contactCount,
+          pendingQuestions: pendingQuestionsCount,
         },
         growthData: {
           skillsDistribution,

@@ -127,6 +127,13 @@ const AdminList = () => {
             category: 'Interactions'
         },
         { 
+            href: '/pending-questions', 
+            text: 'Pending Questions', 
+            icon: <MessageSquare size={22} />,
+            color: 'from-warning to-error',
+            category: 'Interactions'
+        },
+        { 
             href: '/blog/create-post-open', 
             text: 'Create Blog', 
             icon: <FileText size={22} />,

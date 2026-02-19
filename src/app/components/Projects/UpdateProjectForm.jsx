@@ -29,7 +29,8 @@ export default function UpdateProjectForm() {
     category: '',
     liveLink: '',
     githubLink: '',
-    videoLink: ''
+    videoLink: '',
+    order: 0
   });
 
   useEffect(() => {
@@ -53,7 +54,8 @@ export default function UpdateProjectForm() {
 
         setProjectData({
           ...project,
-          videoLink: project.videoLink || ''
+          videoLink: project.videoLink || '',
+          order: project.order || 0
         });
         setCategories(categoriesData.categories);
         setPreviews({
@@ -130,6 +132,7 @@ export default function UpdateProjectForm() {
         formData.append('category', projectData.category);
         formData.append('liveLink', projectData.liveLink);
         formData.append('githubLink', projectData.githubLink);
+        formData.append('order', projectData.order);
         if (files.image) formData.append('image', files.image);
         if (projectData.videoLink) {
           formData.append('videoLink', projectData.videoLink);
@@ -262,6 +265,16 @@ export default function UpdateProjectForm() {
           </div>
         </FormSection>
 
+        <FormSection title="Appearance Order" variants={fieldVariant} transition={{ delay: 0.55 }}>
+          <input
+            type="number"
+            value={projectData.order}
+            onChange={(e) => handleInputChange('order', e.target.value)}
+            className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md"
+            placeholder="Lower numbers appear first"
+          />
+        </FormSection>
+
         <FormSection title="Image" variants={fieldVariant} transition={{ delay: 0.6 }}>
           <FileUpload
             preview={previews.image}
@@ -303,7 +316,7 @@ export default function UpdateProjectForm() {
                     className="mt-2 w-[90%] mx-auto h-[350px] rounded-md border border-primary "
                     allowFullScreen
                   >
-                    
+
                   </iframe>
                 ) : (
                   <video

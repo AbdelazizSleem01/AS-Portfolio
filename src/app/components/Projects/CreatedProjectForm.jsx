@@ -19,6 +19,7 @@ export default function CreatedProjectForm() {
   const [videoPreview, setVideoPreview] = useState(null);
   const [videoLink, setVideoLink] = useState("");
   const [category, setCategory] = useState("");
+  const [order, setOrder] = useState(0);
   const [description, setDescription] = useState("<p> Write description </p>");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +45,7 @@ export default function CreatedProjectForm() {
         const res = await fetch(`/api/categories`);
         const data = await res.json();
         setCategories(data.categories);
-      } catch (error) {}
+      } catch (error) { }
     };
 
     fetchCategories();
@@ -88,6 +89,7 @@ export default function CreatedProjectForm() {
     if (image) formData.append("image", image);
     if (video) formData.append("video", video);
     if (videoLink) formData.append("videoLink", videoLink);
+    formData.append("order", order);
 
     const xhr = new XMLHttpRequest();
 
@@ -274,6 +276,30 @@ export default function CreatedProjectForm() {
               </div>
             </div>
 
+            {/* Project Order */}
+            <motion.div
+              className="mb-4"
+              variants={fieldVariant}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.4 }}
+            >
+              <label
+                htmlFor="order"
+                className="block text-sm label font-medium"
+              >
+                Project Appearance Order (lower numbers appear first)
+              </label>
+              <input
+                id="order"
+                type="number"
+                value={order}
+                onChange={(e) => setOrder(e.target.value)}
+                placeholder="Sort Order (e.g., 0, 1, 2)"
+                className="w-full bg-neutral/10 p-3 mt-1 input input-bordered rounded-md"
+              />
+            </motion.div>
+
             {/* Image Upload */}
             <motion.div
               className="mb-4"
@@ -332,9 +358,9 @@ export default function CreatedProjectForm() {
               <div className="my-4 ">
                 <p className="text-sm">Video Preview:</p>
                 {videoPreview.includes("https://studio.youtube.com/") ||
-                videoPreview.includes("awesomescreenshot") ||
-                videoPreview.includes("https://www.youtube.com") ||
-                videoPreview.includes("https://youtu.be") ? (
+                  videoPreview.includes("awesomescreenshot") ||
+                  videoPreview.includes("https://www.youtube.com") ||
+                  videoPreview.includes("https://youtu.be") ? (
                   <iframe
                     src={videoPreview}
                     width="100%"

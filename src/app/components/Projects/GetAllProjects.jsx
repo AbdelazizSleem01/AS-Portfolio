@@ -2,21 +2,23 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Reorder } from "framer-motion";
 import '../AdminStyle.css';
-import { ArrowBigLeft } from "lucide-react";
+import { ArrowBigLeft, GripVertical, Save, Trash2, Edit3, ExternalLink } from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import { toast } from "react-toastify";
 
 const GetProjects = () => {
     const { user } = useUser();
     const [projects, setProjects] = useState([]);
+    const [originalProjects, setOriginalProjects] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
     const [currentProject, setCurrentProject] = useState(null);
 
-
-
+    const hasChanges = JSON.stringify(projects.map(p => p._id)) !== JSON.stringify(originalProjects.map(p => p._id));
 
     useEffect(() => {
         document.title = `All Projects | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -28,21 +30,48 @@ const GetProjects = () => {
             );
     }, []);
 
+    const fetchProjects = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/projects`);
+            if (!response.ok) throw new Error("Failed to fetch projects");
+            const data = await response.json();
+            setProjects(data.projects);
+            setOriginalProjects(data.projects);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await fetch(`/api/projects`);
-                if (!response.ok) throw new Error("Failed to fetch projects");
-                const data = await response.json();
-                setProjects(data.projects);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchProjects();
     }, []);
+
+    const handleReorder = (newOrder) => {
+        setProjects(newOrder);
+    };
+
+    const saveOrder = async () => {
+        try {
+            setIsSaving(true);
+            const response = await fetch('/api/projects/reorder', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ projects }),
+            });
+
+            if (!response.ok) throw new Error("Failed to save order");
+
+            toast.success("New order saved successfully!");
+            setOriginalProjects(projects);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const handleDetails = (project) => {
         setCurrentProject(project);
@@ -57,18 +86,23 @@ const GetProjects = () => {
     if (loading) {
         return (
             <motion.div
-                className="flex flex-col items-center justify-center h-screen gap-4"
+                className="flex flex-col items-center justify-center h-screen gap-4 transition-all duration-300"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
             >
-                <motion.div
-                    className="w-12 h-12 border-4 border-t-4 border-primary rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                />
-                <motion.span className="text-primary text-lg">
-                    Loading...
+                <div className="relative">
+                    <motion.div
+                        className="w-16 h-16 border-4 border-primary/20 rounded-full"
+                    />
+                    <motion.div
+                        className="absolute top-0 left-0 w-16 h-16 border-4 border-t-primary rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                    />
+                </div>
+                <motion.span className="text-primary font-medium text-lg">
+                    Loading Projects...
                 </motion.span>
             </motion.div>
         );
@@ -77,227 +111,249 @@ const GetProjects = () => {
     if (error) {
         return (
             <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center text-red-500 mt-10 flex flex-col gap-4"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8 bg-error/5 rounded-3xl border border-error/20 max-w-md mx-auto mt-20"
             >
-                <p>Error: {error}</p>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-primary text-white px-6 py-2 rounded-lg"
+                <div className="text-error text-6xl mb-4">⚠️</div>
+                <h3 className="text-xl font-bold text-error mb-2">Error Loading Projects</h3>
+                <p className="text-base-content/70 mb-6">{error}</p>
+                <button
+                    onClick={fetchProjects}
+                    className="btn btn-primary px-8"
                 >
                     Retry
-                </motion.button>
+                </button>
             </motion.div>
         );
     }
 
     if (!user) {
         return <RedirectToSignIn />;
-
     }
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-base-100 min-h-screen p-6 mt-16"
+            className="bg-base-100 min-h-screen p-4 sm:p-8 mt-16"
         >
-            <div className="Heading w-full flex justify-center items-center" >
-                <h1 className="text-2xl semiHead sm:text-3xl w-full font-bold text-center sm:mb-8 text-primary ">
-                    Projects
-                </h1>
+            <div className="max-w-6xl mx-auto">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-10">
+                    <div className="text-center sm:text-left">
+                        <h1 className="text-3xl font-extrabold text-primary mb-2">Project Management</h1>
+                        <p className="text-base-content/60">Drag and drop rows to reorder how projects appear on your portfolio.</p>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <AnimatePresence>
+                            {hasChanges && (
+                                <motion.button
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    onClick={saveOrder}
+                                    disabled={isSaving}
+                                    className="btn btn-success text-white shadow-lg flex items-center gap-2 px-6"
+                                >
+                                    {isSaving ? (
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                    ) : (
+                                        <Save size={18} />
+                                    )}
+                                    Save New Order
+                                </motion.button>
+                            )}
+                        </AnimatePresence>
+
+                        <Link href="/admin">
+                            <button className="btn btn-outline gap-2">
+                                <ArrowBigLeft size={18} />
+                                Back
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="bg-base-200/50 backdrop-blur-sm p-4 rounded-3xl border border-base-300 shadow-xl overflow-x-auto">
+                    <div className="min-w-[800px]">
+                        {/* Table Header */}
+                        <div className="grid grid-cols-[60px_100px_1fr_150px_200px] gap-4 px-6 py-4 border-b border-base-300 text-sm font-bold text-base-content/50 uppercase tracking-wider">
+                            <div className="text-center">Move</div>
+                            <div>Preview</div>
+                            <div>Project Info</div>
+                            <div className="text-center">Current Order</div>
+                            <div className="text-right">Actions</div>
+                        </div>
+
+                        {/* Draggable List */}
+                        <Reorder.Group
+                            axis="y"
+                            values={projects}
+                            onReorder={handleReorder}
+                            className="space-y-3 mt-4"
+                        >
+                            {projects.map((project) => (
+                                <Reorder.Item
+                                    key={project._id}
+                                    value={project}
+                                    className="bg-base-100 rounded-2xl border border-base-300 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-grab active:cursor-grabbing group overflow-hidden"
+                                >
+                                    <div className="grid grid-cols-[60px_100px_1fr_150px_200px] gap-4 items-center px-6 py-3">
+                                        <div className="flex justify-center text-base-content/30 group-hover:text-primary transition-colors">
+                                            <GripVertical size={24} />
+                                        </div>
+
+                                        <div className="h-16 w-16 relative rounded-xl overflow-hidden border border-base-300 bg-base-200">
+                                            {project.imageUrl && (
+                                                <Image
+                                                    src={project.imageUrl}
+                                                    alt={project.title}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <h3 className="font-bold text-lg text-primary">{project.title}</h3>
+                                            <div
+                                                className="text-sm text-base-content/60 line-clamp-1 max-w-md"
+                                                dangerouslySetInnerHTML={{ __html: project.description }}
+                                            />
+                                        </div>
+
+                                        <div className="flex justify-center">
+                                            <div className="badge badge-primary badge-outline font-bold px-4 py-3">
+                                                Order: {project.order || 0}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleDetails(project)}
+                                                className="btn btn-square btn-ghost btn-sm text-success hover:bg-success/10"
+                                                title="View Details"
+                                            >
+                                                <ExternalLink size={18} />
+                                            </button>
+
+                                            <Link href={`updateProject/${project._id}`}>
+                                                <button
+                                                    className="btn btn-square btn-ghost btn-sm text-primary hover:bg-primary/10"
+                                                    title="Edit Project"
+                                                >
+                                                    <Edit3 size={18} />
+                                                </button>
+                                            </Link>
+
+                                            <button
+                                                className="btn btn-square btn-ghost btn-sm text-error hover:bg-error/10"
+                                                title="Delete Project"
+                                                onClick={() => toast.info("Go to edit page to delete")}
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Reorder.Item>
+                            ))}
+                        </Reorder.Group>
+
+                        {projects.length === 0 && (
+                            <div className="text-center py-20">
+                                <div className="text-6xl mb-4">🗂️</div>
+                                <h3 className="text-xl font-bold text-base-content/40">No projects found in database</h3>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            <motion.ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
-                {projects.map((project, index) => (
-                    <motion.li
-                        key={project._id || index}
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        viewport={{ once: true }}
-                        whileHover={{ scale: 1.02 }}
-                        className="bg-neutral h-auto mx-auto shadow-lg p-4 rounded-lg w-full max-w-96 transition-transform flex flex-col"
-                    >
-                        <div className="px-2 flex flex-col flex-grow">
-                            <motion.h2
-                                className="text-xl font-semibold text-primary mb-4"
-                                initial={{ x: -20 }}
-                                whileInView={{ x: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {project.title}
-                            </motion.h2>
-                            <motion.p
-                                dangerouslySetInnerHTML={{ __html: project.description }}
-                                className="mb-4 truncate h-[26px] text-base-100"
-
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                            </motion.p>
-
-                            <motion.div
-                                className="border-2 border-primary rounded-lg bg-base-100 flex items-center justify-center h-60 overflow-hidden p-2"
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                whileInView={{ scale: 1, opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                {project.imageUrl && (
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        whileInView={{ opacity: 1 }}
-                                        transition={{ delay: 0.2 }}
-                                    >
-                                        <Image
-                                            src={project.imageUrl}
-                                            alt={project.title}
-                                            width={300}
-                                            height={200}
-                                            className="object-contain rounded-md w-full h-full border-2 border-primary"
-                                        />
-                                    </motion.div>
-                                )}
-                            </motion.div>
-
-                            <div className="flex flex-col mt-4 gap-3">
-                                <div className="flex gap-3 w-full">
-                                    {project.liveLink && (
-                                        <motion.div
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="flex-1"
-                                        >
-                                            <Link
-                                                href={project.liveLink}
-                                                target="_blank"
-                                                className="flex items-center justify-center gap-2 w-full text-center text-sm text-white bg-primary px-4 py-2 rounded hover:bg-primary/80 transition-colors"
-                                            >
-                                                Live Demo <img className="w-6 h-6" src="/imgs/live.png" alt="live-icon" />
-                                            </Link>
-                                        </motion.div>
-                                    )}
-                                    {project.githubLink && (
-                                        <motion.div
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="flex-1"
-                                        >
-                                            <Link
-                                                href={project.githubLink}
-                                                target="_blank"
-                                                className="flex items-center justify-center gap-2 w-full text-center text-sm text-white bg-gray-800 px-4 py-2 rounded hover:bg-gray-900 transition-colors"
-                                            >
-                                                GitHub <img className="w-6 h-6" src="/imgs/github.png" alt="github-icon" />
-                                            </Link>
-                                        </motion.div>
-                                    )}
-                                </div>
-
-                                {/* Details Button */}
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex items-center justify-center gap-2 text-sm text-white bg-green-500 px-4 py-2 rounded hover:bg-green-600 transition-colors"
-                                    onClick={() => handleDetails(project)}
-                                >
-                                    Details <img className="w-6 h-6" src="/imgs/details.png" alt="details-icon" />
-                                </motion.button>
-
-                                {/* Edit Project Button */}
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="w-full"
-                                >
-                                    <Link
-                                        href={`updateProject/${project._id}`}
-                                        className="flex items-center justify-center gap-2 w-full text-center text-sm text-white bg-error px-4 py-2 rounded hover:bg-error/80 transition-colors"
-                                    >
-                                        Edit <img className="w-5 h-5 rounded-sm bg-white" src="/imgs/setting.gif" alt="setting-icon" />
-                                    </Link>
-                                </motion.div>
-                            </div>
-                        </div>
-                    </motion.li>
-                ))}
-            </motion.ul>
-            <motion.div
-                className="flex justify-center mt-8 sm:mt-10 pb-6"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: false }}
-            >
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Link href="/admin">
-                        <button className="btn btn-primary px-8 text-white rounded-full shadow-lg hover:shadow-xl transition-all gap-2">
-                            <ArrowBigLeft />
-                            Return to Admin Dashboard
-                        </button>
-                    </Link>
-                </motion.div>
-            </motion.div>
+            {/* Project Details Modal */}
             <AnimatePresence>
                 {showDetails && currentProject && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 py-4 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50"
+                        className="fixed inset-0 py-10 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[100] p-4"
+                        onClick={closeDetails}
                     >
                         <motion.div
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.8 }}
-                            className="bg-neutral rounded-lg w-11/12 sm:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto shadow-xl p-6 relative"
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-base-100 rounded-[32px] w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl p-8 relative border border-base-300"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <motion.button
+                            <button
                                 onClick={closeDetails}
-                                className="absolute top-4 right-4"
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
+                                className="btn btn-circle btn-ghost absolute top-6 right-6"
                             >
-                                <Image width={35} height={35} src={'/imgs/close.png'} alt="close-icon" />
-                            </motion.button>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
 
-                            <h2 className="text-2xl font-bold text-primary mb-4">
-                                {currentProject.title}
-                            </h2>
+                            <div className="mb-8">
+                                <h2 className="text-3xl font-extrabold text-primary mb-2">
+                                    {currentProject.title}
+                                </h2>
+                                <div className="h-1.5 w-20 bg-primary rounded-full" />
+                            </div>
 
-                            <motion.div
-                                className="text-base-100 mb-6"
-                                dangerouslySetInnerHTML={{ __html: currentProject.description }}
-                            />
+                            <div className="grid lg:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    <div className="prose prose-neutral max-w-none">
+                                        <h4 className="text-lg font-bold mb-2 opacity-50">Project Description</h4>
+                                        <div
+                                            className="text-base-content/80 leading-relaxed"
+                                            dangerouslySetInnerHTML={{ __html: currentProject.description }}
+                                        />
+                                    </div>
 
-                            {currentProject.videoLink && (
-                                <div className="w-full mt-4 h-[350px]">
-                                    <motion.iframe
-                                        controls
-                                        allowFullScreen
-                                        className="w-[80%] h-[350px] rounded-md mx-auto mb-16 border-[3px] border-primary overflow-hidden"
-                                        src={currentProject.videoLink}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.2 }}
-                                    >
-                                        Your browser does not support the video tag.
-                                    </motion.iframe>
+                                    <div className="flex flex-wrap gap-4 pt-4">
+                                        {currentProject.liveLink && (
+                                            <a href={currentProject.liveLink} target="_blank" className="btn btn-primary gap-2">
+                                                Live Demo <ExternalLink size={16} />
+                                            </a>
+                                        )}
+                                        {currentProject.githubLink && (
+                                            <a href={currentProject.githubLink} target="_blank" className="btn btn-neutral gap-2">
+                                                GitHub Code
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
-                            )}
-                            {currentProject.imageUrl && (
-                                <motion.img
-                                    className="object-contain w-full sm:w-[80%] mt-4 mx-auto rounded-lg border border-primary"
-                                    src={currentProject.imageUrl}
-                                    alt={currentProject.title}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.4 }}
-                                />
-                            )}
+
+                                <div className="space-y-6">
+                                    {currentProject.imageUrl && (
+                                        <div>
+                                            <h4 className="text-sm font-bold mb-3 opacity-40 uppercase tracking-widest">Featured Image</h4>
+                                            <div className="relative aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 shadow-lg">
+                                                <Image
+                                                    fill
+                                                    src={currentProject.imageUrl}
+                                                    alt={currentProject.title}
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {currentProject.videoLink && (
+                                        <div>
+                                            <h4 className="text-sm font-bold mb-3 opacity-40 uppercase tracking-widest">Video Overview</h4>
+                                            <div className="aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 bg-black shadow-lg">
+                                                <iframe
+                                                    src={currentProject.videoLink}
+                                                    className="w-full h-full"
+                                                    allowFullScreen
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}

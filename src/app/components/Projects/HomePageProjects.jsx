@@ -21,6 +21,7 @@ const HomePageProjects = () => {
   const [currentProject, setCurrentProject] = useState(null);
   const [displayCount, setDisplayCount] = useState(6);
   const [hasMore, setHasMore] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -58,6 +59,16 @@ const HomePageProjects = () => {
   const closeDetails = () => {
     setShowDetails(false);
     setCurrentProject(null);
+    document.body.style.overflow = "unset";
+  };
+
+  const handleImageZoom = (imageUrl) => {
+    setZoomedImage(imageUrl);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeImageZoom = () => {
+    setZoomedImage(null);
     document.body.style.overflow = "unset";
   };
 
@@ -163,7 +174,10 @@ const HomePageProjects = () => {
                 layout
               >
                 {/* Project Image */}
-                <div className="relative h-48 overflow-hidden">
+                <div
+                  className="relative h-48 overflow-hidden cursor-zoom-in"
+                  onClick={() => handleImageZoom(project.imageUrl)}
+                >
                   {project.imageUrl && (
                     <motion.img
                       src={project.imageUrl}
@@ -172,8 +186,8 @@ const HomePageProjects = () => {
                       whileHover={{ scale: 1.05 }}
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-base-100/80 to-transparent" />
-                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-base-100/80 to-transparent pointer-events-none" />
+
                   {/* Overlay Icons */}
                   <div className="absolute top-4 right-4 flex gap-2">
                     {project.liveLink && (
@@ -266,7 +280,7 @@ const HomePageProjects = () => {
             animate={{ opacity: 1 }}
           >
             <p className="text-lg text-base-content/70">
-              🎉 You've seen all {allProjects.length} projects! 
+              🎉 You've seen all {allProjects.length} projects!
             </p>
             <p className="text-base-content/60 mt-2">
               Thank you for exploring my work
@@ -347,12 +361,55 @@ const HomePageProjects = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
                     >
-                      <iframe
-                        src={currentProject.videoLink}
-                        className="w-full h-full"
-                        allowFullScreen
-                        title={currentProject.title}
-                      />
+                      {(() => {
+                        const link = currentProject.videoLink;
+                        const isDirectVideo = link.match(/\.(mp4|webm|ogg|mov)$|^blob:/i) || link.includes('public.blob.vercel-storage.com');
+
+                        if (isDirectVideo) {
+                          return (
+                            <video
+                              src={link}
+                              controls
+                              className="w-full h-full rounded-2xl"
+                              poster={currentProject.imageUrl}
+                            />
+                          );
+                        }
+
+                        // Auto-transform common links to embed format
+                        let embedUrl = link;
+                        if (link.includes('youtube.com/watch?v=')) {
+                          embedUrl = link.replace('watch?v=', 'embed/');
+                        } else if (link.includes('youtu.be/')) {
+                          embedUrl = link.replace('youtu.be/', 'youtube.com/embed/');
+                        } else if (link.includes('vimeo.com/') && !link.includes('player.vimeo.com')) {
+                          embedUrl = link.replace('vimeo.com/', 'player.vimeo.com/video/');
+                        } else if (link.includes('loom.com/share/') && !link.includes('loom.com/embed/')) {
+                          embedUrl = link.replace('loom.com/share/', 'loom.com/embed/');
+                        } else if (link.includes('awesomescreenshot.com/video/') && !link.includes('/embed/')) {
+                          // Try to convert awesomescreenshot share link to potential embed pattern
+                          embedUrl = link.replace('/video/', '/video/embed/');
+                        }
+
+                        return (
+                          <div className="flex flex-col h-full gap-2">
+                            <iframe
+                              src={embedUrl}
+                              className="flex-1 w-full h-full min-h-[300px] sm:min-h-[400px] rounded-2xl border-2 border-base-300"
+                              allowFullScreen
+                              title={currentProject.title}
+                            />
+                            <a
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary text-xs hover:underline flex items-center gap-2 px-2 pb-1"
+                            >
+                              <FiExternalLink /> Open in new tab
+                            </a>
+                          </div>
+                        );
+                      })()}
                     </motion.div>
                   )}
 
@@ -404,6 +461,36 @@ const HomePageProjects = () => {
                 </motion.div>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Zoom Modal */}
+      <AnimatePresence>
+        {zoomedImage && (
+          <motion.div
+            className="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] flex items-center justify-center p-4 cursor-zoom-out"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeImageZoom}
+          >
+            <motion.button
+              className="absolute top-6 right-6 text-white/70 hover:text-white p-2 rounded-full bg-white/10 transition-colors z-[101]"
+              onClick={closeImageZoom}
+            >
+              <FiX className="w-8 h-8" />
+            </motion.button>
+            <motion.img
+              src={zoomedImage}
+              alt="Zoomed project image"
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            />
           </motion.div>
         )}
       </AnimatePresence>

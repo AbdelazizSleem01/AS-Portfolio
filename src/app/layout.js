@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import AIChatWidget from "./components/AIChatWidget";
 
 export const metadata = {
   title: {
@@ -163,6 +164,7 @@ export default function RootLayout({ children }) {
               <Analytics />
               <SpeedInsights />
               <Footer />
+              <AIChatWidget />
             </Suspense>
           </ClerkProvider>
         </ThemeProvider>

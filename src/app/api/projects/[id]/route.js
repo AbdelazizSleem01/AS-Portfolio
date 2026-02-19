@@ -50,6 +50,7 @@ export async function PUT(req, { params }) {
     const imageFile = formData.get("image");
     const videoFile = formData.get("video");
     const videoLink = formData.get("videoLink");
+    const order = formData.get("order") ? parseInt(formData.get("order")) : 0;
 
     // Connect to database
     await connectDB();
@@ -195,6 +196,7 @@ export async function PUT(req, { params }) {
       githubLink,
       imageUrl,
       videoLink: uploadedVideoLink,
+      order,
     };
 
     // Update project in database

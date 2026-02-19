@@ -127,7 +127,8 @@ export default function Dashboard() {
     { icon: Award, label: 'Certificates', value: stats.counts.certificates, color: 'from-amber-500 to-orange-500' },
     { icon: MessageSquare, label: 'Feedbacks', value: stats.counts.feedbacks, color: 'from-indigo-500 to-purple-500' },
     { icon: FileText, label: 'Posts', value: stats.counts.posts, color: 'from-teal-500 to-blue-500' },
-    { icon: Mail, label: 'Contacts', value: stats.counts.contacts, color: 'from-rose-500 to-pink-500' }
+    { icon: Mail, label: 'Contacts', value: stats.counts.contacts, color: 'from-rose-500 to-pink-500' },
+    { icon: MessageSquare, label: 'Pending Questions', value: stats.counts.pendingQuestions || 0, color: 'from-red-500 to-orange-500' }
   ];
 
   const growthCharts = [

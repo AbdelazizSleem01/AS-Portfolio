@@ -93,8 +93,6 @@ const AboutMePage = () => {
           variants={containerVariants}
           initial="hidden"
           animate={controls}
-          onViewportEnter={() => controls.start("visible")}
-          onViewportLeave={() => controls.start("hidden")}
           viewport={{ amount: 0.2 }}
         >
           <div className="relative mb-12">
