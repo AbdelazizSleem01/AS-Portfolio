@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
 import {
@@ -75,12 +76,14 @@ export default function HomePage() {
     imageUrl: "/imgs/my-img.jpg",
     githubLink: "https://github.com/AbdelazizSleem01",
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-7ab4593b1/",
+    khamsatLink: "https://khamsat.com/user/abdelaziz_sleem9",
+    mostaqlLink: "https://mostaql.com/u/Zezosleen/portfolio",
   };
 
   useEffect(() => {
     const savedHeader = localStorage.getItem("selectedHeader");
     if (savedHeader) {
-      setSelectedHeader(JSON.parse(savedHeader));
+      setSelectedHeader({ ...defaultHeader, ...JSON.parse(savedHeader) });
     } else {
       setSelectedHeader(defaultHeader);
     }
@@ -300,10 +303,10 @@ export default function HomePage() {
                 title="Visit Abdelaziz Sleem's GitHub Profile"
                 href={selectedHeader.githubLink}
                 target="_blank"
-                className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 flex items-center justify-center gap-3 transition-all duration-300"
+                className="px-5 py-2 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-900 flex items-center justify-center gap-3 transition-all duration-300"
                 data-cursor-hover
               >
-                <FiGithub className="text-xl" />
+                <FiGithub className="text-lg" />
                 <span>GitHub</span>
               </Link>
             )}
@@ -313,11 +316,38 @@ export default function HomePage() {
                 href={selectedHeader.linkedInLink}
                 target="_blank"
                 title="Visit Abdelaziz Sleem's LinkedIn Profile"
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-3 transition-all duration-300"
+                className="px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-3 transition-all duration-300"
                 data-cursor-hover
               >
-                <FiLinkedin className="text-xl" />
+                <FiLinkedin className="text-lg" />
                 <span>LinkedIn</span>
+              </Link>
+            )}
+
+            {selectedHeader?.khamsatLink && (
+              <Link
+                href={selectedHeader.khamsatLink}
+                target="_blank"
+                title="Visit Abdelaziz Sleem's Khamsat Profile"
+                className="px-5 py-2 text-sm bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-3 transition-all duration-300"
+                data-cursor-hover
+              >
+                <Image src="/imgs/5amsat.png" alt="Khamsat" width={18} height={18} />
+                <span>Khamsat</span>
+                
+              </Link>
+            )}
+
+            {selectedHeader?.mostaqlLink && (
+              <Link
+                href={selectedHeader.mostaqlLink}
+                target="_blank"
+                title="Visit Abdelaziz Sleem's Mostaql Portfolio"
+                className="px-5 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-3 transition-all duration-300"
+                data-cursor-hover
+              >
+                <Image src="/imgs/mostaql.png" alt="Mostaql" width={18} height={18} />
+                <span>Mostaql</span>
               </Link>
             )}
 
@@ -325,14 +355,14 @@ export default function HomePage() {
               title="Download Abdelaziz Sleem's CV"
               href="/imgs/Abdelaziz Sleem CV.pdf"
               download="Abdelaziz Sleem CV.pdf"
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 flex items-center justify-center gap-3 transition-all duration-300"
+              className="px-5 py-2 text-sm bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 flex items-center justify-center gap-3 transition-all duration-300"
               data-cursor-hover
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0px 8px 25px rgba(239, 68, 68, 0.3)",
               }}
             >
-              <FiDownload className="text-xl" />
+              <FiDownload className="text-lg" />
               <span>Download CV</span>
             </motion.a>
           </motion.div>
