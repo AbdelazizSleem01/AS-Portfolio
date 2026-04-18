@@ -9,7 +9,7 @@ import { ThemeProvider } from "next-themes";
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next"
 import AIChatWidget from "./components/AIChatWidget";
 
 export const metadata = {
