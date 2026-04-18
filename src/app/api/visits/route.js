@@ -8,30 +8,34 @@ const limiter = rateLimit({
   uniqueTokenPerInterval: 500,
 });
 
+const fetchWithTimeout = async (resource, options = {}) => {
+  const { timeout = 3000 } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+};
+
 const getLocationFromIP = async (ip) => {
   try {
     if (
+      !ip ||
       ip === "127.0.0.1" ||
       ip === "::1" ||
       ip === "unknown" ||
       ip.startsWith("192.168.") ||
       ip.startsWith("10.") ||
-      ip.startsWith("172.16.") ||
-      ip.startsWith("172.17.") ||
-      ip.startsWith("172.18.") ||
-      ip.startsWith("172.19.") ||
-      ip.startsWith("172.20.") ||
-      ip.startsWith("172.21.") ||
-      ip.startsWith("172.22.") ||
-      ip.startsWith("172.23.") ||
-      ip.startsWith("172.24.") ||
-      ip.startsWith("172.25.") ||
-      ip.startsWith("172.26.") ||
-      ip.startsWith("172.27.") ||
-      ip.startsWith("172.28.") ||
-      ip.startsWith("172.29.") ||
-      ip.startsWith("172.30.") ||
-      ip.startsWith("172.31.")
+      ip.startsWith("172.")
     ) {
       return {
         country: "Local",
@@ -45,41 +49,68 @@ const getLocationFromIP = async (ip) => {
       };
     }
 
-    const response = await fetch(`https://ipwho.is/${ip}`, {
-      headers: {
-        'User-Agent': 'WebsiteAnalytics/1.0'
-      },
-      timeout: 5000
-    });
+    // Try 1: ipapi.co
+    try {
+      const res = await fetchWithTimeout(`https://ipapi.co/${ip}/json/`, { timeout: 3000 });
+      if (res.ok) {
+        const data = await res.json();
+        if (!data.error && data.city) {
+          return {
+            country: data.country_name || "Unknown",
+            city: data.city || "Unknown",
+            region: data.region || "Unknown",
+            latitude: data.latitude || 0,
+            longitude: data.longitude || 0,
+            countryCode: data.country_code || "Unknown",
+            countryFlagEmoji: getFlagEmoji(data.country_code),
+            countryFlagImg: data.country_code ? `https://flagcdn.com/w20/${data.country_code.toLowerCase()}.png` : null,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn("IP-API.co error:", e.message);
+    }
 
-    if (!response.ok) throw new Error("Failed to fetch IP data");
-
-    const data = await response.json();
-
-    return {
-      country: data.country || "Unknown",
-      city: data.city || "Unknown",
-      region: data.region || "Unknown",
-      latitude: data.latitude || 0,
-      longitude: data.longitude || 0,
-      countryCode: data.country_code || "Unknown",
-      countryFlagEmoji: data.flag?.emoji || getFlagEmoji(data.country_code),
-      countryFlagImg: data.flag?.img || `https://cdn.ipwhois.io/flags/${data.country_code?.toLowerCase() || 'xx'}`,
-    };
+    // Try 2: ipwho.is
+    try {
+      const res = await fetchWithTimeout(`https://ipwho.is/${ip}`, { 
+        timeout: 3000,
+        headers: { 'User-Agent': 'WebsiteAnalytics/1.0' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          return {
+            country: data.country || "Unknown",
+            city: data.city || "Unknown",
+            region: data.region || "Unknown",
+            latitude: data.latitude || 0,
+            longitude: data.longitude || 0,
+            countryCode: data.country_code || "Unknown",
+            countryFlagEmoji: data.flag?.emoji || getFlagEmoji(data.country_code),
+            countryFlagImg: data.flag?.img || `https://flagcdn.com/w20/${data.country_code?.toLowerCase() || 'xx'}.png`,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn("ipwho.is error:", e.message);
+    }
 
   } catch (error) {
     console.warn("IP Lookup Error:", error.message);
-    return {
-      country: "Unknown",
-      city: "Unknown",
-      region: "Unknown",
-      latitude: 0,
-      longitude: 0,
-      countryCode: "Unknown",
-      countryFlagEmoji: "🌍",
-      countryFlagImg: null,
-    };
   }
+
+  // Fallback
+  return {
+    country: "Unknown",
+    city: "Unknown",
+    region: "Unknown",
+    latitude: 0,
+    longitude: 0,
+    countryCode: "Unknown",
+    countryFlagEmoji: "🌍",
+    countryFlagImg: null,
+  };
 };
 
 const getFlagEmoji = (countryCode) => {
