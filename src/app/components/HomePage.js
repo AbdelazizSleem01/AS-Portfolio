@@ -378,7 +378,7 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-center gap-2">
                 <FiGlobe className="text-primary text-xl" />
-                <span className="text-2xl font-bold">2+</span>
+                <span className="text-2xl font-bold">3+</span>
               </div>
               <p className="text-sm text-neutral">Years Experience</p>
             </motion.div>

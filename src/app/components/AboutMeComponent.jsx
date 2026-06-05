@@ -72,7 +72,7 @@ const AboutMeComponent = () => {
   ];
 
   const stats = [
-    { number: "2.5+", label: "Years Experience", icon: FiAward },
+    { number: "3+", label: "Years Experience", icon: FiAward },
     { number: "12+", label: "Projects Completed", icon: FiGlobe },
     { number: "99%", label: "Client Satisfaction", icon: FiHeart }
   ];

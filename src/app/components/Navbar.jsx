@@ -39,12 +39,12 @@ function Navbar() {
   };
 
   const navLinks = [
-    {
-      href: "/about-page",
-      icon: <FiUser className="w-4 h-4" />,
-      text: "About Me",
-      title: "About Abdelaziz Sleem",
-    },
+    // {
+    //   href: "/about-page",
+    //   icon: <FiUser className="w-4 h-4" />,
+    //   text: "About Me",
+    //   title: "About Abdelaziz Sleem",
+    // },
     {
       href: "/projects-page",
       icon: <FiFolder className="w-4 h-4" />,
