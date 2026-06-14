@@ -45,8 +45,17 @@ const resolveCountryName = (country, countryCode) => {
     return country;
   }
 
-  if (countryCode && countryCode !== 'Unknown' && countryCode !== 'Local') {
-    return countryNameFormatter.of(countryCode.toUpperCase()) || countryCode.toUpperCase();
+  if (
+    countryCode &&
+    countryCode !== 'Unknown' &&
+    countryCode !== 'Local' &&
+    /^[A-Za-z]{2}$/.test(countryCode)
+  ) {
+    try {
+      return countryNameFormatter.of(countryCode.toUpperCase()) || countryCode.toUpperCase();
+    } catch {
+      return countryCode.toUpperCase();
+    }
   }
 
   return 'Unknown';
