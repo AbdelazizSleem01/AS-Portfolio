@@ -319,51 +319,6 @@ export default function Visits() {
     }
   }, [currentPage]);
 
-  const refreshData = () => {
-    setRefreshing(true);
-    fetchAnalytics(true);
-  };
-
-  const exportData = () => {
-    if (!analytics) return;
-
-    const dataStr = JSON.stringify(analytics, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `analytics-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Data Exported!',
-      text: 'Analytics data has been exported successfully.',
-      timer: 3000,
-      showConfirmButton: false,
-    });
-  };
-
-  const shareDashboard = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Website Analytics Dashboard',
-        text: 'Check out these amazing website analytics!',
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      Swal.fire({
-        icon: 'success',
-        title: 'Link Copied!',
-        text: 'Dashboard link has been copied to clipboard.',
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    }
-  };
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
@@ -434,7 +389,7 @@ export default function Visits() {
                 </h1>
               </div>
               <p className="text-xl text-base-content/70 max-w-2xl">
-                Real-time insights into your website's performance and visitor behavior
+                Real-time insights into your website&apos;s performance and visitor behavior
               </p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-primary to-secondary rounded-full mt-4" />
             </div>
@@ -444,31 +399,6 @@ export default function Visits() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
               />
-
-              <button
-                onClick={refreshData}
-                disabled={refreshing}
-                className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors disabled:opacity-50"
-              >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                {refreshing ? 'Refreshing...' : 'Refresh'}
-              </button>
-
-              <button
-                onClick={exportData}
-                className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Export
-              </button>
-
-              <button
-                onClick={shareDashboard}
-                className="bg-base-300 hover:bg-base-400 text-base-content px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-                Share
-              </button>
             </div>
           </div>
 
