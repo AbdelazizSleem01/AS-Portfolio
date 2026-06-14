@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import geoip from 'geoip-lite';
 import connectDB from '../../../../lib/mongodb';
 import Visit from '../../../../models/Visits';
 import rateLimit from '../../../../lib/rateLimit';
@@ -174,22 +173,6 @@ const hasMeaningfulLocation = (location) => {
   );
 };
 
-const getLocationFromGeoIpLite = (ip) => {
-  const result = geoip.lookup(ip);
-  if (!result) {
-    return null;
-  }
-
-  return buildLocation({
-    country: result.country || 'Unknown',
-    city: result.city || 'Unknown',
-    region: result.region || 'Unknown',
-    latitude: result.ll?.[0] || 0,
-    longitude: result.ll?.[1] || 0,
-    countryCode: result.country || 'Unknown',
-  });
-};
-
 const getLocationFromIpApi = async (ip) => {
   const response = await fetchWithTimeout(`https://ipapi.co/${ip}/json/`, {
     timeout: 3000,
@@ -225,11 +208,6 @@ const getLocationFromIP = async (ip, request) => {
       return headerLocation;
     }
 
-    const localDatabaseLocation = getLocationFromGeoIpLite(ip);
-    if (hasMeaningfulLocation(localDatabaseLocation)) {
-      return localDatabaseLocation;
-    }
-
     try {
       const ipApiLocation = await getLocationFromIpApi(ip);
       if (hasMeaningfulLocation(ipApiLocation)) {
@@ -243,42 +221,6 @@ const getLocationFromIP = async (ip, request) => {
   }
 
   return UNKNOWN_LOCATION;
-};
-
-const backfillUnknownLocations = async (matchQuery) => {
-  const staleVisits = await Visit.find({
-    ...matchQuery,
-    'location.country': 'Unknown',
-    ip: { $nin: ['unknown', '127.0.0.1', '::1'] },
-  })
-    .select('_id ip')
-    .limit(200)
-    .lean();
-
-  const updates = staleVisits
-    .map((visit) => {
-      const normalizedIp = normalizeIp(visit.ip);
-      if (isPrivateOrLocalIp(normalizedIp)) {
-        return null;
-      }
-
-      const location = getLocationFromGeoIpLite(normalizedIp);
-      if (!hasMeaningfulLocation(location)) {
-        return null;
-      }
-
-      return {
-        updateOne: {
-          filter: { _id: visit._id, 'location.country': 'Unknown' },
-          update: { $set: { location } },
-        },
-      };
-    })
-    .filter(Boolean);
-
-  if (updates.length > 0) {
-    await Visit.bulkWrite(updates, { ordered: false });
-  }
 };
 
 const parseUserAgent = (userAgent = '') => {
@@ -550,8 +492,6 @@ export async function GET(request) {
     const dateFilter = new Date();
     dateFilter.setDate(dateFilter.getDate() - days);
     matchQuery.createdAt = { $gte: dateFilter };
-
-    await backfillUnknownLocations(matchQuery);
 
     const [
       totalVisitors,
