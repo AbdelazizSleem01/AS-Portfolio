@@ -10,7 +10,12 @@ export default function HomePageCertificates() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [imageErrors, setImageErrors] = useState({});
     const router = useRouter();
+
+    const handleImageError = (id) => {
+        setImageErrors((prev) => ({ ...prev, [id]: true }));
+    };
 
     useEffect(() => {
         const fetchCertificates = async () => {
@@ -120,12 +125,14 @@ export default function HomePageCertificates() {
                             <div className="relative aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-base-300">
                                 <motion.img
                                     key={currentIndex}
-                                    src={certificates[currentIndex].imageUrl}
+                                    src={imageErrors[certificates[currentIndex]._id] ? "/imgs/not-found.png" : certificates[currentIndex].imageUrl}
                                     alt={certificates[currentIndex].title}
                                     className="w-full h-full object-contain"
                                     initial={{ opacity: 0, scale: 1.1 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.5 }}
+                                    loading="lazy"
+                                    onError={() => handleImageError(certificates[currentIndex]._id)}
                                 />
                                 
                                 {/* تحسين الـ overlay للشاشات الصغيرة */}
@@ -234,9 +241,11 @@ export default function HomePageCertificates() {
                                     onClick={() => setCurrentIndex(index)}
                                 >
                                     <img
-                                        src={certificate.imageUrl}
+                                        src={imageErrors[certificate._id] ? "/imgs/not-found.png" : certificate.imageUrl}
                                         alt={certificate.title}
                                         className="w-full h-16 sm:h-20 lg:h-24 object-cover"
+                                        loading="lazy"
+                                        onError={() => handleImageError(certificate._id)}
                                     />
                                 </motion.div>
                             ))}

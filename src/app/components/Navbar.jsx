@@ -1,5 +1,5 @@
 "use client";
-import { CodeXmlIcon, Lock, Menu, X } from "lucide-react";
+import { CodeXmlIcon, Menu, X } from "lucide-react";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -156,25 +156,9 @@ function Navbar() {
           ))}
         </div>
 
-        {/* Right side: ThemeToggle + Admin */}
+        {/* Right side: ThemeToggle */}
         <div className="flex items-center gap-3 xl:gap-4 shrink-0">
           <ThemeToggle />
-
-          <div className="tooltip tooltip-bottom tooltip-primary" data-tip="For admins only">
-            <Link href="/admin" title="For Admin Only">
-              <motion.button
-                className="
-                  btn bg-primary hover:bg-primary/80 text-white 
-                  flex items-center gap-2 px-4 xl:px-5 py-2
-                  text-sm xl:text-base rounded-lg shadow-md whitespace-nowrap
-                "
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Admin <Lock className="w-4 h-4 xl:w-5 xl:h-5" />
-              </motion.button>
-            </Link>
-          </div>
         </div>
       </div>
 
@@ -215,28 +199,6 @@ function Navbar() {
             className="flex justify-center pt-5"
           >
             <ThemeToggle />
-          </motion.div>
-
-          <motion.div
-            variants={{
-              open: { opacity: 1, transition: { delay: 0.6 } },
-              closed: { opacity: 0 },
-            }}
-            className="pt-4"
-          >
-            <Link
-              href="/admin"
-              onClick={() => setIsOpen(false)}
-            >
-              <button
-                className="
-                  w-full btn bg-primary hover:bg-primary/80 text-white 
-                  flex items-center justify-center gap-3 py-3 rounded-lg
-                "
-              >
-                Admin Panel <Lock className="w-5 h-5" />
-              </button>
-            </Link>
           </motion.div>
         </div>
       </motion.div>

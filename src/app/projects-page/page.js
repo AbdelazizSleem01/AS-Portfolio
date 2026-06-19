@@ -12,6 +12,11 @@ const PageOfProjects = () => {
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
+
+  const handleImageError = (projectId) => {
+    setImageErrors((prev) => ({ ...prev, [projectId]: true }));
+  };
 
 
   useEffect(() => {
@@ -211,13 +216,15 @@ const PageOfProjects = () => {
 
                   <div className="border-2 border-primary/30 shadow-md shadow-base-100/20 rounded-lg my-4 bg-white flex items-center justify-center h-60 overflow-hidden p-2 hover:border-primary/50 transition-colors">
                     {project.imageUrl && (
-                      <a href={project.imageUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full">
+                      <a href={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full">
                         <motion.img
-                          src={project.imageUrl}
+                          src={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl}
                           alt={project.title}
                           className="rounded-md w-full h-full object-contain scale-95 group-hover:scale-100 transition-transform"
                           whileHover={{ scale: 1.05 }}
                           transition={{ duration: 0.3 }}
+                          loading="lazy"
+                          onError={() => handleImageError(project._id)}
                         />
                       </a>
                     )}

@@ -22,6 +22,11 @@ const HomePageProjects = () => {
   const [displayCount, setDisplayCount] = useState(6);
   const [hasMore, setHasMore] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
+
+  const handleImageError = (projectId) => {
+    setImageErrors((prev) => ({ ...prev, [projectId]: true }));
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -176,14 +181,16 @@ const HomePageProjects = () => {
                 {/* Project Image */}
                 <div
                   className="relative h-48 overflow-hidden cursor-zoom-in"
-                  onClick={() => handleImageZoom(project.imageUrl)}
+                  onClick={() => handleImageZoom(imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl)}
                 >
                   {project.imageUrl && (
                     <motion.img
-                      src={project.imageUrl}
+                      src={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl}
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       whileHover={{ scale: 1.05 }}
+                      loading="lazy"
+                      onError={() => handleImageError(project._id)}
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-base-100/80 to-transparent pointer-events-none" />
@@ -421,9 +428,11 @@ const HomePageProjects = () => {
                       transition={{ delay: 0.3 }}
                     >
                       <img
-                        src={currentProject.imageUrl}
+                        src={imageErrors[currentProject._id] ? "/imgs/not-found.png" : currentProject.imageUrl}
                         alt={currentProject.title}
                         className="w-full h-auto rounded-2xl border-2 border-base-300"
+                        loading="lazy"
+                        onError={() => handleImageError(currentProject._id)}
                       />
                     </motion.div>
                   )}
