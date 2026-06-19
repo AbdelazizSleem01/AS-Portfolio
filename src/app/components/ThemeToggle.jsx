@@ -24,7 +24,7 @@ export default function ThemeToggle() {
   if (!mounted) return null;
 
   return (
-    <label className="flex items-center cursor-pointer gap-2 lg:pl-24" aria-label="Toggle dark mode">
+    <label className="flex items-center cursor-pointer gap-2 " aria-label="Toggle dark mode">
       <input
         type="checkbox"
         checked={theme === 'dark'}

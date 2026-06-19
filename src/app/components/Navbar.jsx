@@ -121,45 +121,42 @@ function Navbar() {
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </motion.button>
 
-      {/* Desktop Navigation */}
-      <div className="hidden lg:flex flex-1 items-center justify-between ml-6 xl:ml-10">
-        {/* Nav Links */}
-        <div className="flex items-center gap-1 xl:gap-2">
-          {navLinks.map((link) => (
-            <motion.div
-              key={link.href}
-              className="relative group"
-              onHoverStart={() => setActiveLink(link.href)}
-              onHoverEnd={() => setActiveLink("")}
+      {/* Desktop Navigation Links (Centered) */}
+      <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 xl:gap-2">
+        {navLinks.map((link) => (
+          <motion.div
+            key={link.href}
+            className="relative group"
+            onHoverStart={() => setActiveLink(link.href)}
+            onHoverEnd={() => setActiveLink("")}
+          >
+            <Link
+              href={link.href}
+              title={link.title}
+              className={`
+                flex items-center gap-1.5 px-2 xl:px-3 py-2
+                text-sm xl:text-base font-medium text-primary 
+                hover:bg-primary/10 rounded-md transition-colors whitespace-nowrap
+              `}
             >
-              <Link
-                href={link.href}
-                title={link.title}
-                className={`
-                  flex items-center gap-1.5 px-2 xl:px-3 py-2
-                  text-sm xl:text-base font-medium text-primary 
-                  hover:bg-primary/10 rounded-md transition-colors whitespace-nowrap
-                `}
-              >
-                {link.icon}
-                <span className="relative">
-                  {link.text}
-                  <motion.span
-                    variants={underlineVariants}
-                    initial="hidden"
-                    whileHover="hover"
-                    className="absolute -bottom-1 left-0 w-full h-[2px] bg-primary origin-left"
-                  />
-                </span>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+              {link.icon}
+              <span className="relative">
+                {link.text}
+                <motion.span
+                  variants={underlineVariants}
+                  initial="hidden"
+                  whileHover="hover"
+                  className="absolute -bottom-1 left-0 w-full h-[2px] bg-primary origin-left"
+                />
+              </span>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
 
-        {/* Right side: ThemeToggle */}
-        <div className="flex items-center gap-3 xl:gap-4 shrink-0">
-          <ThemeToggle />
-        </div>
+      {/* Right side: ThemeToggle */}
+      <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0">
+        <ThemeToggle />
       </div>
 
       {/* Mobile Navigation */}
