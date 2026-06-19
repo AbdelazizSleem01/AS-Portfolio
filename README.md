@@ -1,5 +1,5 @@
 <img width="1900" height="980" alt="3" src="https://github.com/user-attachments/assets/dfa8a9e1-9353-4dac-a092-2c2ffa1f112c" />
-## AS-Portfolio 🌐
+## AS-Portfolio 🌐 ##
 Welcome to my personal portfolio website, showcasing my skills and projects as a passionate Fullstack Developer. This repository contains the source code for my portfolio website, built using Next.js, Tailwind CSS, and DaisyUI. The site includes a sleek, user-friendly design with dynamic theme capabilities and various features to highlight my work and expertise.
 
 ## Features ✨
