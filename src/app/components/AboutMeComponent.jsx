@@ -121,10 +121,10 @@ const AboutMeComponent = () => {
           <div className="w-full max-w-7xl mx-auto">
             <motion.div className="space-y-8" variants={containerVariants}>
               <motion.div
-                className="bg-base-200 rounded-3xl p-8 shadow-2xl border border-base-300"
+                className="bg-base-200 rounded-3xl pt-8 px-8 pb-12 shadow-2xl border border-base-300"
                 variants={itemVariants}
               >
-                <div className="flex flex-col lg:flex-row items-center gap-8 mb-8">
+                <div className="flex flex-col lg:flex-row items-center gap-8 mb-6">
                   <motion.div
                     className="relative flex-shrink-0"
                     whileHover={{ scale: 1.03 }}
@@ -204,7 +204,7 @@ const AboutMeComponent = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mt-8">
+                <div className="grid grid-cols-3 gap-4 mt-6">
                   {stats.map((stat, index) => {
                     const IconComponent = stat.icon;
                     return (
