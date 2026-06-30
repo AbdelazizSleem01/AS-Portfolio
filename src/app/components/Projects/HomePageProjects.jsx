@@ -183,6 +183,11 @@ const HomePageProjects = () => {
                   className="relative h-48 overflow-hidden cursor-zoom-in"
                   onClick={() => handleImageZoom(imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl)}
                 >
+                  {project.category && typeof project.category === "object" && project.category.name && (
+                    <span className="absolute top-4 left-4 bg-primary/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md z-10 select-none">
+                      {project.category.name}
+                    </span>
+                  )}
                   {project.imageUrl && (
                     <motion.img
                       src={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl}
@@ -338,6 +343,11 @@ const HomePageProjects = () => {
                 >
                   {currentProject.title}
                 </motion.h3>
+                {currentProject.category && typeof currentProject.category === "object" && currentProject.category.name && (
+                  <span className="inline-block mt-2 bg-secondary/80 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    {currentProject.category.name}
+                  </span>
+                )}
                 <motion.button
                   onClick={closeDetails}
                   className="absolute top-6 right-6 text-base-content/70 hover:text-error transition-colors"
