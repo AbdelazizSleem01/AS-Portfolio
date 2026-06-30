@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { ChevronDown, MoveLeft, Shapes } from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
-import SimpleEditor from "../SimpleEditor";
+import TinyMCEEditor from "../TinyMCEEditor";
 
 export default function CreatedProjectForm() {
   const [title, setTitle] = useState("");
@@ -191,7 +191,7 @@ export default function CreatedProjectForm() {
               >
                 Project Description
               </label>
-              <SimpleEditor value={description} onChange={setDescription} />
+              <TinyMCEEditor value={description} onChange={setDescription} />
             </motion.div>
 
             {/* Live Link */}

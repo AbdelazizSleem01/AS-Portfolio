@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { motion, useAnimation } from 'framer-motion';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
 import { ChevronDown, Trash2, Save, MoveLeft } from 'lucide-react';
-import SimpleEditor from '../SimpleEditor';
+import TinyMCEEditor from '../TinyMCEEditor';
 import Swal from 'sweetalert2';
 import Link from 'next/link';
 
@@ -220,7 +220,7 @@ export default function UpdateProjectForm() {
         </FormSection>
 
         <FormSection title="Description" variants={fieldVariant} transition={{ delay: 0.2 }}>
-          <SimpleEditor value={projectData.description} onChange={(value) => handleInputChange('description', value)} />
+          <TinyMCEEditor value={projectData.description} onChange={(value) => handleInputChange('description', value)} />
         </FormSection>
 
         <FormSection title="Live Link" variants={fieldVariant} transition={{ delay: 0.3 }}>
