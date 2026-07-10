@@ -1,13 +1,16 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit, Eye, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
+import AdminLayout from '../../components/AdminLayout';
 import Swal from 'sweetalert2';
 
 const ITEMS_PER_PAGE = 10;
 
 const AdminPostsPage = () => {
+  const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -119,41 +122,45 @@ const AdminPostsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-base-100">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="w-24 h-24 border-4 border-primary border-t-transparent rounded-full animate-spin"
-        />
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xl text-primary font-medium"
-        >
-          Loading Posts...
-        </motion.p>
-      </div>
+      <AdminLayout pageTitle="Loading Posts...">
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="w-24 h-24 border-4 border-primary border-t-transparent rounded-full animate-spin"
+          />
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-xl text-primary font-medium"
+          >
+            Loading Posts...
+          </motion.p>
+        </div>
+      </AdminLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-base-100">
-        <div className="text-4xl">⚠️</div>
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="text-2xl text-error font-medium max-w-md text-center"
-        >
-          {error}
-        </motion.p>
-        <button
-          onClick={() => window.location.reload()}
-          className="btn btn-primary mt-4"
-        >
-          Try Again
-        </button>
-      </div>
+      <AdminLayout pageTitle="Error">
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="text-4xl">⚠️</div>
+          <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="text-2xl text-error font-medium max-w-md text-center"
+          >
+            {error}
+          </motion.p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn btn-primary mt-4"
+          >
+            Try Again
+          </button>
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -162,16 +169,8 @@ const AdminPostsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 p-8 mt-16">
+    <AdminLayout pageTitle="Blog Management">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl font-bold text-primary mb-2">Blog Management</h1>
-          <p className="text-lg text-gray-500">Manage all blog posts and content</p>
-        </motion.div>
 
         <AnimatePresence>
           {success && (
@@ -384,7 +383,7 @@ const AdminPostsPage = () => {
           </button>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

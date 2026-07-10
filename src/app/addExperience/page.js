@@ -1,9 +1,10 @@
+import AdminLayout from "../components/AdminLayout";
 import CreatedExperienceForm from "../components/Experience/CreatedExperienceForm";
 
 export default function AddExperiencePage() {
   return (
-    <div>
+    <AdminLayout pageTitle="Create Experience">
       <CreatedExperienceForm />
-    </div>
+    </AdminLayout>
   );
 }

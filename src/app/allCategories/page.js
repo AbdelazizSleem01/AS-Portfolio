@@ -1,10 +1,11 @@
+import AdminLayout from "../components/AdminLayout";
 import CategoriesList from "../components/categories/AllCategories";
 
 const ProjectsPage = () => {
     return (
-        <div>
+        <AdminLayout pageTitle="All Categories">
             <CategoriesList />
-        </div>
+        </AdminLayout>
     );
 };
 

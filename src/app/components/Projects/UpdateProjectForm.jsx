@@ -8,6 +8,7 @@ import { ChevronDown, Trash2, Save, MoveLeft } from 'lucide-react';
 import TinyMCEEditor from '../TinyMCEEditor';
 import Swal from 'sweetalert2';
 import Link from 'next/link';
+import CustomFileUpload from '../CustomFileUpload';
 
 const fieldVariant = {
   hidden: { opacity: 0, x: -20 },
@@ -355,12 +356,13 @@ export default function UpdateProjectForm() {
         </FormSection>
 
         <FormSection title="Images" variants={fieldVariant} transition={{ delay: 0.6 }}>
-          <input
-            type="file"
-            multiple
-            onChange={handleImagesChange}
+          <CustomFileUpload
+            id="images"
             accept="image/*"
-            className="file-input file-input-primary w-full bg-neutral/10 mt-1 rounded-md"
+            multiple={true}
+            onChange={handleImagesChange}
+            label="Choose or drop project images"
+            helperText="Upload screenshots, mockups, layouts, etc. (Max 10MB each)"
           />
           {imagesList.length > 0 && (
             <div className="mt-6 border-2 border-dashed border-base-300 rounded-2xl p-4">
@@ -544,12 +546,15 @@ const FormSection = ({ title, children, variants, transition }) => (
 
 const FileUpload = ({ preview, onFileChange, accept, isVideo }) => (
   <>
-    <input
-      type="file"
-      onChange={(e) => onFileChange(e.target.files[0])}
-      accept={accept}
-      className="file-input file-input-primary w-full bg-neutral/10 mt-1 rounded-md"
-    />
+  <CustomFileUpload
+    id={isVideo ? "video" : "image"}
+    accept={accept}
+    multiple={false}
+    onChange={(e) => onFileChange(e.target.files[0])}
+    label={isVideo ? "Choose or drop video file" : "Choose or drop preview image"}
+    helperText={isVideo ? "Video demo of the project (Max 50MB)" : "Format: PNG, JPG, WebP (Max 10MB)"}
+    maxSizeMB={isVideo ? 50 : 10}
+  />
     {preview && (
       <div className="mt-4">
         {isVideo ? (

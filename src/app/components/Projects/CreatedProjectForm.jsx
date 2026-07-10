@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, MoveLeft, Shapes } from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import TinyMCEEditor from "../TinyMCEEditor";
+import CustomFileUpload from "../CustomFileUpload";
 
 export default function CreatedProjectForm() {
   const [title, setTitle] = useState("");
@@ -356,14 +357,14 @@ export default function CreatedProjectForm() {
               >
                 Upload Images (Select one or more)
               </label>
-              <input
-                accept="image/*"
+              <CustomFileUpload
                 id="images"
-                type="file"
-                multiple
+                accept="image/*"
+                multiple={true}
                 onChange={handleImagesChange}
                 required={imagesList.length === 0}
-                className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
+                label="Choose or drop project images"
+                helperText="Upload screenshots, layouts, mockups, etc. (Max 10MB each)"
               />
 
               {imagesList.length > 0 && (
@@ -411,11 +412,14 @@ export default function CreatedProjectForm() {
 
             {/* Video Upload */}
             <label className="block text-sm font-medium mb-2">Video File</label>
-            <input
+            <CustomFileUpload
+              id="video"
               accept="video/*"
-              type="file"
+              multiple={false}
               onChange={handleVideoChange}
-              className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
+              label="Choose or drop video file"
+              helperText="Upload a product demo, screen recording, etc. (Max 50MB)"
+              maxSizeMB={50}
             />
 
             <div className="text-center text-lg text-primary my-3">or</div>

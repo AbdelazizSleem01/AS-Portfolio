@@ -1,6 +1,7 @@
 "use client";
 import { CodeXmlIcon, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
@@ -15,6 +16,7 @@ import {
 } from "react-icons/fi";
 
 function Navbar() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -24,7 +26,42 @@ function Navbar() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
+  const isAdminRoute = (path) => {
+    const adminPrefixes = [
+      "/admin",
+      "/Dashboard",
+      "/addCategory",
+      "/addCertificate",
+      "/addExperience",
+      "/addHeader",
+      "/addProject",
+      "/addSkill",
+      "/allCategories",
+      "/allCertificates",
+      "/allExperiences",
+      "/allFeedbacks",
+      "/allHeaders",
+      "/allProjects",
+      "/allSkills",
+      "/blog/create-post-open",
+      "/blog/admin-posts",
+      "/contacts",
+      "/pending-questions",
+      "/Subscribe-Page",
+      "/updateCategory",
+      "/updateCertificates",
+      "/updateExperience",
+      "/updateHeader",
+      "/updateProject",
+      "/updateSkill",
+      "/visits",
+    ];
+    return adminPrefixes.some(
+      (prefix) => path === prefix || path.startsWith(prefix + "/")
+    );
+  };
+
+  if (!mounted || isAdminRoute(pathname)) {
     return null;
   }
 

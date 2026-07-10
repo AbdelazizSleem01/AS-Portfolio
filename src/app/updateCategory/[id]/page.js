@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { ArrowBigLeft, Save, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
+import AdminLayout from "../../../components/AdminLayout";
 
 export default function UpdateCategory() {
   const router = useRouter();
@@ -125,21 +126,8 @@ export default function UpdateCategory() {
   };
 
   return (
-    <>
-      <motion.div
-        className="max-w-4xl mx-auto mt-32 mb-5 p-6 border border-primary shadow-lg rounded-lg"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.h2
-          className="text-2xl font-semibold text-center mb-6 text-neutral"
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4 }}
-        >
-          Update Category
-        </motion.h2>
+    <AdminLayout pageTitle="Update Category">
+      <div className="max-w-4xl mx-auto">
 
         <form onSubmit={handleSubmit}>
           <motion.div
@@ -235,21 +223,7 @@ export default function UpdateCategory() {
             </motion.button>
           </div>
         </form>
-      </motion.div>
-
-      <motion.div
-        className="w-full flex justify-center items-center my-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <Link href="/categories">
-          <button className="btn btn-primary text-white px-8 rounded-full shadow-lg hover:shadow-xl transition-all gap-2">
-            <ArrowBigLeft />
-            Return to Admin Dashboard
-          </button>
-        </Link>
-      </motion.div>
-    </>
+      </div>
+    </AdminLayout>
   );
 }

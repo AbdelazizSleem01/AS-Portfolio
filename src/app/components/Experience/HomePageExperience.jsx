@@ -8,9 +8,6 @@ const HomePageExperience = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const containerRef = useRef(null);
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" });
-
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
@@ -45,12 +42,13 @@ const HomePageExperience = () => {
       <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/5 rounded-full filter blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-secondary/5 rounded-full filter blur-3xl pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" ref={containerRef}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div
           className="text-center mb-20"
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
           <div className="inline-flex items-center gap-3 mb-4">
@@ -85,7 +83,8 @@ const HomePageExperience = () => {
                 <motion.div
                   className="w-full md:w-[calc(50%-2rem)] ml-6 md:ml-0"
                   initial={{ opacity: 0, x: isEven ? 50 : -50 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: idx * 0.15 }}
                 >
                   <div className="bg-base-100 rounded-3xl p-6 md:p-8 shadow-xl border border-base-300 hover:shadow-2xl hover:border-primary/20 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">

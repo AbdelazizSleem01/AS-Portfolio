@@ -1,10 +1,10 @@
+import AdminLayout from "../components/AdminLayout";
 import CreatedProjectForm from "../components/Projects/CreatedProjectForm";
-
 
 export default function addProject() {
     return (
-        <div>
+        <AdminLayout pageTitle="Create Project">
             <CreatedProjectForm />
-        </div>
+        </AdminLayout>
     );
 }

@@ -3,7 +3,8 @@
 import { useUser, RedirectToSignIn } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, Mail, Clock, Send, CheckCircle, XCircle } from 'lucide-react';
+import { MessageSquare, Mail, Clock, Send, CheckCircle } from 'lucide-react';
+import AdminLayout from '../components/AdminLayout';
 
 export default function PendingQuestionsPage() {
   const { user, isLoaded } = useUser();
@@ -62,9 +63,11 @@ export default function PendingQuestionsPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
+      <AdminLayout pageTitle="Loading Questions...">
+        <div className="flex items-center justify-center p-8">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -73,21 +76,8 @@ export default function PendingQuestionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 py-20 px-4">
+    <AdminLayout pageTitle="Pending Questions">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
-            <MessageSquare className="w-8 h-8" />
-            Pending Questions
-          </h1>
-          <p className="text-base-content/70 mt-2">
-            Respond to questions from visitors that the AI couldn't answer
-          </p>
-        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Questions List */}
@@ -223,6 +213,6 @@ export default function PendingQuestionsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

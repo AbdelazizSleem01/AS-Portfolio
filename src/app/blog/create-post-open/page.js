@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import AdminLayout from '../../components/AdminLayout';
+import CustomFileUpload from '../../components/CustomFileUpload';
 
 const CreatePostPage = () => {
   const router = useRouter();
@@ -101,15 +103,11 @@ const CreatePostPage = () => {
 
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen bg-base-100 p-8"
-    >
+    <AdminLayout pageTitle="Create Blog Post">
+      <div className="max-w-4xl mx-auto">
       <motion.form
         onSubmit={handleSubmit}
-        className="max-w-4xl mx-auto my-5 mt-24 p-6 border border-primary text-neutral shadow-lg rounded-lg"
+        className="max-w-4xl mx-auto my-5 p-6 border border-primary text-neutral shadow-lg rounded-lg"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -157,16 +155,17 @@ const CreatePostPage = () => {
           <label htmlFor="userImage" className="block text-sm label font-medium">
             User Image
           </label>
-          <input
-            accept="image/*"
+          <CustomFileUpload
             id="userImage"
-            type="file"
+            accept="image/*"
+            multiple={false}
             onChange={(e) => {
               const file = e.target.files[0];
               setFormData({ ...formData, userImage: file });
             }}
-            className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
-
+            required={false}
+            label="Choose or drop author image"
+            helperText="Author avatar (Max 5MB)"
           />
           {formData.userImage && (
             <div className="mt-4">
@@ -278,15 +277,17 @@ const CreatePostPage = () => {
           <label className="block text-sm label font-medium">
             Cover Image
           </label>
-          <input
-            type="file"
+          <CustomFileUpload
+            id="coverImage"
             accept="image/*"
+            multiple={false}
             onChange={(e) => setFormData({
               ...formData,
               coverImage: e.target.files[0]
             })}
-            className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
-
+            required={!formData.coverImage}
+            label="Choose or drop post cover image"
+            helperText="Cover image for blog post (Max 10MB)"
           />
           {formData.coverImage && (
             <div className="mt-4">
@@ -342,7 +343,8 @@ const CreatePostPage = () => {
           </motion.button>
         </motion.div>
       </motion.form>
-    </motion.div>
+      </div>
+    </AdminLayout>
   );
 };
 

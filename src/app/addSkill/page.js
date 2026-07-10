@@ -1,10 +1,10 @@
+import AdminLayout from "../components/AdminLayout";
 import CreateSkillForm from "../components/Skills/CreateSkillsForm";
-
 
 export default function addSkill() {
     return (
-        <div>
+        <AdminLayout pageTitle="Create Skill">
             <CreateSkillForm />
-        </div>
+        </AdminLayout>
     );
 }

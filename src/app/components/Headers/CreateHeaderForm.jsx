@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import SimpleEditor from "../SimpleEditor";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import CustomFileUpload from "../CustomFileUpload";
 
 export default function CreateHeaderForm() {
   const [title, setTitle] = useState("");
@@ -201,13 +202,14 @@ export default function CreateHeaderForm() {
             <label htmlFor="image" className="block text-sm label font-medium">
               Upload Image
             </label>
-            <input
-              accept="image/*"
+            <CustomFileUpload
               id="image"
-              type="file"
+              accept="image/*"
+              multiple={false}
               onChange={handleImageChange}
-              required
-              className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
+              required={!image}
+              label="Choose or drop header image"
+              helperText="Format: PNG, JPG, WebP (Max 10MB)"
             />
             {imagePreview && (
               <div className="mt-4">

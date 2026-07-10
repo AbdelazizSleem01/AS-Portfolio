@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import CustomFileUpload from "../CustomFileUpload";
 
 export default function CreateCertificateForm() {
     const [title, setTitle] = useState("");
@@ -113,13 +114,14 @@ export default function CreateCertificateForm() {
                         <label htmlFor="image" className="label">
                             <span className="label-text text-neutral">Certificate Image</span>
                         </label>
-                        <input
-                            accept="image/*"
+                        <CustomFileUpload
                             id="image"
-                            type="file"
+                            accept="image/*"
+                            multiple={false}
                             onChange={handleImageChange}
-                            required
-                            className="file-input file-input-primary w-full"
+                            required={!image}
+                            label="Choose or drop certificate image"
+                            helperText="Recommended: PNG or JPG format (Max 10MB)"
                         />
                         {imagePreview && (
                             <motion.img

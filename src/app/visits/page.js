@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
+import AdminLayout from '../components/AdminLayout';
 
 const LoadingSkeleton = () => (
   <div className="space-y-8">
@@ -329,48 +330,50 @@ export default function Visits() {
 
   if (loading && !analytics) {
     return (
-      <div className="min-h-screen bg-base-100 py-8 px-4 sm:px-6 lg:px-8">
+      <AdminLayout pageTitle="Loading Analytics...">
         <div className="max-w-7xl mx-auto">
           <LoadingSkeleton />
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (error && !analytics) {
     return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center p-8 bg-error/10 rounded-3xl border border-error/20 max-w-md w-full"
-        >
-          <div className="text-error text-6xl mb-4">⚠️</div>
-          <h3 className="text-xl font-semibold text-error mb-2">Error Loading Analytics</h3>
-          <p className="text-base-content/70 mb-4">{error}</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={refreshData}
-              className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-              disabled={refreshing}
-            >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Retrying...' : 'Try Again'}
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-base-300 text-base-content px-6 py-2 rounded-lg hover:bg-base-400 transition-colors"
-            >
-              Reload Page
-            </button>
-          </div>
-        </motion.div>
-      </div>
+      <AdminLayout pageTitle="Error">
+        <div className="flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center p-8 bg-error/10 rounded-3xl border border-error/20 max-w-md w-full"
+          >
+            <div className="text-error text-6xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-error mb-2">Error Loading Analytics</h3>
+            <p className="text-base-content/70 mb-4">{error}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={fetchAnalytics}
+                className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                disabled={refreshing}
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Retrying...' : 'Try Again'}
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-base-300 text-base-content px-6 py-2 rounded-lg hover:bg-base-400 transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base-100 py-8 px-4 sm:px-6 lg:px-8 mt-20">
+    <AdminLayout pageTitle="Website Analytics">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -1105,7 +1108,7 @@ export default function Visits() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

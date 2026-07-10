@@ -1,9 +1,10 @@
-import CreateHeaderForm from "../components/Headers/CreateHeaderForm"
+import AdminLayout from "../components/AdminLayout";
+import CreateHeaderForm from "../components/Headers/CreateHeaderForm";
 
 export default function addHeader() {
     return (
-        <div>
+        <AdminLayout pageTitle="Create Header">
             <CreateHeaderForm />
-        </div>
+        </AdminLayout>
     );
 }

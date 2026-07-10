@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import Swal from 'sweetalert2';
+import CustomFileUpload from "../CustomFileUpload";
 import { MoveLeftIcon, Save, Trash2 } from "lucide-react";
 
 export default function UpdateCertificateForm() {
@@ -197,12 +198,14 @@ export default function UpdateCertificateForm() {
                         <label htmlFor="image" className="label">
                             <span className="label-text text-neutral">Certificate Image</span>
                         </label>
-                        <input
-                            accept="image/*"
+                        <CustomFileUpload
                             id="image"
-                            type="file"
+                            accept="image/*"
+                            multiple={false}
                             onChange={handleImageChange}
-                            className="file-input file-input-primary w-full"
+                            required={false}
+                            label="Choose or drop new certificate image"
+                            helperText="Leave empty to keep existing image (Max 10MB)"
                         />
                         {imagePreview && (
                             <motion.div

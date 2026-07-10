@@ -1,10 +1,11 @@
+import AdminLayout from "../components/AdminLayout";
 import GetAllSCertificates from '../components/Certificates/GetAllCertificates.jsx';
 
 const ProjectsPage = () => {
     return (
-        <div>
+        <AdminLayout pageTitle="All Certificates">
             <GetAllSCertificates />
-        </div>
+        </AdminLayout>
     );
 };
 

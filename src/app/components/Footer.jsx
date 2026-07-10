@@ -1,12 +1,14 @@
 "use client"
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Phone, Mail, MapPin, CodeXmlIcon } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 const Footer = () => {
+    const pathname = usePathname();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -78,6 +80,45 @@ const Footer = () => {
         { name: 'linkedin', url: 'https://www.linkedin.com/in/abdelaziz-sleem-600a1027a/', icon: '/imgs/linkedIn-f.png', title: "Visit Abdelaziz Sleem's LinkedIn Profile" },
         { name: 'facebook', url: 'https://www.facebook.com/profile.php?id=100028557526450', icon: '/imgs/facebook-f.png', title: "Visit Abdelaziz Sleem's Facebook Profile" }
     ];
+
+    const isAdminRoute = (path) => {
+        const adminPrefixes = [
+            "/admin",
+            "/Dashboard",
+            "/addCategory",
+            "/addCertificate",
+            "/addExperience",
+            "/addHeader",
+            "/addProject",
+            "/addSkill",
+            "/allCategories",
+            "/allCertificates",
+            "/allExperiences",
+            "/allFeedbacks",
+            "/allHeaders",
+            "/allProjects",
+            "/allSkills",
+            "/blog/create-post-open",
+            "/blog/admin-posts",
+            "/contacts",
+            "/pending-questions",
+            "/Subscribe-Page",
+            "/updateCategory",
+            "/updateCertificates",
+            "/updateExperience",
+            "/updateHeader",
+            "/updateProject",
+            "/updateSkill",
+            "/visits",
+        ];
+        return adminPrefixes.some(
+            (prefix) => path === prefix || path.startsWith(prefix + "/")
+        );
+    };
+
+    if (isAdminRoute(pathname)) {
+        return null;
+    }
 
     return (
         <motion.div

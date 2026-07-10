@@ -1,10 +1,11 @@
+import AdminLayout from "../components/AdminLayout";
 import GetProjects from '../components/Projects/GetAllProjects.jsx';
 
 const ProjectsPage = () => {
     return (
-        <div>
+        <AdminLayout pageTitle="All Projects">
             <GetProjects />
-        </div>
+        </AdminLayout>
     );
 };
 

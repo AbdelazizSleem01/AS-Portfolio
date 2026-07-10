@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
+import CustomFileUpload from "../CustomFileUpload";
 
 export default function CreateSkillForm() {
     const [name, setName] = useState("");
@@ -114,13 +115,15 @@ export default function CreateSkillForm() {
                         <label htmlFor="image" className="label">
                             <span className="label-text text-neutral">Skill Image</span>
                         </label>
-                        <input
-                            accept="image/*"
+                        <CustomFileUpload
                             id="image"
-                            type="file"
+                            accept="image/*"
+                            multiple={false}
                             onChange={handleImageChange}
-                            required
-                            className="file-input file-input-primary w-full"
+                            required={!image}
+                            label="Choose or drop skill image"
+                            helperText="Recommended: PNG format (Max 5MB)"
+                            maxSizeMB={5}
                         />
                         {imagePreview && (
                             <motion.img

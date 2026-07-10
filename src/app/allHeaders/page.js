@@ -1,10 +1,11 @@
+import AdminLayout from "../components/AdminLayout";
 import GetAllHeader from "../components/Headers/GetAllHeaders";
 
 const HeaderPage = () => {
     return (
-        <div>
+        <AdminLayout pageTitle="All Headers">
             <GetAllHeader />
-        </div>
+        </AdminLayout>
     );
 };
 

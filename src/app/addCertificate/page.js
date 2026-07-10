@@ -1,10 +1,10 @@
+import AdminLayout from "../components/AdminLayout";
 import CreateCertificateForm from "../components/Certificates/CreateCertificateForm";
-
 
 export default function addCertificate() {
     return (
-        <div>
+        <AdminLayout pageTitle="Create Certificate">
             <CreateCertificateForm />
-        </div>
+        </AdminLayout>
     );
 }

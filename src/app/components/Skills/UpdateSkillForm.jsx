@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import Swal from "sweetalert2";
+import CustomFileUpload from "../CustomFileUpload";
 
 export default function UpdateSkillForm() {
   const { id } = useParams();
@@ -231,11 +232,15 @@ export default function UpdateSkillForm() {
                   </div>
                 </motion.div>
               )}
-              <input
-                type="file"
-                onChange={handleImageChange}
-                className="file-input file-input-primary w-full"
+              <CustomFileUpload
+                id="image"
                 accept="image/*"
+                multiple={false}
+                onChange={handleImageChange}
+                required={false}
+                label="Choose or drop new skill image"
+                helperText="Leave empty to keep existing image (Max 5MB)"
+                maxSizeMB={5}
               />
             </div>
           </motion.div>

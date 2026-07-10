@@ -1,10 +1,11 @@
+import AdminLayout from "../components/AdminLayout";
 import CreateCategory from "../components/categories/CreateCategory";
 
 const ProjectsPage = () => {
     return (
-        <div>
+        <AdminLayout pageTitle="Create Category">
             <CreateCategory />
-        </div>
+        </AdminLayout>
     );
 };
 

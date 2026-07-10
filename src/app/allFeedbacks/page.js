@@ -1,10 +1,10 @@
+import AdminLayout from "../components/AdminLayout";
 import AdminFeedbackList from "../components/Feedback/AdminFeedbackList";
 
-
-export default function addFeedbacks() {
+export default function allFeedbacks() {
     return (
-        <div>
+        <AdminLayout pageTitle="All Feedbacks">
             <AdminFeedbackList />
-        </div>
+        </AdminLayout>
     );
 }

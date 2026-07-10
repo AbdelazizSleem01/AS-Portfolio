@@ -5,16 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 
+import AdminLayout from "../components/AdminLayout";
+
 const ContactsPage = () => {
   const [contacts, setContacts] = useState([]);
   const [replyTexts, setReplyTexts] = useState({});
   const [loadingId, setLoadingId] = useState(null);
 
   const { user } = useUser();
-
-  if (!user) {
-    return <RedirectToSignIn />;
-  }
 
   useEffect(() => {
     document.title = `Contacts | ${process.env.NEXT_PUBLIC_META_TITLE}`;
@@ -102,20 +100,13 @@ const ContactsPage = () => {
     }
   };
 
+  if (!user) {
+    return <RedirectToSignIn />;
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen p-8 bg-base-100 text-foreground mt-16"
-    >
-      <div className="Heading max-w-4xl mx-auto">
-        <motion.h1
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="text-3xl semiHead font-bold mb-8 text-center text-primary"
-        >
-          Contact Messages
-        </motion.h1>
+    <AdminLayout pageTitle="Contact Messages">
+      <div className="max-w-4xl mx-auto">
 
         <AnimatePresence>
           {contacts.length === 0 ? (
@@ -232,7 +223,7 @@ const ContactsPage = () => {
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </AdminLayout>
   );
 };
 

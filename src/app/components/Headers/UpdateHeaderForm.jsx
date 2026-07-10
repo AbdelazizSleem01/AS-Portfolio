@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import SimpleEditor from "../SimpleEditor";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import Swal from "sweetalert2";
+import CustomFileUpload from "../CustomFileUpload";
 import { Save, Trash2 } from "lucide-react";
 
 export default function UpdateHeaderForm() {
@@ -246,16 +247,18 @@ export default function UpdateHeaderForm() {
         <label htmlFor="image" className="label block text-sm font-medium">
           Image
         </label>
-        <input
-          accept="image/*"
+        <CustomFileUpload
           id="image"
-          type="file"
+          accept="image/*"
+          multiple={false}
           onChange={(e) => {
             const file = e.target.files[0];
             setImage(file);
             setImagePreview(URL.createObjectURL(file));
           }}
-          className="file-input file-input-primary w-full bg-neutral/10 mt-1  rounded-md "
+          required={false}
+          label="Choose or drop new header image"
+          helperText="Leave empty to keep existing image (Max 10MB)"
         />
         {imagePreview && (
           <img
