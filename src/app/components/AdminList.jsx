@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     PlusCircle, List, FilePlus, FolderPlus, BookOpen, Award, MessageSquare, Mail, FileText, LayoutDashboard, Eye,
-    Shapes, Settings, Database, BarChart3, Users, Image
+    Shapes, Settings, Database, BarChart3, Users, Image, Briefcase
 } from 'lucide-react';
 
 const AdminList = () => {
@@ -62,6 +62,20 @@ const AdminList = () => {
             icon: <FolderPlus size={22} />,
             color: 'from-primary to-secondary',
             category: 'Projects'
+        },
+        { 
+            href: '/addExperience', 
+            text: 'Create Experience', 
+            icon: <Briefcase size={22} />,
+            color: 'from-amber-500 to-orange-600',
+            category: 'Experience'
+        },
+        { 
+            href: '/allExperiences', 
+            text: 'All Experiences', 
+            icon: <List size={22} />,
+            color: 'from-orange-600 to-red-500',
+            category: 'Experience'
         },
         { 
             href: '/addCategory', 

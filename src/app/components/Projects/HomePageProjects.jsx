@@ -11,6 +11,8 @@ import {
   FiFolder,
   FiCode
 } from "react-icons/fi";
+import ProjectImageCarousel from "./ProjectImageCarousel";
+import ProjectDetailsModal from "./ProjectDetailsModal";
 
 const HomePageProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -319,170 +321,11 @@ const HomePageProjects = () => {
       </div>
 
       {/* Project Details Modal */}
-      <AnimatePresence>
-        {showDetails && currentProject && (
-          <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeDetails}
-          >
-            <motion.div
-              className="bg-base-100 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="relative p-6 border-b border-base-300">
-                <motion.h3
-                  className="text-2xl font-bold text-primary pr-12"
-                  layoutId={`title-${currentProject._id}`}
-                >
-                  {currentProject.title}
-                </motion.h3>
-                {currentProject.category && typeof currentProject.category === "object" && currentProject.category.name && (
-                  <span className="inline-block mt-2 bg-secondary/80 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    {currentProject.category.name}
-                  </span>
-                )}
-                <motion.button
-                  onClick={closeDetails}
-                  className="absolute top-6 right-6 text-base-content/70 hover:text-error transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <FiX className="w-6 h-6" />
-                </motion.button>
-              </div>
-
-              {/* Modal Content */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                {/* Description */}
-                <motion.div
-                  className="prose prose-lg max-w-none mb-6"
-                  dangerouslySetInnerHTML={{ __html: currentProject.description }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                />
-
-                {/* Media */}
-                <div className="space-y-6">
-                  {currentProject.videoLink && (
-                    <motion.div
-                      className="aspect-video rounded-2xl overflow-hidden bg-black"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                    >
-                      {(() => {
-                        const link = currentProject.videoLink;
-                        const isDirectVideo = link.match(/\.(mp4|webm|ogg|mov)$|^blob:/i) || link.includes('public.blob.vercel-storage.com');
-
-                        if (isDirectVideo) {
-                          return (
-                            <video
-                              src={link}
-                              controls
-                              className="w-full h-full rounded-2xl"
-                              poster={currentProject.imageUrl}
-                            />
-                          );
-                        }
-
-                        // Auto-transform common links to embed format
-                        let embedUrl = link;
-                        if (link.includes('youtube.com/watch?v=')) {
-                          embedUrl = link.replace('watch?v=', 'embed/');
-                        } else if (link.includes('youtu.be/')) {
-                          embedUrl = link.replace('youtu.be/', 'youtube.com/embed/');
-                        } else if (link.includes('vimeo.com/') && !link.includes('player.vimeo.com')) {
-                          embedUrl = link.replace('vimeo.com/', 'player.vimeo.com/video/');
-                        } else if (link.includes('loom.com/share/') && !link.includes('loom.com/embed/')) {
-                          embedUrl = link.replace('loom.com/share/', 'loom.com/embed/');
-                        } else if (link.includes('awesomescreenshot.com/video/') && !link.includes('/embed/')) {
-                          // Try to convert awesomescreenshot share link to potential embed pattern
-                          embedUrl = link.replace('/video/', '/video/embed/');
-                        }
-
-                        return (
-                          <div className="flex flex-col h-full gap-2">
-                            <iframe
-                              src={embedUrl}
-                              className="flex-1 w-full h-full min-h-[300px] sm:min-h-[400px] rounded-2xl border-2 border-base-300"
-                              allowFullScreen
-                              title={currentProject.title}
-                            />
-                            <a
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary text-xs hover:underline flex items-center gap-2 px-2 pb-1"
-                            >
-                              <FiExternalLink /> Open in new tab
-                            </a>
-                          </div>
-                        );
-                      })()}
-                    </motion.div>
-                  )}
-
-                  {currentProject.imageUrl && (
-                    <motion.div
-                      className="rounded-2xl overflow-hidden"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      <img
-                        src={imageErrors[currentProject._id] ? "/imgs/not-found.png" : currentProject.imageUrl}
-                        alt={currentProject.title}
-                        className="w-full h-auto rounded-2xl border-2 border-base-300"
-                        loading="lazy"
-                        onError={() => handleImageError(currentProject._id)}
-                      />
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <motion.div
-                  className="flex gap-4 mt-8 pt-6 border-t border-base-300"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  {currentProject.liveLink && (
-                    <a
-                      href={currentProject.liveLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-3 hover:shadow-lg transition-all duration-300"
-                    >
-                      <FiExternalLink className="w-5 h-5" />
-                      Live Demo
-                    </a>
-                  )}
-                  {currentProject.githubLink && (
-                    <a
-                      href={currentProject.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-base-300 text-base-content py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-3 hover:bg-base-400 transition-all duration-300"
-                    >
-                      <FiGithub className="w-5 h-5" />
-                      Source Code
-                    </a>
-                  )}
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ProjectDetailsModal
+        project={currentProject}
+        isOpen={showDetails && !!currentProject}
+        onClose={closeDetails}
+      />
 
       {/* Image Zoom Modal */}
       <AnimatePresence>

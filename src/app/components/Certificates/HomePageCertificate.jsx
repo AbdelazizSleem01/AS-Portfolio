@@ -35,13 +35,13 @@ export default function HomePageCertificates() {
     }, []);
 
     const nextSlide = () => {
-        setCurrentIndex((prevIndex) => 
+        setCurrentIndex((prevIndex) =>
             prevIndex === certificates.length - 1 ? 0 : prevIndex + 1
         );
     };
 
     const prevSlide = () => {
-        setCurrentIndex((prevIndex) => 
+        setCurrentIndex((prevIndex) =>
             prevIndex === 0 ? certificates.length - 1 : prevIndex - 1
         );
     };
@@ -134,10 +134,10 @@ export default function HomePageCertificates() {
                                     loading="lazy"
                                     onError={() => handleImageError(certificates[currentIndex]._id)}
                                 />
-                                
+
                                 {/* تحسين الـ overlay للشاشات الصغيرة */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-base-100/60 sm:from-base-100/80 via-transparent to-transparent" />
-                                
+
                                 {/* تحسين الـ overlay للشاشات الصغيرة */}
                                 <div className="absolute bottom-2 sm:bottom-4 lg:bottom-6 left-2 sm:left-4 lg:left-6 right-2 sm:right-4 lg:right-6">
                                     <motion.div
@@ -204,11 +204,10 @@ export default function HomePageCertificates() {
                                         <button
                                             key={index}
                                             onClick={() => setCurrentIndex(index)}
-                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${
-                                                index === currentIndex 
-                                                    ? 'bg-primary scale-125' 
-                                                    : 'bg-base-400 hover:bg-base-500'
-                                            }`}
+                                            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${index === currentIndex
+                                                ? 'bg-primary scale-125'
+                                                : 'bg-base-400 hover:bg-base-500'
+                                                }`}
                                             aria-label={`Go to certificate ${index + 1}`}
                                         />
                                     ))}
@@ -233,11 +232,10 @@ export default function HomePageCertificates() {
                                     key={certificate._id}
                                     whileHover={{ scale: 1.05, y: -5 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className={`cursor-pointer rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all ${
-                                        index === currentIndex 
-                                            ? 'border-primary shadow-md sm:shadow-lg' 
-                                            : 'border-base-300 hover:border-primary/50'
-                                    }`}
+                                    className={`cursor-pointer rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all ${index === currentIndex
+                                        ? 'border-primary shadow-md sm:shadow-lg'
+                                        : 'border-base-300 hover:border-primary/50'
+                                        }`}
                                     onClick={() => setCurrentIndex(index)}
                                 >
                                     <img

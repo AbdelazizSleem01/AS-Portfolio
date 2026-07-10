@@ -334,7 +334,7 @@ export default function HomePage() {
               >
                 <Image src="/imgs/5amsat.png" alt="Khamsat" width={18} height={18} />
                 <span>Khamsat</span>
-                
+
               </Link>
             )}
 

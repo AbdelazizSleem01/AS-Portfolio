@@ -129,11 +129,10 @@ export default function FeedbackForm({ setFeedbacks }) {
               type="button"
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
-              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
-                star <= rating 
-                  ? 'bg-primary text-base-100 shadow-lg' 
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${star <= rating
+                  ? 'bg-primary text-base-100 shadow-lg'
                   : 'bg-base-300 text-base-content/50 hover:bg-base-400'
-              }`}
+                }`}
               onClick={() => setRating(star)}
               aria-label={`${star} star rating`}
             >

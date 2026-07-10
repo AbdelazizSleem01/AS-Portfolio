@@ -5,6 +5,9 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import "../components/AdminStyle.css";
 import { Github, Globe, X } from "lucide-react";
+import { FiExternalLink, FiGithub, FiInfo } from "react-icons/fi";
+import ProjectImageCarousel from "../components/Projects/ProjectImageCarousel";
+import ProjectDetailsModal from "../components/Projects/ProjectDetailsModal";
 
 const PageOfProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -174,96 +177,94 @@ const PageOfProjects = () => {
 
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial="hidden"
-            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            layout
           >
             {projects.map((project, index) => (
               <motion.div
                 key={project._id}
-                className="bg-neutral rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow relative overflow-hidden group"
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{
-                  once: false,
-                  margin: "0px 0px -100px 0px",
-                  amount: 0.2
-                }}
-                transition={{
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  duration: 0.5
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  transition: { duration: 0.2 }
-                }}
+                className="group bg-base-100 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-base-300 overflow-hidden"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                whileHover={{ y: -8 }}
+                layout
               >
-                <div className="flex flex-col flex-grow">
-                  <h2 className="text-xl font-semibold text-base-100 mb-2">{project.title}</h2>
+                {/* Project Image */}
+                <div
+                  className="relative h-48 overflow-hidden cursor-zoom-in"
+                  onClick={() => handleDetails(project)}
+                >
+                  {project.category && typeof project.category === "object" && project.category.name && (
+                    <span className="absolute top-4 left-4 bg-primary/80 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md z-10 select-none">
+                      {project.category.name}
+                    </span>
+                  )}
+                  {project.imageUrl && (
+                    <motion.img
+                      src={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      whileHover={{ scale: 1.05 }}
+                      loading="lazy"
+                      onError={() => handleImageError(project._id)}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-base-100/80 to-transparent pointer-events-none" />
 
-                  <div className="relative mb-4">
-                    <div className="absolute inset-0 bg-gradient-to-t from-neutral/50 to-transparent z-10" />
-                    <p
-                      className="text-base-100 line-clamp-3 pr-4 h-[28px] text-sm leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: project.description.split("<br>")[0],
-                      }}
-                    ></p>
-                  </div>
-
-                  <div className="border-2 border-primary/30 shadow-md shadow-base-100/20 rounded-lg my-4 bg-white flex items-center justify-center h-60 overflow-hidden p-2 hover:border-primary/50 transition-colors">
-                    {project.imageUrl && (
-                      <a href={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full">
-                        <motion.img
-                          src={imageErrors[project._id] ? "/imgs/not-found.png" : project.imageUrl}
-                          alt={project.title}
-                          className="rounded-md w-full h-full object-contain scale-95 group-hover:scale-100 transition-transform"
-                          whileHover={{ scale: 1.05 }}
-                          transition={{ duration: 0.3 }}
-                          loading="lazy"
-                          onError={() => handleImageError(project._id)}
-                        />
-                      </a>
-                    )}
-                  </div>
-
-                  <div className="flex justify-around items-center text-center mt-4 gap-3">
+                  {/* Overlay Icons */}
+                  <div className="absolute top-4 right-4 flex gap-2">
                     {project.liveLink && (
-                      <Link
+                      <motion.a
                         href={project.liveLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm w-full bg-primary text-white px-4 py-2 flex items-center justify-center gap-2 rounded-lg hover:bg-primary/90 transition-colors"
+                        className="bg-primary/90 text-white p-2 rounded-lg backdrop-blur-sm hover:bg-primary transition-colors"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                       >
-                        Live Demo
-                        <img className="w-5 h-5 filter brightness-0 invert" src="/imgs/live.png" alt="live-icon" />
-                      </Link>
+                        <FiExternalLink className="w-4 h-4" />
+                      </motion.a>
                     )}
                     {project.githubLink && (
-                      <Link
+                      <motion.a
                         href={project.githubLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm w-full text-white bg-gray-700 px-4 py-2 flex items-center justify-center gap-2 rounded-lg hover:bg-gray-600 transition-colors"
+                        className="bg-base-300/90 text-base-content p-2 rounded-lg backdrop-blur-sm hover:bg-base-300 transition-colors"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                       >
-                        GitHub
-                        <img className="w-5 h-5 filter brightness-0 invert" src="/imgs/github.png" alt="github-icon" />
-                      </Link>
+                        <FiGithub className="w-4 h-4" />
+                      </motion.a>
                     )}
                   </div>
+                </div>
 
-                  <div className="flex justify-center w-full items-center mt-3">
+                {/* Project Content */}
+                <div className="p-6">
+                  <motion.h3
+                    className="text-xl font-bold text-primary mb-3 line-clamp-1"
+                  >
+                    {project.title}
+                  </motion.h3>
+
+                  <motion.div
+                    className="text-base-content/70 mb-4 line-clamp-2 h-12 text-sm leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: project.description }}
+                  />
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
                     <motion.button
-                      className="text-sm bg-error w-full px-4 py-2 flex items-center text-white justify-center gap-2 rounded-lg hover:bg-error/90 transition-colors"
                       onClick={() => handleDetails(project)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-lg transition-all duration-300 text-sm"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Details
-                      <img className="w-5 h-5 filter brightness-0 invert" src="/imgs/details.png" alt="details-icon" />
+                      <FiInfo className="w-4 h-4" />
+                      View Details
                     </motion.button>
                   </div>
                 </div>
@@ -274,76 +275,11 @@ const PageOfProjects = () => {
       </section>
 
       {/* Enhanced Project Details Modal */}
-      {showDetails && currentProject && (
-        <motion.div
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <motion.div
-            className="bg-base-100 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-3xl font-bold text-primary">
-                  {currentProject.title}
-                </h2>
-                <button
-                  onClick={closeDetails}
-                  className="text-gray-500 hover:text-primary transition-colors"
-                >
-                  <X className="w-8 h-8" />
-                </button>
-              </div>
-
-              {currentProject.videoLink && (
-                <div className="aspect-video rounded-xl overflow-hidden mb-6">
-                  <motion.iframe
-                    controls
-                    className="w-[100%] h-[100%] rounded-xl mx-auto mb-4 border-[3px] border-primary overflow-hidden"
-                    src={currentProject.videoLink}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    Your browser does not support the video tag.
-                  </motion.iframe>
-                </div>
-              )}
-
-              <div
-                className="prose prose-lg max-w-none mb-6"
-                dangerouslySetInnerHTML={{ __html: currentProject.description }}
-              />
-
-              <div className="flex flex-wrap gap-4 mt-8">
-                {currentProject.liveLink && (
-                  <Link
-                    href={currentProject.liveLink}
-                    target="_blank"
-                    className="btn btn-primary gap-2"
-                  >
-                    <Globe className="w-5 h-5" />
-                    Visit Live Demo
-                  </Link>
-                )}
-                {currentProject.githubLink && (
-                  <Link
-                    href={currentProject.githubLink}
-                    target="_blank"
-                    className="btn btn-neutral gap-2"
-                  >
-                    <Github className="w-5 h-5" />
-                    View Source Code
-                  </Link>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
+      <ProjectDetailsModal
+        project={currentProject}
+        isOpen={showDetails && !!currentProject}
+        onClose={closeDetails}
+      />
     </div>
   );
 };

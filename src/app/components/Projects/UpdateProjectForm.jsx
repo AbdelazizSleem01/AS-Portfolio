@@ -19,8 +19,9 @@ export default function UpdateProjectForm() {
   const { id } = useParams();
   const { user } = useUser();
   const router = useRouter();
-  const [files, setFiles] = useState({ image: null, video: null });
-  const [previews, setPreviews] = useState({ image: null, video: null });
+  const [files, setFiles] = useState({ video: null });
+  const [previews, setPreviews] = useState({ video: null });
+  const [imagesList, setImagesList] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
   const [projectData, setProjectData] = useState({
@@ -59,9 +60,24 @@ export default function UpdateProjectForm() {
         });
         setCategories(categoriesData.categories);
         setPreviews({
-          image: project.imageUrl,
           video: project.videoLink || project.videoUrl
         });
+
+        // Initialize imagesList from images or fallback to imageUrl
+        const projectImages = (project.images && project.images.length > 0)
+          ? project.images.map((url) => ({
+              id: url,
+              type: 'existing',
+              url: url,
+              isCover: url === project.imageUrl,
+            }))
+          : (project.imageUrl ? [{
+              id: project.imageUrl,
+              type: 'existing',
+              url: project.imageUrl,
+              isCover: true,
+            }] : []);
+        setImagesList(projectImages);
       } catch (error) {
         toast.error('Failed to load project data');
       }
@@ -69,6 +85,47 @@ export default function UpdateProjectForm() {
 
     fetchData();
   }, [id]);
+
+  const handleImagesChange = (e) => {
+    const filesList = Array.from(e.target.files);
+    const newItems = filesList.map((file) => {
+      const id = Math.random().toString(36).substring(2, 9);
+      return {
+        id,
+        type: 'new',
+        file,
+        preview: URL.createObjectURL(file),
+        isCover: false,
+      };
+    });
+
+    setImagesList((prev) => {
+      const updated = [...prev, ...newItems];
+      if (updated.length > 0 && !updated.some((item) => item.isCover)) {
+        updated[0].isCover = true;
+      }
+      return updated;
+    });
+  };
+
+  const handleSetCover = (id) => {
+    setImagesList((prev) =>
+      prev.map((item) => ({
+        ...item,
+        isCover: item.id === id,
+      }))
+    );
+  };
+
+  const handleRemoveImage = (id) => {
+    setImagesList((prev) => {
+      const filtered = prev.filter((item) => item.id !== id);
+      if (filtered.length > 0 && !filtered.some((item) => item.isCover)) {
+        filtered[0].isCover = true;
+      }
+      return filtered;
+    });
+  };
 
   const handleFile = useCallback((type, file) => {
     if (!file) return;
@@ -133,7 +190,29 @@ export default function UpdateProjectForm() {
         formData.append('liveLink', projectData.liveLink);
         formData.append('githubLink', projectData.githubLink);
         formData.append('order', projectData.order);
-        if (files.image) formData.append('image', files.image);
+        
+        // Build imagesMeta and append new images
+        let newFileIndex = 0;
+        const imagesMeta = imagesList.map((item) => {
+          if (item.type === "existing") {
+            return {
+              type: "existing",
+              url: item.url,
+              isCover: item.isCover,
+            };
+          } else {
+            formData.append("newImages", item.file);
+            const meta = {
+              type: "new",
+              index: newFileIndex,
+              isCover: item.isCover,
+            };
+            newFileIndex++;
+            return meta;
+          }
+        });
+        formData.append("imagesMeta", JSON.stringify(imagesMeta));
+
         if (projectData.videoLink) {
           formData.append('videoLink', projectData.videoLink);
         } else if (files.video) {
@@ -275,12 +354,55 @@ export default function UpdateProjectForm() {
           />
         </FormSection>
 
-        <FormSection title="Image" variants={fieldVariant} transition={{ delay: 0.6 }}>
-          <FileUpload
-            preview={previews.image}
-            onFileChange={file => handleFile('image', file)}
+        <FormSection title="Images" variants={fieldVariant} transition={{ delay: 0.6 }}>
+          <input
+            type="file"
+            multiple
+            onChange={handleImagesChange}
             accept="image/*"
+            className="file-input file-input-primary w-full bg-neutral/10 mt-1 rounded-md"
           />
+          {imagesList.length > 0 && (
+            <div className="mt-6 border-2 border-dashed border-base-300 rounded-2xl p-4">
+              <p className="text-sm font-semibold mb-3">Project Images ({imagesList.length}):</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {imagesList.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`relative rounded-xl overflow-hidden border-2 bg-neutral/5 p-2 transition-all duration-200 ${
+                      item.isCover ? "border-primary shadow-lg ring-2 ring-primary/20" : "border-base-300"
+                    }`}
+                  >
+                    <img
+                      src={item.type === 'existing' ? item.url : item.preview}
+                      alt="preview"
+                      className="h-24 w-full object-cover rounded-lg"
+                    />
+                    <div className="mt-2 flex flex-col gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleSetCover(item.id)}
+                        className={`text-xs py-1 px-2 rounded-md font-medium transition-colors ${
+                          item.isCover
+                            ? "bg-primary text-white"
+                            : "bg-base-200 text-base-content hover:bg-primary/10"
+                        }`}
+                      >
+                        {item.isCover ? "Cover / Front" : "Set as Cover"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(item.id)}
+                        className="text-xs bg-error/10 text-error hover:bg-error hover:text-white py-1 px-2 rounded-md font-medium transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </FormSection>
 
         <FormSection title="Video" variants={fieldVariant} transition={{ delay: 0.7 }}>

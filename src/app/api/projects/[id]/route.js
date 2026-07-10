@@ -133,31 +133,104 @@ export async function PUT(req, { params }) {
         },
       },
     });
-    // Handle image upload
+    // Handle image upload (multiple or fallback)
     let imageUrl = existingProject.imageUrl;
-    if (imageFile && imageFile.size > 0) {
-      if (imageFile.size > MAX_IMAGE_SIZE) {
-        throw new Error("Image size exceeds 5MB limit");
-      }
-      if (!ALLOWED_IMAGE_TYPES.includes(imageFile.type)) {
-        throw new Error("Invalid image file type");
-      }
+    let images = existingProject.images || [];
 
-      // Delete old image if it exists
-      if (existingProject.imageUrl) {
-        await del(existingProject.imageUrl);
-      }
+    const imagesMetaStr = formData.get("imagesMeta");
+    if (imagesMetaStr) {
+      const imagesMeta = JSON.parse(imagesMetaStr);
+      const newImageFiles = formData.getAll("newImages");
 
-      // Upload new image
-      const imageUploadResult = await put(
-        `projects/images/${Date.now()}-${imageFile.name}`,
-        imageFile.stream(),
-        {
-          access: "public",
-          contentType: imageFile.type,
+      // Upload all new images
+      const uploadPromises = newImageFiles.map(async (file) => {
+        if (file && file.size > 0) {
+          if (file.size > MAX_IMAGE_SIZE) {
+            throw new Error(`Image ${file.name} size exceeds 5MB limit`);
+          }
+          if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            throw new Error(`Invalid image type for ${file.name}`);
+          }
+          const uploadResult = await put(
+            `projects/images/${Date.now()}-${file.name}`,
+            file.stream(),
+            {
+              access: "public",
+              contentType: file.type,
+            }
+          );
+          return uploadResult.url;
         }
-      );
-      imageUrl = imageUploadResult.url;
+        return "";
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // Resolve the final list of images
+      const finalImages = imagesMeta.map((item) => {
+        if (item.type === "existing") return item.url;
+        if (item.type === "new") return uploadedUrls[item.index];
+        return "";
+      }).filter(Boolean);
+
+      // Determine the cover image
+      const coverItem = imagesMeta.find((item) => item.isCover);
+      if (coverItem) {
+        if (coverItem.type === "existing") imageUrl = coverItem.url;
+        if (coverItem.type === "new") imageUrl = uploadedUrls[coverItem.index];
+      } else if (finalImages.length > 0) {
+        imageUrl = finalImages[0];
+      } else {
+        imageUrl = "";
+      }
+
+      // Delete images that were removed
+      const oldImages = existingProject.images && existingProject.images.length > 0
+        ? existingProject.images
+        : (existingProject.imageUrl ? [existingProject.imageUrl] : []);
+
+      for (const oldUrl of oldImages) {
+        if (oldUrl && !finalImages.includes(oldUrl) && oldUrl.includes("public.blob.vercel-storage.com")) {
+          try {
+            await del(oldUrl);
+          } catch (e) {
+            console.error("Failed to delete unused blob:", oldUrl, e);
+          }
+        }
+      }
+
+      images = finalImages;
+    } else {
+      // Fallback to legacy single image upload
+      if (imageFile && imageFile.size > 0) {
+        if (imageFile.size > MAX_IMAGE_SIZE) {
+          throw new Error("Image size exceeds 5MB limit");
+        }
+        if (!ALLOWED_IMAGE_TYPES.includes(imageFile.type)) {
+          throw new Error("Invalid image file type");
+        }
+
+        // Delete old image if it exists
+        if (existingProject.imageUrl && existingProject.imageUrl.includes("public.blob.vercel-storage.com")) {
+          try {
+            await del(existingProject.imageUrl);
+          } catch (e) {
+            console.error("Failed to delete blob:", existingProject.imageUrl, e);
+          }
+        }
+
+        // Upload new image
+        const imageUploadResult = await put(
+          `projects/images/${Date.now()}-${imageFile.name}`,
+          imageFile.stream(),
+          {
+            access: "public",
+            contentType: imageFile.type,
+          }
+        );
+        imageUrl = imageUploadResult.url;
+        images = [imageUrl];
+      }
     }
 
     // Handle video upload or URL
@@ -195,6 +268,7 @@ export async function PUT(req, { params }) {
       liveLink,
       githubLink,
       imageUrl,
+      images,
       videoLink: uploadedVideoLink,
       order,
     };
@@ -225,6 +299,31 @@ export async function DELETE(req, { params }) {
     const project = await Project.findById(id);
     if (!project)
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
+
+    // Delete all images associated with this project
+    const allImages = project.images && project.images.length > 0
+      ? project.images
+      : (project.imageUrl ? [project.imageUrl] : []);
+
+    for (const url of allImages) {
+      if (url && url.includes("public.blob.vercel-storage.com")) {
+        try {
+          await del(url);
+        } catch (e) {
+          console.error("Failed to delete project blob:", url, e);
+        }
+      }
+    }
+
+    // Delete video if it's uploaded to Vercel Blob
+    if (project.videoLink && project.videoLink.includes("public.blob.vercel-storage.com")) {
+      try {
+        await del(project.videoLink);
+      } catch (e) {
+        console.error("Failed to delete project video blob:", project.videoLink, e);
+      }
+    }
+
     await Project.findByIdAndDelete(id);
     return NextResponse.json({ message: "Project deleted" });
   } catch (error) {

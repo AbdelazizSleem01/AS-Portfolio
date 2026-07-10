@@ -52,6 +52,12 @@ function Navbar() {
       title: "View Abdelaziz Sleem's Projects",
     },
     {
+      href: "/#experience",
+      icon: <FiBriefcase className="w-4 h-4" />,
+      text: "Experience",
+      title: "View Abdelaziz Sleem's Work Experience",
+    },
+    {
       href: "/ContactMe",
       icon: <FiMail className="w-4 h-4" />,
       text: "Contact",

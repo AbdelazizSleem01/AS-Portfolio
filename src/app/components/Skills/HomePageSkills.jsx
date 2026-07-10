@@ -131,7 +131,7 @@ export default function HomePageSkills() {
                                     />
                                 </div>
                             </div>
-                          
+
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -142,14 +142,14 @@ export default function HomePageSkills() {
                                         initial={{ opacity: 0, scale: 0.8, y: 20 }}
                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                         exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                                        transition={{ 
+                                        transition={{
                                             delay: index * 0.05,
-                                            type: "spring", 
-                                            stiffness: 300, 
-                                            damping: 24 
+                                            type: "spring",
+                                            stiffness: 300,
+                                            damping: 24
                                         }}
-                                        whileHover={{ 
-                                            scale: 1.1, 
+                                        whileHover={{
+                                            scale: 1.1,
                                             y: -8,
                                             transition: { type: "spring", stiffness: 400, damping: 25 }
                                         }}
@@ -175,11 +175,11 @@ export default function HomePageSkills() {
                                                         </div>
                                                     )}
                                                 </motion.div>
-                                                
+
                                                 <h3 className="font-semibold text-base-content mb-2 group-hover:text-primary transition-colors line-clamp-1">
                                                     {skill.name}
                                                 </h3>
-                                                
+
                                                 {skill.category && (
                                                     <span className="text-xs text-base-content/60 bg-base-200 px-2 py-1 rounded-full">
                                                         {skill.category}

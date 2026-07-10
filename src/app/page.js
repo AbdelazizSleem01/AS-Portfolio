@@ -4,6 +4,7 @@ import FeedbackSection from "./components/Feedback/FeedbackSection";
 import HomePage from "./components/HomePage";
 import HomePageProjects from "./components/Projects/HomePageProjects";
 import HomePageSkills from "./components/Skills/HomePageSkills";
+import HomePageExperience from "./components/Experience/HomePageExperience";
 
 export default function Home() {
 
@@ -11,6 +12,7 @@ export default function Home() {
     <div>
       <HomePage />
       <AboutMeComponent />
+      <HomePageExperience />
       <HomePageProjects />
       <HomePageSkills />
       <HomePageCertificates />

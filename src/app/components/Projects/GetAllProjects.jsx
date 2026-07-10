@@ -7,6 +7,7 @@ import '../AdminStyle.css';
 import { ArrowBigLeft, GripVertical, Save, Trash2, Edit3, ExternalLink } from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
+import ProjectImageCarousel from "./ProjectImageCarousel";
 
 const GetProjects = () => {
     const { user } = useUser();
@@ -284,7 +285,7 @@ const GetProjects = () => {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-base-100 rounded-[32px] w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl p-8 relative border border-base-300"
+                            className="bg-base-100 rounded-[32px] w-full max-w-5xl max-h-[95vh] overflow-y-auto shadow-2xl p-8 relative border border-base-300"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <button
@@ -301,56 +302,90 @@ const GetProjects = () => {
                                 <div className="h-1.5 w-20 bg-primary rounded-full" />
                             </div>
 
-                            <div className="grid lg:grid-cols-2 gap-8">
-                                <div className="space-y-6">
-                                    <div className="prose prose-neutral max-w-none">
-                                        <h4 className="text-lg font-bold mb-2 opacity-50">Project Description</h4>
-                                        <div
-                                            className="text-base-content/80 leading-relaxed"
-                                            dangerouslySetInnerHTML={{ __html: currentProject.description }}
-                                        />
+                            <div className="space-y-6">
+                                {/* 1. Images at the top */}
+                                {(currentProject.imageUrl || (currentProject.images && currentProject.images.length > 0)) && (
+                                    <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden">
+                                        <ProjectImageCarousel project={currentProject} />
                                     </div>
+                                )}
 
-                                    <div className="flex flex-wrap gap-4 pt-4">
-                                        {currentProject.liveLink && (
-                                            <a href={currentProject.liveLink} target="_blank" className="btn btn-primary gap-2">
-                                                Live Demo <ExternalLink size={16} />
-                                            </a>
-                                        )}
-                                        {currentProject.githubLink && (
-                                            <a href={currentProject.githubLink} target="_blank" className="btn btn-neutral gap-2">
-                                                GitHub Code
-                                            </a>
-                                        )}
-                                    </div>
+                                {/* 2. Description in the middle */}
+                                <div>
+                                    <style>{`
+                                      .project-desc-container {
+                                        color: var(--fallback-bc, oklch(var(--bc) / 0.85)) !important;
+                                        font-size: 1.05rem !important;
+                                        line-height: 1.8 !important;
+                                      }
+                                      .project-desc-container h1,
+                                      .project-desc-container h2,
+                                      .project-desc-container h3,
+                                      .project-desc-container h4 {
+                                        color: var(--primary) !important;
+                                        font-weight: 700 !important;
+                                        margin-top: 1.5rem !important;
+                                        margin-bottom: 0.75rem !important;
+                                      }
+                                      .project-desc-container h1 { font-size: 1.8rem !important; }
+                                      .project-desc-container h2 { font-size: 1.5rem !important; }
+                                      .project-desc-container h3 { font-size: 1.25rem !important; }
+                                      .project-desc-container p {
+                                        margin-bottom: 1.25rem !important;
+                                      }
+                                      .project-desc-container ul {
+                                        list-style-type: disc !important;
+                                        margin-left: 1.5rem !important;
+                                        margin-bottom: 1.25rem !important;
+                                      }
+                                      .project-desc-container ol {
+                                        list-style-type: decimal !important;
+                                        margin-left: 1.5rem !important;
+                                        margin-bottom: 1.25rem !important;
+                                      }
+                                      .project-desc-container li {
+                                        margin-bottom: 0.5rem !important;
+                                      }
+                                      .project-desc-container strong {
+                                        font-weight: 600 !important;
+                                        color: var(--fallback-bc, oklch(var(--bc) / 1)) !important;
+                                      }
+                                      .project-desc-container a {
+                                        color: var(--primary) !important;
+                                        text-decoration: underline !important;
+                                      }
+                                    `}</style>
+                                    <div
+                                        className="project-desc-container"
+                                        dangerouslySetInnerHTML={{ __html: currentProject.description }}
+                                    />
                                 </div>
 
-                                <div className="space-y-6">
-                                    {currentProject.imageUrl && (
-                                        <div>
-                                            <h4 className="text-sm font-bold mb-3 opacity-40 uppercase tracking-widest">Featured Image</h4>
-                                            <div className="relative aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 shadow-lg">
-                                                <Image
-                                                    fill
-                                                    src={currentProject.imageUrl}
-                                                    alt={currentProject.title}
-                                                    className="object-cover"
-                                                />
-                                            </div>
+                                {/* 3. Video at the bottom (if any) */}
+                                {currentProject.videoLink && (
+                                    <div className="max-w-3xl mx-auto">
+                                        <h4 className="text-sm font-bold mb-3 opacity-40 uppercase tracking-widest text-center">Video Overview</h4>
+                                        <div className="aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 bg-black shadow-lg">
+                                            <iframe
+                                                src={currentProject.videoLink}
+                                                className="w-full h-full"
+                                                allowFullScreen
+                                            />
                                         </div>
-                                    )}
+                                    </div>
+                                )}
 
-                                    {currentProject.videoLink && (
-                                        <div>
-                                            <h4 className="text-sm font-bold mb-3 opacity-40 uppercase tracking-widest">Video Overview</h4>
-                                            <div className="aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 bg-black shadow-lg">
-                                                <iframe
-                                                    src={currentProject.videoLink}
-                                                    className="w-full h-full"
-                                                    allowFullScreen
-                                                />
-                                            </div>
-                                        </div>
+                                {/* 4. Actions */}
+                                <div className="flex flex-wrap gap-4 pt-4 justify-center">
+                                    {currentProject.liveLink && (
+                                        <a href={currentProject.liveLink} target="_blank" className="btn btn-primary gap-2">
+                                            Live Demo <ExternalLink size={16} />
+                                        </a>
+                                    )}
+                                    {currentProject.githubLink && (
+                                        <a href={currentProject.githubLink} target="_blank" className="btn btn-neutral gap-2">
+                                            GitHub Code
+                                        </a>
                                     )}
                                 </div>
                             </div>

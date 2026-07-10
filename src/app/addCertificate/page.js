@@ -4,7 +4,7 @@ import CreateCertificateForm from "../components/Certificates/CreateCertificateF
 export default function addCertificate() {
     return (
         <div>
-            <CreateCertificateForm/>
+            <CreateCertificateForm />
         </div>
     );
 }

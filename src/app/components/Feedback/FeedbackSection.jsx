@@ -92,8 +92,8 @@ export default function FeedbackPage() {
                         <Star
                           key={star}
                           className={`w-4 h-4 ${star <= stats.averageRating
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-base-300'
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-base-300'
                             }`}
                         />
                       ))}

@@ -14,6 +14,10 @@ const projectSchema = new mongoose.Schema({
   githubLink: String,
   videoLink: String, 
   imageUrl: String, 
+  images: {
+    type: [String],
+    default: [],
+  },
   category: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',

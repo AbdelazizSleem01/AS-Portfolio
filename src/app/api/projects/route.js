@@ -30,31 +30,79 @@ export async function POST(req) {
     const category = formData.get("category");
     const liveLink = formData.get("liveLink");
     const githubLink = formData.get("githubLink");
-    const imageFile = formData.get("image");
+
     const videoFile = formData.get("video");
     const videoLink = formData.get("videoLink");
     const order = formData.get("order") ? parseInt(formData.get("order")) : 0;
 
-    // Validate image file size and type
+    // Handle multiple image upload or fallback
     let imageUrl = "";
-    if (imageFile && imageFile.size > 0) {
-      if (imageFile.size > MAX_IMAGE_SIZE) {
-        throw new Error("Image size exceeds 5MB limit");
-      }
-      if (!ALLOWED_IMAGE_TYPES.includes(imageFile.type)) {
-        throw new Error("Invalid image file type");
-      }
+    let images = [];
+    const imagesMetaStr = formData.get("imagesMeta");
 
-      // Upload image
-      const imageUploadResult = await put(
-        `projects/images/${Date.now()}-${imageFile.name}`,
-        imageFile.stream(),
-        {
-          access: "public",
-          contentType: imageFile.type,
+    if (imagesMetaStr) {
+      const imagesMeta = JSON.parse(imagesMetaStr);
+      const newImageFiles = formData.getAll("newImages");
+
+      // Upload all new images
+      const uploadPromises = newImageFiles.map(async (file) => {
+        if (file && file.size > 0) {
+          if (file.size > MAX_IMAGE_SIZE) {
+            throw new Error(`Image ${file.name} size exceeds 5MB limit`);
+          }
+          if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            throw new Error(`Invalid image type for ${file.name}`);
+          }
+          const uploadResult = await put(
+            `projects/images/${Date.now()}-${file.name}`,
+            file.stream(),
+            {
+              access: "public",
+              contentType: file.type,
+            }
+          );
+          return uploadResult.url;
         }
-      );
-      imageUrl = imageUploadResult.url;
+        return "";
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // Resolve final images list
+      images = imagesMeta.map((item) => {
+        if (item.type === "existing") return item.url;
+        if (item.type === "new") return uploadedUrls[item.index];
+        return "";
+      }).filter(Boolean);
+
+      const coverItem = imagesMeta.find((item) => item.isCover);
+      if (coverItem) {
+        if (coverItem.type === "existing") imageUrl = coverItem.url;
+        if (coverItem.type === "new") imageUrl = uploadedUrls[coverItem.index];
+      } else if (images.length > 0) {
+        imageUrl = images[0];
+      }
+    } else {
+      // Fallback to legacy single image upload
+      const imageFile = formData.get("image");
+      if (imageFile && imageFile.size > 0) {
+        if (imageFile.size > MAX_IMAGE_SIZE) {
+          throw new Error("Image size exceeds 5MB limit");
+        }
+        if (!ALLOWED_IMAGE_TYPES.includes(imageFile.type)) {
+          throw new Error("Invalid image file type");
+        }
+        const imageUploadResult = await put(
+          `projects/images/${Date.now()}-${imageFile.name}`,
+          imageFile.stream(),
+          {
+            access: "public",
+            contentType: imageFile.type,
+          }
+        );
+        imageUrl = imageUploadResult.url;
+        images = [imageUrl];
+      }
     }
 
     // Validate and upload video file
@@ -143,6 +191,7 @@ export async function POST(req) {
       description,
       category,
       imageUrl,
+      images,
       videoLink: uploadedVideoLink,
       liveLink,
       githubLink,

@@ -13,8 +13,7 @@ export default function CreatedProjectForm() {
   const [title, setTitle] = useState("");
   const [liveLink, setLiveLink] = useState("");
   const [githubLink, setGithubLink] = useState("");
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagesList, setImagesList] = useState([]);
   const [video, setVideo] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
   const [videoLink, setVideoLink] = useState("");
@@ -51,12 +50,44 @@ export default function CreatedProjectForm() {
     fetchCategories();
   }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
+  const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newItems = files.map((file) => {
+      const id = Math.random().toString(36).substring(2, 9);
+      return {
+        id,
+        file,
+        preview: URL.createObjectURL(file),
+        isCover: false,
+      };
+    });
+
+    setImagesList((prev) => {
+      const updated = [...prev, ...newItems];
+      if (updated.length > 0 && !updated.some((item) => item.isCover)) {
+        updated[0].isCover = true;
+      }
+      return updated;
+    });
+  };
+
+  const handleSetCover = (id) => {
+    setImagesList((prev) =>
+      prev.map((item) => ({
+        ...item,
+        isCover: item.id === id,
+      }))
+    );
+  };
+
+  const handleRemoveImage = (id) => {
+    setImagesList((prev) => {
+      const filtered = prev.filter((item) => item.id !== id);
+      if (filtered.length > 0 && !filtered.some((item) => item.isCover)) {
+        filtered[0].isCover = true;
+      }
+      return filtered;
+    });
   };
 
   const handleVideoChange = (e) => {
@@ -86,7 +117,18 @@ export default function CreatedProjectForm() {
     formData.append("liveLink", liveLink);
     formData.append("githubLink", githubLink);
     formData.append("category", category);
-    if (image) formData.append("image", image);
+    
+    // Build newImages array and imagesMeta
+    const imagesMeta = imagesList.map((item, index) => {
+      formData.append("newImages", item.file);
+      return {
+        type: "new",
+        index,
+        isCover: item.isCover,
+      };
+    });
+    formData.append("imagesMeta", JSON.stringify(imagesMeta));
+
     if (video) formData.append("video", video);
     if (videoLink) formData.append("videoLink", videoLink);
     formData.append("order", order);
@@ -309,27 +351,60 @@ export default function CreatedProjectForm() {
               transition={{ delay: 0.5 }}
             >
               <label
-                htmlFor="image"
+                htmlFor="images"
                 className="block text-sm label font-medium"
               >
-                Upload Image
+                Upload Images (Select one or more)
               </label>
               <input
                 accept="image/*"
-                id="image"
+                id="images"
                 type="file"
-                onChange={handleImageChange}
-                required
+                multiple
+                onChange={handleImagesChange}
+                required={imagesList.length === 0}
                 className="w-full bg-neutral/10 mt-1 file-input file-input-primary rounded-md"
               />
-              {imagePreview && (
-                <div className="mt-4">
-                  <p className="text-sm">Selected Image Preview:</p>
-                  <img
-                    src={imagePreview}
-                    alt="Image preview"
-                    className="mt-2 max-w-full mx-auto rounded-md border border-primary p-4"
-                  />
+
+              {imagesList.length > 0 && (
+                <div className="mt-6 border-2 border-dashed border-base-300 rounded-2xl p-4">
+                  <p className="text-sm font-semibold mb-3">Project Images ({imagesList.length}):</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {imagesList.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`relative rounded-xl overflow-hidden border-2 bg-neutral/5 p-2 transition-all duration-200 ${
+                          item.isCover ? "border-primary shadow-lg ring-2 ring-primary/20" : "border-base-300"
+                        }`}
+                      >
+                        <img
+                          src={item.preview}
+                          alt="preview"
+                          className="h-24 w-full object-cover rounded-lg"
+                        />
+                        <div className="mt-2 flex flex-col gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleSetCover(item.id)}
+                            className={`text-xs py-1 px-2 rounded-md font-medium transition-colors ${
+                              item.isCover
+                                ? "bg-primary text-white"
+                                : "bg-base-200 text-base-content hover:bg-primary/10"
+                            }`}
+                          >
+                            {item.isCover ? "Cover / Front" : "Set as Cover"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(item.id)}
+                            className="text-xs bg-error/10 text-error hover:bg-error hover:text-white py-1 px-2 rounded-md font-medium transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </motion.div>

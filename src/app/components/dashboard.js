@@ -24,7 +24,8 @@ import {
   Mail, 
   Code,
   BarChart3,
-  Eye
+  Eye,
+  Briefcase
 } from 'lucide-react';
 
 ChartJS.register(
@@ -128,7 +129,8 @@ export default function Dashboard() {
     { icon: MessageSquare, label: 'Feedbacks', value: stats.counts.feedbacks, color: 'from-indigo-500 to-purple-500' },
     { icon: FileText, label: 'Posts', value: stats.counts.posts, color: 'from-teal-500 to-blue-500' },
     { icon: Mail, label: 'Contacts', value: stats.counts.contacts, color: 'from-rose-500 to-pink-500' },
-    { icon: MessageSquare, label: 'Pending Questions', value: stats.counts.pendingQuestions || 0, color: 'from-red-500 to-orange-500' }
+    { icon: MessageSquare, label: 'Pending Questions', value: stats.counts.pendingQuestions || 0, color: 'from-red-500 to-orange-500' },
+    { icon: Briefcase, label: 'Experiences', value: stats.counts.experiences || 0, color: 'from-orange-500 to-amber-500' }
   ];
 
   const growthCharts = [
@@ -138,7 +140,8 @@ export default function Dashboard() {
     { data: stats.growthData.projectGrowth, label: 'Project Growth', type: 'line', icon: Folder },
     { data: stats.growthData.certificatesGrowth, label: 'Certificates Growth', type: 'bar', icon: Award },
     { data: stats.growthData.postGrowth, label: 'Post Growth', type: 'line', icon: FileText },
-    { data: stats.growthData.contactGrowth, label: 'Contact Growth', type: 'bar', icon: Mail }
+    { data: stats.growthData.contactGrowth, label: 'Contact Growth', type: 'bar', icon: Mail },
+    { data: stats.growthData.experienceGrowth || [], label: 'Experience Growth', type: 'line', icon: Briefcase }
   ];
 
   return (

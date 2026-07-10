@@ -18,7 +18,7 @@
 }
 
 body {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 
   .navbar {
     background-color: var(--foreground);
@@ -29,7 +29,7 @@ body {
 
 html {
   scroll-behavior: smooth;
-  
+
 }
 
 .Heading .semiHead {
@@ -154,15 +154,15 @@ html {
   body {
     @apply overflow-y-scroll;
   }
-  
+
   ::-webkit-scrollbar {
     @apply w-2 h-2;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-gray-100;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-gray-400 rounded-full hover:bg-gray-500;
   }
@@ -192,3 +192,158 @@ html {
   @apply bg-base-200 p-1 rounded;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Project Details Modal — Unified Description Styling
+   Resets any inline styles from TinyMCE and enforces a
+   clean, consistent, readable presentation.
+   ═══════════════════════════════════════════════════════════ */
+
+.project-modal-desc,
+.project-modal-desc * {
+  font-family: inherit !important;
+  background-color: transparent !important;
+}
+
+.project-modal-desc {
+  color: var(--fallback-bc, oklch(var(--bc) / 0.82));
+  font-size: 1rem;
+  line-height: 1.85;
+  word-break: break-word;
+}
+
+/* ── Headings ── */
+.project-modal-desc h1,
+.project-modal-desc h2,
+.project-modal-desc h3,
+.project-modal-desc h4 {
+  color: var(--fallback-bc, oklch(var(--bc) / 1)) !important;
+  font-weight: 700 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.6em !important;
+  line-height: 1.35 !important;
+}
+
+.project-modal-desc h1 { font-size: 1.6rem !important; }
+.project-modal-desc h2 { font-size: 1.35rem !important; }
+.project-modal-desc h3 { font-size: 1.15rem !important; }
+.project-modal-desc h4 { font-size: 1.05rem !important; }
+
+/* first heading shouldn't have top margin */
+.project-modal-desc > h1:first-child,
+.project-modal-desc > h2:first-child,
+.project-modal-desc > h3:first-child,
+.project-modal-desc > h4:first-child {
+  margin-top: 0 !important;
+}
+
+/* ── Paragraphs ── */
+.project-modal-desc p {
+  margin-bottom: 1em !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* ── Lists ── */
+.project-modal-desc ul,
+.project-modal-desc ol {
+  margin-left: 1.6rem !important;
+  margin-bottom: 1em !important;
+  padding-left: 0 !important;
+  list-style-position: outside !important;
+}
+
+.project-modal-desc ul { list-style-type: disc !important; }
+.project-modal-desc ol { list-style-type: decimal !important; }
+
+.project-modal-desc li {
+  margin-bottom: 0.4em !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.project-modal-desc li > p {
+  margin-bottom: 0.25em !important;
+}
+
+/* ── Links ── */
+.project-modal-desc a {
+  color: var(--primary) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+.project-modal-desc a:hover { opacity: 0.75; }
+
+/* ── Inline formatting ── */
+.project-modal-desc strong,
+.project-modal-desc b {
+  font-weight: 700 !important;
+  color: var(--fallback-bc, oklch(var(--bc) / 1)) !important;
+}
+
+.project-modal-desc em,
+.project-modal-desc i {
+  font-style: italic !important;
+}
+
+.project-modal-desc code {
+  background: var(--fallback-b2, oklch(var(--b2) / 1));
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* ── Block-level ── */
+.project-modal-desc blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin: 1em 0;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.project-modal-desc hr {
+  border: none;
+  border-top: 1px solid var(--fallback-bc, oklch(var(--bc) / 0.12));
+  margin: 1.5em 0;
+}
+
+.project-modal-desc img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1em auto;
+  display: block;
+}
+
+/* ── Tables ── */
+.project-modal-desc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.project-modal-desc th,
+.project-modal-desc td {
+  padding: 0.5em 0.75em;
+  border: 1px solid var(--fallback-bc, oklch(var(--bc) / 0.12));
+  text-align: left;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
+.project-modal-desc th {
+  font-weight: 700;
+  background: var(--fallback-b2, oklch(var(--b2) / 0.5));
+}
+
+/* ── Nuke TinyMCE colour/size spans ── */
+.project-modal-desc span {
+  color: inherit !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  background: transparent !important;
+}
