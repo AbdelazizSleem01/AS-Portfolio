@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { ArrowBigLeft, Save, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
-import AdminLayout from "../../../components/AdminLayout";
+import AdminLayout from "../../components/AdminLayout";
 
 export default function UpdateCategory() {
   const router = useRouter();
