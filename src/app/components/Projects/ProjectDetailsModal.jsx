@@ -26,6 +26,28 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
       );
     }
 
+    if (link.includes("awesomescreenshot.com")) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full min-h-[300px] sm:min-h-[400px] bg-base-200/50 rounded-2xl p-6 text-center border border-base-300">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4 animate-bounce">
+            <FiPlay className="w-8 h-8 ml-1" />
+          </div>
+          <h5 className="font-bold text-lg text-base-content mb-2">Watch Video Demo</h5>
+          <p className="text-sm text-base-content/60 max-w-sm mb-6">
+            This screen recording is hosted on Awesome Screenshot. Click the button below to view the demo in a new tab.
+          </p>
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary px-8 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-transform text-white"
+          >
+            <FiExternalLink /> Watch on Awesome Screenshot
+          </a>
+        </div>
+      );
+    }
+
     let embedUrl = link;
     if (link.includes("youtube.com/watch?v="))
       embedUrl = link.replace("watch?v=", "embed/");
@@ -41,11 +63,6 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
       !link.includes("loom.com/embed/")
     )
       embedUrl = link.replace("loom.com/share/", "loom.com/embed/");
-    else if (
-      link.includes("awesomescreenshot.com/video/") &&
-      !link.includes("/embed/")
-    )
-      embedUrl = link.replace("/video/", "/video/embed/");
 
     return (
       <div className="flex flex-col h-full gap-2">

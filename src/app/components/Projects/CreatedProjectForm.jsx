@@ -434,20 +434,35 @@ export default function CreatedProjectForm() {
             />
 
             {videoPreview && (
-              <div className="my-4 ">
-                <p className="text-sm">Video Preview:</p>
-                {videoPreview.includes("https://studio.youtube.com/") ||
-                  videoPreview.includes("awesomescreenshot") ||
+              <div className="my-4">
+                <p className="text-sm font-semibold mb-2">Video Preview:</p>
+                {videoPreview.includes("awesomescreenshot") ? (
+                  <div className="flex flex-col items-center justify-center p-6 bg-base-200 border-2 border-dashed border-primary rounded-2xl text-center">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3">
+                      <Shapes className="w-6 h-6 animate-pulse" />
+                    </div>
+                    <p className="text-sm font-bold text-base-content mb-1">Awesome Screenshot Link</p>
+                    <p className="text-xs text-base-content/60 mb-4">Awesome Screenshot prevents embedding. Preview by opening the link below.</p>
+                    <a
+                      href={videoPreview}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-sm btn-primary text-white"
+                    >
+                      Open Link in New Tab
+                    </a>
+                  </div>
+                ) : videoPreview.includes("https://studio.youtube.com/") ||
                   videoPreview.includes("https://www.youtube.com") ||
                   videoPreview.includes("https://youtu.be") ? (
                   <iframe
-                    src={videoPreview}
+                    src={videoPreview.includes("watch?v=") ? videoPreview.replace("watch?v=", "embed/") : videoPreview}
                     width="100%"
-                    height="500px"
+                    height="400px"
                     className="border-2 border-primary overflow-hidden rounded-lg p-4"
                   ></iframe>
                 ) : (
-                  <video width="100%" height="500px" controls>
+                  <video width="100%" height="400px" controls>
                     <source src={videoPreview} />
                   </video>
                 )}

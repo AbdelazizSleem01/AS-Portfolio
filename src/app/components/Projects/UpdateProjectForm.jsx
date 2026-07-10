@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { motion, useAnimation } from 'framer-motion';
 import { RedirectToSignIn, useUser } from '@clerk/nextjs';
-import { ChevronDown, Trash2, Save, MoveLeft } from 'lucide-react';
+import { ChevronDown, Trash2, Save, MoveLeft, Video } from 'lucide-react';
 import TinyMCEEditor from '../TinyMCEEditor';
 import Swal from 'sweetalert2';
 import Link from 'next/link';
@@ -430,23 +430,36 @@ export default function UpdateProjectForm() {
               />
             </div>
             {projectData.videoLink && (
-              <div className="mt-4 h-[350px] overflow-hidden">
-                <p className="text-sm">Video Preview:</p>
-                {(projectData.videoLink?.startsWith("https://www.youtube") ||
-                  projectData.videoLink?.startsWith("https://youtu.be") ||
-                  projectData.videoLink?.startsWith("https://www.awesomescreenshot.com/")) ? (
+              <div className="mt-4">
+                <p className="text-sm font-semibold mb-2">Video Preview:</p>
+                {projectData.videoLink.includes("awesomescreenshot") ? (
+                  <div className="flex flex-col items-center justify-center p-6 bg-base-200 border-2 border-dashed border-primary rounded-2xl text-center">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-3">
+                      <Video className="w-6 h-6 animate-pulse" />
+                    </div>
+                    <p className="text-sm font-bold text-base-content mb-1">Awesome Screenshot Link</p>
+                    <p className="text-xs text-base-content/60 mb-4">Awesome Screenshot prevents embedding. Preview by opening the link below.</p>
+                    <a
+                      href={projectData.videoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-sm btn-primary text-white"
+                    >
+                      Open Link in New Tab
+                    </a>
+                  </div>
+                ) : (projectData.videoLink?.startsWith("https://www.youtube") ||
+                  projectData.videoLink?.startsWith("https://youtu.be")) ? (
                   <iframe
-                    src={projectData.videoLink}
+                    src={projectData.videoLink.includes("watch?v=") ? projectData.videoLink.replace("watch?v=", "embed/") : projectData.videoLink}
                     className="mt-2 w-[90%] mx-auto h-[350px] rounded-md border border-primary "
                     allowFullScreen
-                  >
-
-                  </iframe>
+                  ></iframe>
                 ) : (
                   <video
                     controls
                     src={projectData.videoLink}
-                    className="mt-2 w-full rounded-md border border-primary"
+                    className="mt-2 w-full rounded-md border border-primary h-[350px] object-contain bg-black"
                   />
                 )}
               </div>
