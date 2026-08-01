@@ -210,6 +210,7 @@ const AdminLayout = ({ children, pageTitle }) => {
               {/* Group header */}
               {(!collapsed || isMobile) ? (
                 <button
+                  type="button"
                   onClick={() => toggleGroup(group.label)}
                   className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors ${
                     hasActiveChild
@@ -242,7 +243,7 @@ const AdminLayout = ({ children, pageTitle }) => {
                       const Icon = item.icon;
                       const active = isActive(item.href);
                       return (
-                        <Link key={item.href} href={item.href}>
+                        <Link key={item.href} href={item.href} scroll={false}>
                           <div
                             className={`group relative flex items-center transition-all duration-200 cursor-pointer ${
                               collapsed && !isMobile
@@ -305,7 +306,7 @@ const AdminLayout = ({ children, pageTitle }) => {
       <div className={`border-t border-base-content/10 py-2 shrink-0 ${
         collapsed && !isMobile ? "px-2" : "px-3"
       }`}>
-        <Link href="/">
+        <Link href="/" scroll={false}>
           <div
             className={`flex items-center transition-colors cursor-pointer rounded-xl text-base-content/60 hover:bg-base-content/5 hover:text-base-content ${
               collapsed && !isMobile
@@ -360,6 +361,7 @@ const AdminLayout = ({ children, pageTitle }) => {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => signOut()}
                 className="p-2 rounded-xl hover:bg-error/10 text-base-content/40 hover:text-error transition-colors"
                 title="Sign Out"
@@ -383,6 +385,7 @@ const AdminLayout = ({ children, pageTitle }) => {
 
         {/* Collapse toggle */}
         <button
+          type="button"
           onClick={() => setCollapsed(!collapsed)}
           className="absolute -right-3 top-6 w-6 h-6 bg-base-200 border border-base-300 rounded-full flex items-center justify-center text-base-content/50 hover:text-primary hover:border-primary transition-colors shadow-sm z-50"
         >
@@ -426,9 +429,8 @@ const AdminLayout = ({ children, pageTitle }) => {
 
       {/* ─── Main Content ─── */}
       <main
-        className={`flex-1 transition-all duration-300 ${
-          collapsed ? "lg:ml-[80px]" : "lg:ml-[280px]"
-        }`}
+        className={`flex-1 transition-all duration-300 ${collapsed ? "lg:ml-[80px]" : "lg:ml-[280px]"
+          }`}
       >
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-base-100/90 backdrop-blur-md border-b border-base-300/50 px-4 sm:px-6 lg:px-8 py-4">
