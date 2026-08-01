@@ -169,10 +169,12 @@ const AdminLayout = ({ children, pageTitle }) => {
   const sidebarWidth = collapsed ? "w-[80px]" : "w-[280px]";
 
   const SidebarContent = ({ isMobile = false }) => (
-    <div className="flex flex-col h-full bg-base-200/90 dark:bg-base-300/40 backdrop-blur-md">
+    <div className="flex flex-col h-full bg-base-200/90 dark:bg-base-300/40 backdrop-blur-md overflow-x-hidden">
       {/* ─── Brand / Logo ─── */}
-      <div className="px-5 py-6 border-b border-base-content/10 shrink-0">
-        <div className="flex items-center gap-3">
+      <div className={`py-5 border-b border-base-content/10 shrink-0 transition-all ${
+        collapsed && !isMobile ? "px-2 flex justify-center" : "px-5"
+      }`}>
+        <div className={`flex items-center ${collapsed && !isMobile ? "justify-center" : "gap-3"}`}>
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
             <Shield className="w-5 h-5 text-white" />
           </div>
@@ -194,8 +196,10 @@ const AdminLayout = ({ children, pageTitle }) => {
       </div>
 
       {/* ─── Navigation ─── */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-2 scrollbar-thin">
-        {sidebarGroups.map((group) => {
+      <nav className={`flex-1 overflow-y-auto overflow-x-hidden py-4 space-y-1 scrollbar-thin ${
+        collapsed && !isMobile ? "px-2" : "px-3"
+      }`}>
+        {sidebarGroups.map((group, groupIdx) => {
           const isGroupOpen = openGroups[group.label] ?? false;
           const hasActiveChild = group.items.some((item) =>
             isActive(item.href)
@@ -221,7 +225,7 @@ const AdminLayout = ({ children, pageTitle }) => {
                   />
                 </button>
               ) : (
-                <div className="h-px bg-base-content/10 my-3 mx-2" />
+                groupIdx > 0 && <div className="h-px bg-base-content/10 my-2 mx-2" />
               )}
 
               {/* Group items */}
@@ -240,7 +244,11 @@ const AdminLayout = ({ children, pageTitle }) => {
                       return (
                         <Link key={item.href} href={item.href}>
                           <div
-                            className={`group relative flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer ${
+                            className={`group relative flex items-center transition-all duration-200 cursor-pointer ${
+                              collapsed && !isMobile
+                                ? "w-10 h-10 mx-auto justify-center rounded-xl"
+                                : "px-3 py-2 gap-3 rounded-xl"
+                            } ${
                               active
                                 ? "bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-md shadow-primary/10"
                                 : "text-base-content/70 hover:bg-base-content/5 hover:text-base-content"
@@ -248,12 +256,18 @@ const AdminLayout = ({ children, pageTitle }) => {
                             title={collapsed && !isMobile ? item.text : undefined}
                           >
                             {/* Icon Wrapper badge */}
-                            <div className={`p-1.5 rounded-lg shrink-0 transition-colors ${
-                              active ? "bg-white/20" : "bg-primary/10"
+                            <div className={`shrink-0 transition-colors ${
+                              collapsed && !isMobile
+                                ? "p-0 bg-transparent"
+                                : `p-1.5 rounded-lg ${active ? "bg-white/20" : "bg-primary/10"}`
                             }`}>
                               <Icon
-                                className={`w-4 h-4 ${
-                                  active ? "text-white" : "text-primary"
+                                className={`w-4.5 h-4.5 ${
+                                  active
+                                    ? "text-white"
+                                    : collapsed && !isMobile
+                                    ? "text-base-content/70 group-hover:text-primary transition-colors"
+                                    : "text-primary"
                                 }`}
                               />
                             </div>
@@ -276,21 +290,28 @@ const AdminLayout = ({ children, pageTitle }) => {
       </nav>
 
       {/* ─── Theme Toggle ─── */}
-      <div className="border-t border-base-content/10 px-3 py-2 shrink-0 flex items-center justify-between">
+      <div className={`border-t border-base-content/10 py-3 shrink-0 flex items-center ${
+        collapsed && !isMobile ? "justify-center px-2" : "justify-between px-4"
+      }`}>
         {(!collapsed || isMobile) && (
-          <span className="text-xs font-semibold uppercase tracking-wider text-base-content/40 pl-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-base-content/40 pl-1">
             Theme Mode
           </span>
         )}
-        <div className={collapsed && !isMobile ? "mx-auto" : ""}>
-          <ThemeToggle />
-        </div>
+        <ThemeToggle compact={collapsed && !isMobile} />
       </div>
 
       {/* ─── Back to Site ─── */}
-      <div className="border-t border-base-content/10 px-3 py-2 shrink-0">
+      <div className={`border-t border-base-content/10 py-2 shrink-0 ${
+        collapsed && !isMobile ? "px-2" : "px-3"
+      }`}>
         <Link href="/">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base-content/60 hover:bg-base-content/5 hover:text-base-content transition-colors cursor-pointer"
+          <div
+            className={`flex items-center transition-colors cursor-pointer rounded-xl text-base-content/60 hover:bg-base-content/5 hover:text-base-content ${
+              collapsed && !isMobile
+                ? "w-10 h-10 mx-auto justify-center p-0"
+                : "px-3 py-2.5 gap-3"
+            }`}
             title={collapsed && !isMobile ? "Back to Site" : undefined}
           >
             <div className="p-1.5 rounded-lg bg-base-content/5">
@@ -304,33 +325,48 @@ const AdminLayout = ({ children, pageTitle }) => {
       </div>
 
       {/* ─── User / Sign Out ─── */}
-      <div className="border-t border-base-content/10 px-4 py-4 shrink-0">
-        <div className="flex items-center gap-3">
+      <div className={`border-t border-base-content/10 py-3 shrink-0 ${
+        collapsed && !isMobile ? "px-2" : "px-4"
+      }`}>
+        <div className={`flex items-center ${
+          collapsed && !isMobile ? "justify-center" : "gap-3"
+        }`}>
           {user?.imageUrl && (
-            <img
-              src={user.imageUrl}
-              alt=""
-              className="w-9 h-9 rounded-full border-2 border-primary/30 shrink-0"
-            />
-          )}
-          {(!collapsed || isMobile) && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-base-content truncate">
-                {user?.firstName || "Admin"}
-              </p>
-              <p className="text-[10px] text-base-content/50 truncate">
-                {user?.primaryEmailAddress?.emailAddress || "admin"}
-              </p>
+            <div
+              className="relative group cursor-pointer"
+              title={collapsed && !isMobile ? `${user?.firstName || "Admin"} (Click to Sign Out)` : undefined}
+              onClick={collapsed && !isMobile ? () => signOut() : undefined}
+            >
+              <img
+                src={user.imageUrl}
+                alt=""
+                className="w-9 h-9 rounded-full border-2 border-primary/30 shrink-0 object-cover"
+              />
+              {collapsed && !isMobile && (
+                <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
+                  <LogOut className="w-4 h-4" />
+                </div>
+              )}
             </div>
           )}
           {(!collapsed || isMobile) && (
-            <button
-              onClick={() => signOut()}
-              className="p-2 rounded-xl hover:bg-error/10 text-base-content/40 hover:text-error transition-colors"
-              title="Sign Out"
-            >
-              <LogOut className="w-4.5 h-4.5" />
-            </button>
+            <>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-base-content truncate">
+                  {user?.firstName || "Admin"}
+                </p>
+                <p className="text-[10px] text-base-content/50 truncate">
+                  {user?.primaryEmailAddress?.emailAddress || "admin"}
+                </p>
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="p-2 rounded-xl hover:bg-error/10 text-base-content/40 hover:text-error transition-colors"
+                title="Sign Out"
+              >
+                <LogOut className="w-4.5 h-4.5" />
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -348,7 +384,7 @@ const AdminLayout = ({ children, pageTitle }) => {
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-base-200 border border-base-300 rounded-full flex items-center justify-center text-base-content/50 hover:text-primary hover:border-primary transition-colors shadow-sm z-50"
+          className="absolute -right-3 top-6 w-6 h-6 bg-base-200 border border-base-300 rounded-full flex items-center justify-center text-base-content/50 hover:text-primary hover:border-primary transition-colors shadow-sm z-50"
         >
           {collapsed ? (
             <ChevronRight className="w-3.5 h-3.5" />

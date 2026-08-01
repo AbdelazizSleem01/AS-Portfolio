@@ -118,7 +118,7 @@ export default function CreatedProjectForm() {
     formData.append("liveLink", liveLink);
     formData.append("githubLink", githubLink);
     formData.append("category", category);
-    
+
     // Build newImages array and imagesMeta
     const imagesMeta = imagesList.map((item, index) => {
       formData.append("newImages", item.file);
@@ -374,9 +374,8 @@ export default function CreatedProjectForm() {
                     {imagesList.map((item) => (
                       <div
                         key={item.id}
-                        className={`relative rounded-xl overflow-hidden border-2 bg-neutral/5 p-2 transition-all duration-200 ${
-                          item.isCover ? "border-primary shadow-lg ring-2 ring-primary/20" : "border-base-300"
-                        }`}
+                        className={`relative rounded-xl overflow-hidden border-2 bg-neutral/5 p-2 transition-all duration-200 ${item.isCover ? "border-primary shadow-lg ring-2 ring-primary/20" : "border-base-300"
+                          }`}
                       >
                         <img
                           src={item.preview}
@@ -387,11 +386,10 @@ export default function CreatedProjectForm() {
                           <button
                             type="button"
                             onClick={() => handleSetCover(item.id)}
-                            className={`text-xs py-1 px-2 rounded-md font-medium transition-colors ${
-                              item.isCover
-                                ? "bg-primary text-white"
-                                : "bg-base-200 text-base-content hover:bg-primary/10"
-                            }`}
+                            className={`text-xs py-1 px-2 rounded-md font-medium transition-colors ${item.isCover
+                              ? "bg-primary text-white"
+                              : "bg-base-200 text-base-content hover:bg-primary/10"
+                              }`}
                           >
                             {item.isCover ? "Cover / Front" : "Set as Cover"}
                           </button>
