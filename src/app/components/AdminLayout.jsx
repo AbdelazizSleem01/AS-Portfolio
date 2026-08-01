@@ -192,7 +192,7 @@ const AdminLayout = ({ children, pageTitle }) => {
 
   const sidebarWidth = collapsed ? "w-[80px]" : "w-[280px]";
 
-  const SidebarContent = ({ isMobile = false }) => (
+  const renderSidebarContent = (isMobile = false) => (
     <div className="flex flex-col h-full bg-base-200/90 dark:bg-base-300/40 backdrop-blur-md overflow-x-hidden">
       {/* ─── Brand / Logo ─── */}
       <div className={`py-5 border-b border-base-content/10 shrink-0 transition-all ${
@@ -410,7 +410,7 @@ const AdminLayout = ({ children, pageTitle }) => {
       <aside
         className={`hidden lg:flex flex-col ${sidebarWidth} border-r border-base-300/50 fixed top-0 left-0 h-screen z-40 transition-all duration-300`}
       >
-        <SidebarContent />
+        {renderSidebarContent(false)}
 
         {/* Collapse toggle */}
         <button
@@ -445,12 +445,13 @@ const AdminLayout = ({ children, pageTitle }) => {
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
             >
               <button
+                type="button"
                 onClick={() => setMobileOpen(false)}
                 className="absolute top-4 right-4 p-1.5 rounded-lg bg-base-300 text-base-content/60 hover:text-error transition-colors z-10"
               >
                 <X className="w-5 h-5" />
               </button>
-              <SidebarContent isMobile />
+              {renderSidebarContent(true)}
             </motion.aside>
           </>
         )}
@@ -495,7 +496,7 @@ const AdminLayout = ({ children, pageTitle }) => {
         </header>
 
         {/* Page content with top separation padding */}
-        <div className="p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-73px)] relative z-10">
+        <div className="p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-73px)] relative z-0">
           {children}
         </div>
       </main>

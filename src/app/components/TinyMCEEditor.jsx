@@ -23,7 +23,10 @@ export default function TinyMCEEditor({ value = "", onChange }) {
       attributeFilter: ["data-theme"],
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      document.body.classList.remove("tox-fullscreen-active");
+    };
   }, []);
 
   if (!mounted) {
@@ -37,7 +40,7 @@ export default function TinyMCEEditor({ value = "", onChange }) {
   const apiKey = process.env.NEXT_PUBLIC_TINYMCE_API_KEY || "no-api-key";
 
   return (
-    <div className="w-full text-black">
+    <div className="w-full text-black relative">
       <Editor
         key={theme}
         apiKey={apiKey === "no-api-key" ? undefined : apiKey}
@@ -50,6 +53,15 @@ export default function TinyMCEEditor({ value = "", onChange }) {
         init={{
           height: 450,
           menubar: true,
+          setup: (editor) => {
+            editor.on("FullscreenStateChanged", (e) => {
+              if (e.state) {
+                document.body.classList.add("tox-fullscreen-active");
+              } else {
+                document.body.classList.remove("tox-fullscreen-active");
+              }
+            });
+          },
           plugins: [
             "advlist",
             "autolink",
@@ -75,6 +87,27 @@ export default function TinyMCEEditor({ value = "", onChange }) {
             "forecolor backcolor | alignleft aligncenter alignright alignjustify | " +
             "ltr rtl | bullist numlist outdent indent | " +
             "link image table media | removeformat | code fullscreen preview | help",
+          color_map: [
+            "00000000", "Transparent (Clear)",
+            "000000", "Black",
+            "4B5563", "Dark Gray",
+            "9CA3AF", "Gray",
+            "E5E7EB", "Light Gray",
+            "FFFFFF", "White",
+            "EF4444", "Red",
+            "F97316", "Orange",
+            "F59E0B", "Amber",
+            "FDE047", "Yellow",
+            "84CC16", "Lime",
+            "22C55E", "Green",
+            "06B6D4", "Cyan",
+            "3B82F6", "Blue",
+            "6366F1", "Indigo",
+            "8B5CF6", "Purple",
+            "EC4899", "Pink"
+          ],
+          color_cols: 6,
+          custom_colors: true,
           content_style:
             theme === "dark"
               ? "body { font-family:Inter,Helvetica,Arial,sans-serif; font-size:16px; background-color: #1d232a; color: #a6adbb; direction: rtl; text-align: right; }"

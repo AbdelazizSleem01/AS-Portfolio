@@ -340,10 +340,39 @@ html {
   background: var(--fallback-b2, oklch(var(--b2) / 0.5));
 }
 
-/* ── Nuke TinyMCE colour/size spans ── */
+/* ── TinyMCE Font/Size inheritance ── */
 .project-modal-desc span {
-  color: inherit !important;
-  font-size: inherit !important;
-  font-family: inherit !important;
-  background: transparent !important;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TinyMCE Fullscreen Mode & Z-Index Overlay Fix
+   ═══════════════════════════════════════════════════════════ */
+body.tox-fullscreen-active aside,
+body.tox-fullscreen-active header,
+body:has(.tox-fullscreen) aside,
+body:has(.tox-fullscreen) header {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+body.tox-fullscreen-active .tox.tox-tinymce.tox-fullscreen,
+body:has(.tox-fullscreen) .tox.tox-tinymce.tox-fullscreen,
+body .tox.tox-tinymce.tox-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999999 !important;
+}
+
+body .tox-tinymce-aux,
+body .tox-dialog-wrap,
+body .tox-pop,
+body .tox-silver-sink {
+  z-index: 9999999 !important;
 }

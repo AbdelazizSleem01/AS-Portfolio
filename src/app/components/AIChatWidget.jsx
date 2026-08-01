@@ -1,10 +1,42 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, X, MessageSquare, User, Bot, Loader2, Sparkles, Minus } from 'lucide-react';
 
+const adminPrefixes = [
+  "/admin",
+  "/Dashboard",
+  "/addCategory",
+  "/addCertificate",
+  "/addExperience",
+  "/addHeader",
+  "/addProject",
+  "/addSkill",
+  "/allCategories",
+  "/allCertificates",
+  "/allExperiences",
+  "/allFeedbacks",
+  "/allHeaders",
+  "/allProjects",
+  "/allSkills",
+  "/blog/create-post-open",
+  "/blog/admin-posts",
+  "/contacts",
+  "/pending-questions",
+  "/Subscribe-Page",
+  "/updateCategory",
+  "/updateCertificates",
+  "/updateExperience",
+  "/updateHeader",
+  "/updateProject",
+  "/updateSkill",
+  "/visits",
+];
+
 export default function AIChatWidget() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -16,6 +48,12 @@ export default function AIChatWidget() {
   const [hasNewNotification, setHasNewNotification] = useState(false);
   const [lastReplyContent, setLastReplyContent] = useState('');
   const messagesEndRef = useRef(null);
+
+  const isAdmin = adminPrefixes.some(
+    (prefix) => pathname === prefix || pathname?.startsWith(prefix + "/")
+  );
+
+  if (isAdmin) return null;
 
   const playNotificationSound = useCallback(() => {
     try {
