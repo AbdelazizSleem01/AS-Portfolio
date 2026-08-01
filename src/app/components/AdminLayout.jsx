@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -138,6 +138,30 @@ const AdminLayout = ({ children, pageTitle }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState({});
+  const desktopNavRef = useRef(null);
+
+  // Restore sidebar scroll position across navigation
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem("admin_sidebar_scroll");
+    if (savedScroll !== null && desktopNavRef.current) {
+      desktopNavRef.current.scrollTop = parseInt(savedScroll, 10);
+    } else if (desktopNavRef.current) {
+      const activeEl = desktopNavRef.current.querySelector("[data-active='true']");
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: "nearest", behavior: "instant" });
+      }
+    }
+  }, [pathname]);
+
+  const handleNavScroll = (e) => {
+    sessionStorage.setItem("admin_sidebar_scroll", e.target.scrollTop.toString());
+  };
+
+  const handleLinkClick = () => {
+    if (desktopNavRef.current) {
+      sessionStorage.setItem("admin_sidebar_scroll", desktopNavRef.current.scrollTop.toString());
+    }
+  };
 
   // Auto-open group that contains active link
   useEffect(() => {
@@ -196,9 +220,13 @@ const AdminLayout = ({ children, pageTitle }) => {
       </div>
 
       {/* ─── Navigation ─── */}
-      <nav className={`flex-1 overflow-y-auto overflow-x-hidden py-4 space-y-1 scrollbar-thin ${
-        collapsed && !isMobile ? "px-2" : "px-3"
-      }`}>
+      <nav
+        ref={!isMobile ? desktopNavRef : undefined}
+        onScroll={!isMobile ? handleNavScroll : undefined}
+        className={`flex-1 overflow-y-auto overflow-x-hidden py-4 space-y-1 scrollbar-thin ${
+          collapsed && !isMobile ? "px-2" : "px-3"
+        }`}
+      >
         {sidebarGroups.map((group, groupIdx) => {
           const isGroupOpen = openGroups[group.label] ?? false;
           const hasActiveChild = group.items.some((item) =>
@@ -243,8 +271,9 @@ const AdminLayout = ({ children, pageTitle }) => {
                       const Icon = item.icon;
                       const active = isActive(item.href);
                       return (
-                        <Link key={item.href} href={item.href} scroll={false}>
+                        <Link key={item.href} href={item.href} scroll={false} onClick={handleLinkClick}>
                           <div
+                            data-active={active}
                             className={`group relative flex items-center transition-all duration-200 cursor-pointer ${
                               collapsed && !isMobile
                                 ? "w-10 h-10 mx-auto justify-center rounded-xl"
