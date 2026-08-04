@@ -19,6 +19,7 @@ export default function ThemeToggle({ compact = false }) {
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
+    window.dispatchEvent(new Event('themeChange'));
   };
 
   if (!mounted) return null;

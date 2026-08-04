@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Phone, Mail, MapPin, CodeXmlIcon } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useCurrentTheme } from '@/utils/useCurrentTheme';
 
 const Footer = () => {
     const pathname = usePathname();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const theme = useCurrentTheme();
 
     const { scrollYProgress } = useScroll();
     const opacity = useTransform(scrollYProgress, [0, 0.5], [0, 1]);
@@ -152,10 +154,10 @@ const Footer = () => {
                             <div className="flex items-center gap-4">
                                 <Link href={'/'} title="My LOGO" className="flex items-center gap-2 text-xl font-semibold text-base-100 bg-neutral rounded-lg px-2 hover:bg-neutral/90 transition-all">
                                     <motion.img
-                                        src="/imgs/Logo.png"
-                                        alt="logo"
+                                        src={theme === "dark" ? "/new-logo.png" : "/red-logo.png"}
+                                        alt="Abdelaziz Sleem Logo"
                                         className="w-12 h-12 object-contain"
-                                        animate={{ rotate: [0, 10, -10, 0] }}
+                                        animate={{ rotate: [0, 5, -5, 0] }}
                                         transition={{ repeat: Infinity, duration: 4 }}
                                     />
                                     Abdelaziz Sleem

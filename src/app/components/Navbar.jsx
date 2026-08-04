@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
-import { useTheme } from "next-themes";
+import { useCurrentTheme } from "@/utils/useCurrentTheme";
 import {
   FiBook,
   FiBriefcase,
@@ -20,7 +20,7 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
   const [mounted, setMounted] = useState(false);
-  const { theme } = useTheme();
+  const theme = useCurrentTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -126,26 +126,16 @@ function Navbar() {
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         <Link
           href="/"
-          title="My Logo"
-          className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-primary"
+          title="Abdelaziz Sleem Logo"
+          className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-primary group"
         >
-          {theme === "dark" ? (
-            <motion.img
-              src="/imgs/Logo.png"
-              alt="Dark Logo"
-              className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-            />
-          ) : (
-            <motion.img
-              src="/imgs/light_Logo.png"
-              alt="Light Logo"
-              className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.5 }}
-            />
-          )}
+          <motion.img
+            src={theme === "dark" ? "/new-logo.png" : "/red-logo.png"}
+            alt="Abdelaziz Sleem Logo"
+            className="w-10 h-10 sm:w-16 sm:h-16 object-contain filter drop-shadow"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            transition={{ duration: 0.3 }}
+          />
           <span className="hidden sm:inline whitespace-nowrap">Abdelaziz Sleem</span>
         </Link>
       </div>

@@ -5,12 +5,14 @@ import HomePage from "./components/HomePage";
 import HomePageProjects from "./components/Projects/HomePageProjects";
 import HomePageSkills from "./components/Skills/HomePageSkills";
 import HomePageExperience from "./components/Experience/HomePageExperience";
+import BrandVideoShowcase from "./components/BrandVideoShowcase";
 
 export default function Home() {
 
   return (
     <div>
       <HomePage />
+      <BrandVideoShowcase />
       <AboutMeComponent />
       <HomePageExperience />
       <HomePageProjects />

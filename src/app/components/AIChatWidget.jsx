@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, X, MessageSquare, User, Bot, Loader2, Sparkles, Minus } from 'lucide-react';
+import { useCurrentTheme } from '@/utils/useCurrentTheme';
 
 const adminPrefixes = [
   "/admin",
@@ -37,6 +38,7 @@ const adminPrefixes = [
 
 export default function AIChatWidget() {
   const pathname = usePathname();
+  const theme = useCurrentTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -48,6 +50,8 @@ export default function AIChatWidget() {
   const [hasNewNotification, setHasNewNotification] = useState(false);
   const [lastReplyContent, setLastReplyContent] = useState('');
   const messagesEndRef = useRef(null);
+
+  const logoSrc = theme === 'dark' ? '/new-logo.png' : '/red-logo.png';
 
   const isAdmin = adminPrefixes.some(
     (prefix) => pathname === prefix || pathname?.startsWith(prefix + "/")
@@ -221,14 +225,14 @@ export default function AIChatWidget() {
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.92 }}
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 z-50 group"
         aria-label="Toggle Chat"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur-md opacity-50 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-        <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center border border-white/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+        <div className="relative bg-gradient-to-r from-primary to-secondary text-base-100 p-4 rounded-full shadow-2xl flex items-center justify-center border border-white/20">
           {isOpen ? (
             <X className="w-6 h-6 transition-transform rotate-90" />
           ) : (
@@ -252,27 +256,27 @@ export default function AIChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: 'bottom right' }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-3rem)] h-[500px] bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-white/20 dark:border-white/10"
+            className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-3rem)] h-[520px] bg-base-100 text-base-content backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-base-300"
           >
             {/* Header */}
-            <div className="relative p-6 pb-4 bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border-b border-white/20 dark:border-white/5">
+            <div className="relative p-5 pb-4 bg-gradient-to-br from-primary/10 to-secondary/10 border-b border-base-300">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3.5">
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                      <Bot className="w-6 h-6 text-white" />
+                    <div className="w-11 h-11 rounded-2xl bg-base-200 border border-primary/20 flex items-center justify-center shadow-md overflow-hidden p-1.5">
+                      <img src={logoSrc} alt="AS Assistant Logo" className="w-full h-full object-contain" />
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm"></span>
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-base-100 rounded-full shadow-sm"></span>
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg dark:text-white flex items-center gap-1.5">
-                      AI Assistant
-                      <Sparkles className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
+                    <h3 className="font-bold text-lg text-base-content flex items-center gap-1.5">
+                      AS AI Assistant
+                      <Sparkles className="w-4 h-4 text-primary animate-pulse" />
                     </h3>
-                    <div className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
                       <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                       </span>
                       Online & Ready
                     </div>
@@ -280,7 +284,7 @@ export default function AIChatWidget() {
                 </div>
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-xl transition-colors text-gray-500 dark:text-gray-400"
+                  className="p-2 hover:bg-base-200 rounded-xl transition-colors text-base-content/70"
                 >
                   <Minus className="w-5 h-5" />
                 </button>
@@ -288,19 +292,19 @@ export default function AIChatWidget() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-hide bg-base-100">
               {messages.length === 0 && (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-12 px-6"
+                  className="text-center py-10 px-4"
                 >
-                  <div className="w-20 h-20 mx-auto mb-4 bg-blue-50 dark:bg-blue-900/30 rounded-3xl flex items-center justify-center">
-                    <Sparkles className="w-10 h-10 text-blue-500" />
+                  <div className="w-16 h-16 mx-auto mb-3 bg-primary/10 rounded-3xl flex items-center justify-center border border-primary/20">
+                    <img src={logoSrc} alt="AS Logo" className="w-10 h-10 object-contain" />
                   </div>
-                  <h4 className="text-xl font-bold dark:text-white mb-2">Hello!</h4>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    I'm your AI assistant. I can help you with anything about this portfolio!
+                  <h4 className="text-lg font-bold text-base-content mb-1">مرحباً بك! 👋</h4>
+                  <p className="text-sm text-base-content/70">
+                    أنا المساعد الذكي لـ Abdelaziz Sleem. يمكنني إجابتك عن أي استفسار تخص الأعمال والخدمات!
                   </p>
                 </motion.div>
               )}
@@ -313,29 +317,33 @@ export default function AIChatWidget() {
                   className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div className={`flex items-start gap-2.5 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm
-                      ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm overflow-hidden p-1
+                      ${msg.role === 'user' ? 'bg-primary text-white' : 'bg-base-200 border border-base-300'}`}
                     >
-                      {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                      {msg.role === 'user' ? (
+                        <User className="w-4 h-4 text-white" />
+                      ) : (
+                        <img src={logoSrc} alt="Bot" className="w-full h-full object-contain" />
+                      )}
                     </div>
                     
                     <div className="flex flex-col gap-1.5">
                       <div className={`px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed
                         ${msg.role === 'user' 
-                          ? 'bg-blue-600 text-white rounded-tr-none' 
+                          ? 'bg-gradient-to-r from-primary to-secondary text-white rounded-tr-none' 
                           : msg.role === 'admin'
-                          ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 text-gray-800 dark:text-gray-100 rounded-tl-none border border-amber-200 dark:border-amber-700/50'
-                          : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-tl-none border border-gray-100 dark:border-gray-700/50'
+                          ? 'bg-gradient-to-br from-amber-500/10 to-orange-500/10 text-base-content rounded-tl-none border border-amber-500/30'
+                          : 'bg-base-200 text-base-content rounded-tl-none border border-base-300'
                         }`}
                       >
                         {msg.role === 'admin' && (
-                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-amber-200/50 dark:border-amber-700/30">
-                            <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Owner Reply</span>
+                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-amber-500/20">
+                            <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Owner Reply</span>
                           </div>
                         )}
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                       </div>
-                      <span className="text-[10px] text-gray-400 dark:text-gray-500 px-1 font-medium">
+                      <span className="text-[10px] text-base-content/50 px-1 font-medium">
                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -345,9 +353,9 @@ export default function AIChatWidget() {
               
               {loading && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                  <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                    <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Assistant is thinking...</span>
+                  <div className="bg-base-200 border border-base-300 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    <span className="text-sm text-base-content/70 font-medium">المساعد الذكي يفكر...</span>
                   </div>
                 </motion.div>
               )}
@@ -361,26 +369,26 @@ export default function AIChatWidget() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 m-4 rounded-2xl text-white shadow-xl"
+                  className="p-4 bg-gradient-to-r from-primary to-secondary m-3 rounded-2xl text-white shadow-xl"
                 >
-                  <p className="text-sm font-medium mb-3 flex items-center gap-2">
+                  <p className="text-sm font-medium mb-2.5 flex items-center gap-2">
                     <Sparkles className="w-4 h-4" />
-                    Get notified when the owner replies:
+                    أدخل بريدك الإلكتروني ليصلك إشعار فور رد صاحب الموقع:
                   </p>
                   <form onSubmit={handleEmailSubmit} className="flex gap-2">
                     <input
                       type="email"
                       value={userEmail}
                       onChange={(e) => setUserEmail(e.target.value)}
-                      placeholder="Enter your email..."
-                      className="flex-1 px-4 py-2 text-sm bg-white/20 border border-white/30 rounded-xl placeholder:text-white/60 focus:outline-none focus:bg-white/30 transition-all"
+                      placeholder="بريدك الإلكتروني..."
+                      className="flex-1 px-3 py-1.5 text-sm bg-white/20 border border-white/30 rounded-xl placeholder:text-white/70 focus:outline-none focus:bg-white/30 transition-all text-white"
                       required
                     />
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-white text-blue-600 text-sm font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-lg"
+                      className="px-4 py-1.5 bg-white text-primary text-sm font-bold rounded-xl hover:bg-white/90 transition-colors shadow-md"
                     >
-                      Save
+                      حفظ
                     </button>
                   </form>
                 </motion.div>
@@ -388,22 +396,22 @@ export default function AIChatWidget() {
             </AnimatePresence>
 
             {/* Input Area */}
-            <div className="p-6 pt-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+            <div className="p-4 pt-2 bg-base-200/60 backdrop-blur-sm border-t border-base-300">
               <form onSubmit={sendMessage} className="relative group">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message..."
-                  className="w-full pl-6 pr-14 py-4 bg-gray-100 dark:bg-gray-800 border-none rounded-2xl dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  placeholder="اكتب رسالتك هنا..."
+                  className="w-full pl-5 pr-12 py-3 bg-base-100 border border-base-300 rounded-2xl text-base-content focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-base-content/50 text-sm"
                   disabled={loading}
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="absolute right-2 top-2 bottom-2 w-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-blue-500/30"
+                  className="absolute right-1.5 top-1.5 bottom-1.5 w-9 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-md"
                 >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
               </form>
             </div>
@@ -413,3 +421,4 @@ export default function AIChatWidget() {
     </>
   );
 }
+

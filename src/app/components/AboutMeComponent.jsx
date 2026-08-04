@@ -11,7 +11,8 @@ import {
   FiAward,
   FiMail,
   FiGlobe,
-  FiHeart
+  FiHeart,
+  FiPlay,
 } from "react-icons/fi";
 import {
   RiNextjsFill,
@@ -244,7 +245,7 @@ const AboutMeComponent = () => {
                 </p>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="flex justify-center">
+              <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-4">
                 <Link href="/ContactMe" title="Contact Me">
                   <motion.button
                     className="group relative bg-gradient-to-r from-primary to-secondary text-base-100 font-semibold text-lg px-8 py-4 rounded-2xl shadow-lg overflow-hidden"
@@ -261,6 +262,20 @@ const AboutMeComponent = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-secondary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </motion.button>
                 </Link>
+
+                <a href="#brand-video" title="Watch AS Brand Intro">
+                  <motion.button
+                    className="group relative bg-base-200 border border-primary/30 text-base-content font-semibold text-lg px-7 py-4 rounded-2xl shadow-lg overflow-hidden flex items-center gap-3 hover:border-primary"
+                    whileHover={{
+                      scale: 1.05,
+                      boxShadow: "0 10px 30px rgba(6, 182, 212, 0.3)"
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FiPlay className="text-xl text-primary animate-pulse" />
+                    <span>Watch Brand Intro Video</span>
+                  </motion.button>
+                </a>
               </motion.div>
             </motion.div>
           </div>

@@ -19,6 +19,7 @@ import {
   FiStar,
   FiAward,
   FiGlobe,
+  FiPlay,
 } from "react-icons/fi";
 import { RiReactjsLine, RiNextjsLine, RiNodejsLine } from "react-icons/ri";
 import {
@@ -76,7 +77,6 @@ export default function HomePage() {
     imageUrl: "/imgs/my-img.jpg",
     githubLink: "https://github.com/AbdelazizSleem01",
     linkedInLink: "https://www.linkedin.com/in/abdelaziz-sleem-7ab4593b1/",
-    khamsatLink: "https://khamsat.com/user/abdelaziz_sleem9",
     mostaqlLink: "https://mostaql.com/u/Zezosleen/portfolio",
   };
 
@@ -324,20 +324,7 @@ export default function HomePage() {
               </Link>
             )}
 
-            {selectedHeader?.khamsatLink && (
-              <Link
-                href={selectedHeader.khamsatLink}
-                target="_blank"
-                title="Visit Abdelaziz Sleem's Khamsat Profile"
-                className="px-5 py-2 text-sm bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-3 transition-all duration-300"
-                data-cursor-hover
-              >
-                <Image src="/imgs/5amsat.png" alt="Khamsat" width={18} height={18} />
-                <span>Khamsat</span>
-
-              </Link>
-            )}
-
+           
             {selectedHeader?.mostaqlLink && (
               <Link
                 href={selectedHeader.mostaqlLink}
@@ -365,6 +352,8 @@ export default function HomePage() {
               <FiDownload className="text-lg" />
               <span>Download CV</span>
             </motion.a>
+
+         
           </motion.div>
 
           {/* Stats */}

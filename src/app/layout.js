@@ -48,9 +48,8 @@ export const metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
@@ -59,6 +58,7 @@ export const metadata = {
       { url: '/favicon.ico' }
     ],
   },
+  manifest: '/site.webmanifest',
   openGraph: {
     title: "Abdelaziz Sleem | Fullstack Developer | React, Next.js, Node.js Expert",
     description: "Passionate Fullstack Developer specializing in React, Next.js, Node.js, and MongoDB. Hire a freelance developer for your next project!",
