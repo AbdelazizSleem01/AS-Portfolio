@@ -92,7 +92,7 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -186,10 +186,10 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
             </div>
 
             {/* ─── Sticky Footer / Action Buttons ─── */}
-            {(project.liveLink || project.githubLink) && (
+            {((project.liveLink && project.liveLink.trim() !== "") || (project.githubLink && project.githubLink.trim() !== "")) && (
               <div className="px-6 sm:px-8 py-4 border-t border-base-300 bg-base-100/95 backdrop-blur-sm shrink-0">
                 <div className="flex gap-3 max-w-lg mx-auto">
-                  {project.liveLink && (
+                  {project.liveLink && project.liveLink.trim() !== "" && (
                     <a
                       href={project.liveLink}
                       target="_blank"
@@ -200,7 +200,7 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
                       Live Demo
                     </a>
                   )}
-                  {project.githubLink && (
+                  {project.githubLink && project.githubLink.trim() !== "" && (
                     <a
                       href={project.githubLink}
                       target="_blank"

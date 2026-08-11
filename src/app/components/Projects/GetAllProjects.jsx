@@ -1,400 +1,458 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
-import '../AdminStyle.css';
-import { ArrowBigLeft, GripVertical, Save, Trash2, Edit3, ExternalLink } from "lucide-react";
+import {
+  GripVertical,
+  Save,
+  Trash2,
+  Edit3,
+  ExternalLink,
+  Plus,
+  Search,
+  Filter,
+  Layers,
+  Sparkles,
+  ArrowLeft,
+  CheckCircle2,
+  FolderGit2,
+  Eye,
+  RefreshCw,
+  Clock,
+  ArrowUpDown
+} from "lucide-react";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
 import ProjectImageCarousel from "./ProjectImageCarousel";
+import ProjectDetailsModal from "./ProjectDetailsModal";
 
-const GetProjects = () => {
-    const { user } = useUser();
-    const [projects, setProjects] = useState([]);
-    const [originalProjects, setOriginalProjects] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [showDetails, setShowDetails] = useState(false);
-    const [currentProject, setCurrentProject] = useState(null);
+export default function GetProjects() {
+  const { user } = useUser();
+  const [projects, setProjects] = useState([]);
+  const [originalProjects, setOriginalProjects] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [currentProject, setCurrentProject] = useState(null);
 
-    const hasChanges = JSON.stringify(projects.map(p => p._id)) !== JSON.stringify(originalProjects.map(p => p._id));
+  // Search & Filter state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-    useEffect(() => {
-        document.title = `All Projects | ${process.env.NEXT_PUBLIC_META_TITLE}`;
-        document
-            .querySelector('meta[name="description"]')
-            ?.setAttribute(
-                'content',
-                `Check out my latest projects at ${process.env.NEXT_PUBLIC_META_TITLE}. ${process.env.NEXT_PUBLIC_META_DESCRIPTION}`
-            );
-    }, []);
-
-    const fetchProjects = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch(`/api/projects`);
-            if (!response.ok) throw new Error("Failed to fetch projects");
-            const data = await response.json();
-            setProjects(data.projects);
-            setOriginalProjects(data.projects);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchProjects();
-    }, []);
-
-    const handleReorder = (newOrder) => {
-        setProjects(newOrder);
-    };
-
-    const saveOrder = async () => {
-        try {
-            setIsSaving(true);
-            const response = await fetch('/api/projects/reorder', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ projects }),
-            });
-
-            if (!response.ok) throw new Error("Failed to save order");
-
-            toast.success("New order saved successfully!");
-            setOriginalProjects(projects);
-        } catch (err) {
-            toast.error(err.message);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleDetails = (project) => {
-        setCurrentProject(project);
-        setShowDetails(true);
-    };
-
-    const closeDetails = () => {
-        setShowDetails(false);
-        setCurrentProject(null);
-    };
-
-    if (loading) {
-        return (
-            <motion.div
-                className="flex flex-col items-center justify-center h-screen gap-4 transition-all duration-300"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-            >
-                <div className="relative">
-                    <motion.div
-                        className="w-16 h-16 border-4 border-primary/20 rounded-full"
-                    />
-                    <motion.div
-                        className="absolute top-0 left-0 w-16 h-16 border-4 border-t-primary rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    />
-                </div>
-                <motion.span className="text-primary font-medium text-lg">
-                    Loading Projects...
-                </motion.span>
-            </motion.div>
-        );
-    }
-
-    if (error) {
-        return (
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8 bg-error/5 rounded-3xl border border-error/20 max-w-md mx-auto mt-20"
-            >
-                <div className="text-error text-6xl mb-4">⚠️</div>
-                <h3 className="text-xl font-bold text-error mb-2">Error Loading Projects</h3>
-                <p className="text-base-content/70 mb-6">{error}</p>
-                <button
-                    onClick={fetchProjects}
-                    className="btn btn-primary px-8"
-                >
-                    Retry
-                </button>
-            </motion.div>
-        );
-    }
-
-    if (!user) {
-        return <RedirectToSignIn />;
-    }
-
+  const hasChanges = useMemo(() => {
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-base-100 min-h-screen p-4 sm:p-8 mt-16"
-        >
-            <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-10">
-                    <div className="text-center sm:text-left">
-                        <h1 className="text-3xl font-extrabold text-primary mb-2">Project Management</h1>
-                        <p className="text-base-content/60">Drag and drop rows to reorder how projects appear on your portfolio.</p>
-                    </div>
-
-                    <div className="flex gap-3">
-                        <AnimatePresence>
-                            {hasChanges && (
-                                <motion.button
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 20 }}
-                                    onClick={saveOrder}
-                                    disabled={isSaving}
-                                    className="btn btn-success text-white shadow-lg flex items-center gap-2 px-6"
-                                >
-                                    {isSaving ? (
-                                        <span className="loading loading-spinner loading-sm"></span>
-                                    ) : (
-                                        <Save size={18} />
-                                    )}
-                                    Save New Order
-                                </motion.button>
-                            )}
-                        </AnimatePresence>
-
-                        <Link href="/admin">
-                            <button className="btn btn-outline gap-2">
-                                <ArrowBigLeft size={18} />
-                                Back
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="bg-base-200/50 backdrop-blur-sm p-4 rounded-3xl border border-base-300 shadow-xl overflow-x-auto">
-                    <div className="min-w-[800px]">
-                        {/* Table Header */}
-                        <div className="grid grid-cols-[60px_100px_1fr_150px_200px] gap-4 px-6 py-4 border-b border-base-300 text-sm font-bold text-base-content/50 uppercase tracking-wider">
-                            <div className="text-center">Move</div>
-                            <div>Preview</div>
-                            <div>Project Info</div>
-                            <div className="text-center">Current Order</div>
-                            <div className="text-right">Actions</div>
-                        </div>
-
-                        {/* Draggable List */}
-                        <Reorder.Group
-                            axis="y"
-                            values={projects}
-                            onReorder={handleReorder}
-                            className="space-y-3 mt-4"
-                        >
-                            {projects.map((project) => (
-                                <Reorder.Item
-                                    key={project._id}
-                                    value={project}
-                                    className="bg-base-100 rounded-2xl border border-base-300 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-grab active:cursor-grabbing group overflow-hidden"
-                                >
-                                    <div className="grid grid-cols-[60px_100px_1fr_150px_200px] gap-4 items-center px-6 py-3">
-                                        <div className="flex justify-center text-base-content/30 group-hover:text-primary transition-colors">
-                                            <GripVertical size={24} />
-                                        </div>
-
-                                        <div className="h-16 w-16 relative rounded-xl overflow-hidden border border-base-300 bg-base-200">
-                                            {project.imageUrl && (
-                                                <Image
-                                                    src={project.imageUrl}
-                                                    alt={project.title}
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <h3 className="font-bold text-lg text-primary">{project.title}</h3>
-                                            <div
-                                                className="text-sm text-base-content/60 line-clamp-1 max-w-md"
-                                                dangerouslySetInnerHTML={{ __html: project.description }}
-                                            />
-                                        </div>
-
-                                        <div className="flex justify-center">
-                                            <div className="badge badge-primary badge-outline font-bold px-4 py-3">
-                                                Order: {project.order || 0}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-end gap-2">
-                                            <button
-                                                onClick={() => handleDetails(project)}
-                                                className="btn btn-square btn-ghost btn-sm text-success hover:bg-success/10"
-                                                title="View Details"
-                                            >
-                                                <ExternalLink size={18} />
-                                            </button>
-
-                                            <Link href={`updateProject/${project._id}`}>
-                                                <button
-                                                    className="btn btn-square btn-ghost btn-sm text-primary hover:bg-primary/10"
-                                                    title="Edit Project"
-                                                >
-                                                    <Edit3 size={18} />
-                                                </button>
-                                            </Link>
-
-                                            <button
-                                                className="btn btn-square btn-ghost btn-sm text-error hover:bg-error/10"
-                                                title="Delete Project"
-                                                onClick={() => toast.info("Go to edit page to delete")}
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Reorder.Item>
-                            ))}
-                        </Reorder.Group>
-
-                        {projects.length === 0 && (
-                            <div className="text-center py-20">
-                                <div className="text-6xl mb-4">🗂️</div>
-                                <h3 className="text-xl font-bold text-base-content/40">No projects found in database</h3>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Project Details Modal */}
-            <AnimatePresence>
-                {showDetails && currentProject && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 py-10 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[100] p-4"
-                        onClick={closeDetails}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-base-100 rounded-[32px] w-full max-w-5xl max-h-[95vh] overflow-y-auto shadow-2xl p-8 relative border border-base-300"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <button
-                                onClick={closeDetails}
-                                className="btn btn-circle btn-ghost absolute top-6 right-6"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-
-                            <div className="mb-8">
-                                <h2 className="text-3xl font-extrabold text-primary mb-2">
-                                    {currentProject.title}
-                                </h2>
-                                <div className="h-1.5 w-20 bg-primary rounded-full" />
-                            </div>
-
-                            <div className="space-y-6">
-                                {/* 1. Images at the top */}
-                                {(currentProject.imageUrl || (currentProject.images && currentProject.images.length > 0)) && (
-                                    <div className="max-w-3xl mx-auto rounded-3xl overflow-hidden">
-                                        <ProjectImageCarousel project={currentProject} />
-                                    </div>
-                                )}
-
-                                {/* 2. Description in the middle */}
-                                <div>
-                                    <style>{`
-                                      .project-desc-container {
-                                        color: var(--fallback-bc, oklch(var(--bc) / 0.85)) !important;
-                                        font-size: 1.05rem !important;
-                                        line-height: 1.8 !important;
-                                      }
-                                      .project-desc-container h1,
-                                      .project-desc-container h2,
-                                      .project-desc-container h3,
-                                      .project-desc-container h4 {
-                                        color: var(--primary) !important;
-                                        font-weight: 700 !important;
-                                        margin-top: 1.5rem !important;
-                                        margin-bottom: 0.75rem !important;
-                                      }
-                                      .project-desc-container h1 { font-size: 1.8rem !important; }
-                                      .project-desc-container h2 { font-size: 1.5rem !important; }
-                                      .project-desc-container h3 { font-size: 1.25rem !important; }
-                                      .project-desc-container p {
-                                        margin-bottom: 1.25rem !important;
-                                      }
-                                      .project-desc-container ul {
-                                        list-style-type: disc !important;
-                                        margin-left: 1.5rem !important;
-                                        margin-bottom: 1.25rem !important;
-                                      }
-                                      .project-desc-container ol {
-                                        list-style-type: decimal !important;
-                                        margin-left: 1.5rem !important;
-                                        margin-bottom: 1.25rem !important;
-                                      }
-                                      .project-desc-container li {
-                                        margin-bottom: 0.5rem !important;
-                                      }
-                                      .project-desc-container strong {
-                                        font-weight: 600 !important;
-                                        color: var(--fallback-bc, oklch(var(--bc) / 1)) !important;
-                                      }
-                                      .project-desc-container a {
-                                        color: var(--primary) !important;
-                                        text-decoration: underline !important;
-                                      }
-                                    `}</style>
-                                    <div
-                                        className="project-desc-container"
-                                        dangerouslySetInnerHTML={{ __html: currentProject.description }}
-                                    />
-                                </div>
-
-                                {/* 3. Video at the bottom (if any) */}
-                                {currentProject.videoLink && (
-                                    <div className="max-w-3xl mx-auto">
-                                        <h4 className="text-sm font-bold mb-3 opacity-40 uppercase tracking-widest text-center">Video Overview</h4>
-                                        <div className="aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 bg-black shadow-lg">
-                                            <iframe
-                                                src={currentProject.videoLink}
-                                                className="w-full h-full"
-                                                allowFullScreen
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* 4. Actions */}
-                                <div className="flex flex-wrap gap-4 pt-4 justify-center">
-                                    {currentProject.liveLink && (
-                                        <a href={currentProject.liveLink} target="_blank" className="btn btn-primary gap-2">
-                                            Live Demo <ExternalLink size={16} />
-                                        </a>
-                                    )}
-                                    {currentProject.githubLink && (
-                                        <a href={currentProject.githubLink} target="_blank" className="btn btn-neutral gap-2">
-                                            GitHub Code
-                                        </a>
-                                    )}
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
+      JSON.stringify(projects.map((p) => p._id)) !==
+      JSON.stringify(originalProjects.map((p) => p._id))
     );
-};
+  }, [projects, originalProjects]);
 
-export default GetProjects;
+  useEffect(() => {
+    document.title = `Project Management | ${process.env.NEXT_PUBLIC_META_TITLE || "Admin"}`;
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/projects`);
+      if (!response.ok) throw new Error("Failed to fetch projects");
+      const data = await response.json();
+      setProjects(data.projects || []);
+      setOriginalProjects(data.projects || []);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // Extract unique categories from projects list
+  const categoriesList = useMemo(() => {
+    const map = new Map();
+    projects.forEach((p) => {
+      if (p.category && typeof p.category === "object" && p.category._id) {
+        map.set(p.category._id, p.category.name);
+      }
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [projects]);
+
+  // Filtered projects
+  const filteredProjects = useMemo(() => {
+    return projects.filter((p) => {
+      const matchesSearch =
+        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesCat =
+        selectedCategory === "all" ||
+        (p.category && typeof p.category === "object" && p.category._id === selectedCategory) ||
+        p.category === selectedCategory;
+
+      return matchesSearch && matchesCat;
+    });
+  }, [projects, searchTerm, selectedCategory]);
+
+  const handleReorder = (newOrder) => {
+    // If filtering is active, update position in main array
+    if (searchTerm || selectedCategory !== "all") {
+      const newMap = new Map(newOrder.map((item, idx) => [item._id, idx]));
+      const updatedAll = [...projects].sort((a, b) => {
+        const indexA = newMap.has(a._id) ? newMap.get(a._id) : 999;
+        const indexB = newMap.has(b._id) ? newMap.get(b._id) : 999;
+        return indexA - indexB;
+      });
+      setProjects(updatedAll);
+    } else {
+      setProjects(newOrder);
+    }
+  };
+
+  const saveOrder = async () => {
+    try {
+      setIsSaving(true);
+      // Map new numeric order
+      const updatedOrderProjects = projects.map((p, idx) => ({
+        ...p,
+        order: idx,
+      }));
+
+      const response = await fetch("/api/projects/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projects: updatedOrderProjects }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save order");
+
+      toast.success("Project display order updated!");
+      setProjects(updatedOrderProjects);
+      setOriginalProjects(updatedOrderProjects);
+    } catch (err) {
+      toast.error(err.message || "Failed to update order");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDetails = (project) => {
+    setCurrentProject(project);
+    setShowDetails(true);
+  };
+
+  const closeDetails = () => {
+    setShowDetails(false);
+    setCurrentProject(null);
+  };
+
+  if (!user) {
+    return <RedirectToSignIn />;
+  }
+
+  return (
+    <div className="space-y-8 pb-12">
+      {/* ─── Header Section ─── */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-purple-500/10 to-secondary/10 p-6 sm:p-8 border border-primary/20 shadow-xl backdrop-blur-md">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Portfolio Manager</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-primary via-purple-500 to-secondary bg-clip-text text-transparent">
+              Projects Showcase
+            </h1>
+            <p className="text-base-content/70 text-sm sm:text-base max-w-xl">
+              Drag and reorder projects to customize how they appear on your public website.
+            </p>
+          </div>
+
+          {/* Quick Stats & Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            <AnimatePresence>
+              {hasChanges && (
+                <motion.button
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  onClick={saveOrder}
+                  disabled={isSaving}
+                  className="btn btn-success text-white shadow-lg shadow-success/20 gap-2 rounded-2xl px-5"
+                >
+                  {isSaving ? (
+                    <span className="loading loading-spinner loading-sm" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  Save New Order
+                </motion.button>
+              )}
+            </AnimatePresence>
+
+            <Link href="/addProject">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="btn btn-primary text-white shadow-lg shadow-primary/20 gap-2 rounded-2xl px-5"
+              >
+                <Plus className="w-4 h-4" />
+                Add New Project
+              </motion.button>
+            </Link>
+
+            <Link href="/admin">
+              <button className="btn btn-outline rounded-2xl gap-2 hover:bg-base-content/10">
+                <ArrowLeft className="w-4 h-4" />
+                Panel
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Decorative background glow */}
+        <div className="absolute -right-20 -bottom-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      </div>
+
+      {/* ─── Metric Counter Badges ─── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-base-200/50 backdrop-blur-md p-4 rounded-2xl border border-base-300 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <FolderGit2 className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-base-content">{projects.length}</p>
+            <p className="text-xs text-base-content/60 font-medium">Total Projects</p>
+          </div>
+        </div>
+
+        <div className="bg-base-200/50 backdrop-blur-md p-4 rounded-2xl border border-base-300 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+            <Layers className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-base-content">{categoriesList.length}</p>
+            <p className="text-xs text-base-content/60 font-medium">Active Categories</p>
+          </div>
+        </div>
+
+        <div className="bg-base-200/50 backdrop-blur-md p-4 rounded-2xl border border-base-300 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+            <ArrowUpDown className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-base-content uppercase tracking-wider">
+              {hasChanges ? "Unsaved" : "Synced"}
+            </p>
+            <p className="text-xs text-base-content/60 font-medium">
+              {hasChanges ? "Pending Save" : "Order Set"}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-base-200/50 backdrop-blur-md p-4 rounded-2xl border border-base-300 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-info/10 text-info flex items-center justify-center shrink-0">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-base-content uppercase tracking-wider">Drag & Drop</p>
+            <p className="text-xs text-base-content/60 font-medium">Reorder Anytime</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Search & Filter Controls ─── */}
+      <div className="bg-base-200/40 backdrop-blur-md p-4 rounded-2xl border border-base-300 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        {/* Search input */}
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/40" />
+          <input
+            type="text"
+            placeholder="Search project title or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-base-100 pl-10 pr-4 py-2.5 rounded-xl border border-base-300 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          />
+        </div>
+
+        {/* Category filter & Refresh */}
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 bg-base-100 px-3 py-1.5 rounded-xl border border-base-300 w-full sm:w-auto">
+            <Filter className="w-4 h-4 text-base-content/50" />
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-transparent text-sm focus:outline-none cursor-pointer pr-4"
+            >
+              <option value="all">All Categories</option>
+              {categoriesList.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={fetchProjects}
+            className="p-2.5 rounded-xl bg-base-100 border border-base-300 text-base-content/70 hover:text-primary transition-colors"
+            title="Refresh List"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* ─── Projects List / Table ─── */}
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-24 bg-base-200/50 animate-pulse rounded-2xl border border-base-300"
+            />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center p-8 bg-error/10 rounded-3xl border border-error/20 max-w-md mx-auto">
+          <p className="text-error font-bold mb-2">Error Loading Projects</p>
+          <p className="text-sm text-base-content/70 mb-4">{error}</p>
+          <button onClick={fetchProjects} className="btn btn-error btn-sm text-white">
+            Try Again
+          </button>
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="text-center py-16 bg-base-200/30 rounded-3xl border border-dashed border-base-300">
+          <FolderGit2 className="w-12 h-12 text-base-content/30 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-base-content/70 mb-1">No Projects Found</h3>
+          <p className="text-sm text-base-content/50 mb-6">
+            {searchTerm || selectedCategory !== "all"
+              ? "Try adjusting your search or category filter."
+              : "You haven't created any projects yet."}
+          </p>
+          <Link href="/addProject">
+            <button className="btn btn-primary text-white rounded-xl">
+              <Plus className="w-4 h-4 mr-2" /> Create First Project
+            </button>
+          </Link>
+        </div>
+      ) : (
+        <div className="bg-base-200/40 backdrop-blur-md rounded-3xl border border-base-300 p-4 sm:p-6 shadow-xl">
+          <div className="flex items-center justify-between px-2 pb-4 mb-2 border-b border-base-300 text-xs font-bold uppercase tracking-wider text-base-content/50">
+            <span>Reorder & Info</span>
+            <span>Actions</span>
+          </div>
+
+          <Reorder.Group
+            axis="y"
+            values={filteredProjects}
+            onReorder={handleReorder}
+            className="space-y-3"
+          >
+            {filteredProjects.map((project, index) => {
+              const catName =
+                project.category && typeof project.category === "object"
+                  ? project.category.name
+                  : "";
+
+              return (
+                <Reorder.Item
+                  key={project._id}
+                  value={project}
+                  className="group bg-base-100 rounded-2xl border border-base-300/80 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all cursor-grab active:cursor-grabbing overflow-hidden"
+                >
+                  <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    {/* Left: Drag grip + Image Preview + Info */}
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      {/* Drag Handle */}
+                      <div className="p-2 rounded-lg bg-base-200 text-base-content/40 group-hover:text-primary transition-colors shrink-0">
+                        <GripVertical className="w-5 h-5" />
+                      </div>
+
+                      {/* Cover Thumbnail */}
+                      <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-base-200 border border-base-300 shrink-0">
+                        {project.imageUrl ? (
+                          <img
+                            src={project.imageUrl}
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-base-content/40">
+                            No Img
+                          </div>
+                        )}
+                        {project.images && project.images.length > 1 && (
+                          <span className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded-md font-bold">
+                            +{project.images.length - 1}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Details */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className="font-bold text-base text-base-content group-hover:text-primary transition-colors truncate">
+                            {project.title}
+                          </h3>
+                          {catName && (
+                            <span className="bg-primary/10 text-primary border border-primary/20 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                              {catName}
+                            </span>
+                          )}
+                          <span className="bg-base-200 text-base-content/60 text-[11px] font-medium px-2 py-0.5 rounded-md">
+                            #Order: {project.order ?? index}
+                          </span>
+                        </div>
+                        <div
+                          className="text-xs text-base-content/60 line-clamp-1"
+                          dangerouslySetInnerHTML={{
+                            __html: project.description?.replace(/<[^>]*>?/gm, "") || "",
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right: Quick Links & Actions */}
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                      <button
+                        onClick={() => handleDetails(project)}
+                        className="btn btn-sm btn-ghost text-info hover:bg-info/10 rounded-xl"
+                        title="Quick View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span className="hidden md:inline text-xs">Preview</span>
+                      </button>
+
+                      <Link href={`/updateProject/${project._id}`}>
+                        <button
+                          className="btn btn-sm btn-ghost text-primary hover:bg-primary/10 rounded-xl"
+                          title="Edit Project"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                          <span className="hidden md:inline text-xs">Edit</span>
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </Reorder.Item>
+              );
+            })}
+          </Reorder.Group>
+        </div>
+      )}
+
+      {/* ─── Project Details Modal ─── */}
+      <ProjectDetailsModal
+        project={currentProject}
+        isOpen={showDetails && !!currentProject}
+        onClose={closeDetails}
+      />
+    </div>
+  );
+}

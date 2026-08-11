@@ -496,7 +496,7 @@ const AdminLayout = ({ children, pageTitle }) => {
         </header>
 
         {/* Page content with top separation padding */}
-        <div className="p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-73px)] relative z-0">
+        <div className="p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-73px)]">
           {children}
         </div>
       </main>

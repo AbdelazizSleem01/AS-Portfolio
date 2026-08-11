@@ -227,7 +227,7 @@ const PageOfProjects = () => {
                         <FiExternalLink className="w-4 h-4" />
                       </motion.a>
                     )}
-                    {project.githubLink && (
+                    {project.githubLink && project.githubLink.trim() !== "" && (
                       <motion.a
                         href={project.githubLink}
                         target="_blank"
