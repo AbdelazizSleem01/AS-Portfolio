@@ -217,17 +217,17 @@ export default function HomePageSkills() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="flex justify-center"
+                        className="flex justify-center mt-8 sm:mt-12"
                     >
                         <motion.button
                             onClick={loadMore}
-                            className="bg-gradient-to-r from-primary to-secondary text-base-100 px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 hover:shadow-2xl transition-all duration-300 group"
+                            className="bg-gradient-to-r from-primary to-secondary text-base-100 px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 sm:gap-3 hover:shadow-2xl transition-all duration-300 group shadow-lg"
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-                            Load More Skills
-                            <span className="text-sm opacity-80">
+                            <Plus className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-90 transition-transform duration-300 shrink-0" />
+                            <span className="whitespace-nowrap">Load More Skills</span>
+                            <span className="text-xs sm:text-sm opacity-85 font-normal whitespace-nowrap">
                                 ({filteredSkills.length - displayCount} remaining)
                             </span>
                         </motion.button>
@@ -239,9 +239,9 @@ export default function HomePageSkills() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6 }}
-                        className="text-center mt-12 p-6 bg-base-200 rounded-3xl border border-base-300"
+                        className="text-center mt-6 sm:mt-12 p-4 sm:p-6 bg-base-200 rounded-2xl sm:rounded-3xl border border-base-300"
                     >
-                        <p className="text-base-content/70">
+                        <p className="text-sm sm:text-base text-base-content/70">
                             🎉 Showing {Math.min(displayCount, filteredSkills.length)} of {filteredSkills.length} skills
                         </p>
                     </motion.div>

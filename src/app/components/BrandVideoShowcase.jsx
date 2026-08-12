@@ -82,7 +82,7 @@ const BrandVideoShowcase = ({ autoScrollToId = "brand-video" }) => {
   };
 
   return (
-    <section id={autoScrollToId} className="w-full py-16 bg-base-100 relative overflow-hidden">
+    <section id={autoScrollToId} className="hidden md:block w-full py-16 bg-base-100 relative overflow-hidden">
       {/* Dynamic Background Glow Effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div

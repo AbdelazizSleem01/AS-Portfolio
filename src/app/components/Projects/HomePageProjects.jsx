@@ -273,13 +273,13 @@ const HomePageProjects = () => {
           >
             <motion.button
               onClick={loadMore}
-              className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 hover:shadow-2xl transition-all duration-300 group"
+              className="bg-gradient-to-r from-primary to-secondary text-white px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 sm:gap-3 hover:shadow-2xl transition-all duration-300 group shadow-lg"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              <FiPlus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-              Load More Projects
-              <span className="text-sm opacity-80">
+              <FiPlus className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-90 transition-transform duration-300 shrink-0" />
+              <span className="whitespace-nowrap">Load More Projects</span>
+              <span className="text-xs sm:text-sm opacity-85 font-normal whitespace-nowrap">
                 ({allProjects.length - displayCount} remaining)
               </span>
             </motion.button>

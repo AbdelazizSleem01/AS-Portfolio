@@ -19,6 +19,8 @@
 
 body {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  overflow-x: hidden;
+  max-width: 100vw;
 
   .navbar {
     background-color: var(--foreground);
@@ -29,7 +31,8 @@ body {
 
 html {
   scroll-behavior: smooth;
-
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 .Heading .semiHead {

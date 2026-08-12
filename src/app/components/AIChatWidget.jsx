@@ -450,16 +450,16 @@ export default function AIChatWidget() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 group cursor-pointer"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 group cursor-pointer"
         aria-label="Toggle Chat"
       >
         {/* Soft Ambient Radial Glow */}
         <div className="absolute inset-0 bg-primary/20 dark:bg-primary/30 rounded-full blur-xl group-hover:bg-primary/40 transition-all duration-300 scale-125"></div>
 
         {/* Clean Logo Button Container */}
-        <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-base-100/90 dark:bg-base-200/90 backdrop-blur-md shadow-2xl flex items-center justify-center p-2 border border-primary/20 hover:border-primary/50 transition-all duration-300">
+        <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-base-100/90 dark:bg-base-200/90 backdrop-blur-md shadow-2xl flex items-center justify-center p-2 border border-primary/20 hover:border-primary/50 transition-all duration-300">
           {isOpen ? (
-            <X className="w-7 h-7 text-primary transition-transform duration-300 rotate-90" />
+            <X className="w-6 h-6 sm:w-7 sm:h-7 text-primary transition-transform duration-300 rotate-90" />
           ) : (
             <div className="relative w-full h-full flex items-center justify-center">
               <img
@@ -487,7 +487,7 @@ export default function AIChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: 'bottom right' }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-3rem)] h-[540px] bg-base-100 text-base-content backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-base-300"
+            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[540px] max-h-[80vh] bg-base-100 text-base-content backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-base-300"
           >
             {/* Header */}
             <div className="relative p-4 pb-3.5 bg-gradient-to-br from-primary/10 to-secondary/10 border-b border-base-300">

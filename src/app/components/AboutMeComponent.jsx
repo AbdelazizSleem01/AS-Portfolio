@@ -122,7 +122,7 @@ const AboutMeComponent = () => {
           <div className="w-full max-w-7xl mx-auto">
             <motion.div className="space-y-8" variants={containerVariants}>
               <motion.div
-                className="bg-base-200 rounded-3xl pt-8 px-8 pb-12 shadow-2xl border border-base-300"
+                className="bg-base-200 rounded-3xl p-4 sm:p-8 pb-8 sm:pb-12 shadow-2xl border border-base-300"
                 variants={itemVariants}
               >
                 <div className="flex flex-col lg:flex-row items-center gap-8 mb-6">
@@ -132,7 +132,7 @@ const AboutMeComponent = () => {
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <motion.img
-                      className="w-48 h-48 lg:w-64 lg:h-64 object-cover rounded-full shadow-xl border-4 border-primary/20"
+                      className="w-40 h-40 sm:w-52 sm:h-52 lg:w-64 lg:h-64 object-cover rounded-full shadow-xl border-4 border-primary/20"
                       src="/imgs/my-img.jpg"
                       alt="Abdelaziz Sleem"
                       whileHover={{ scale: 1.05 }}
@@ -157,55 +157,61 @@ const AboutMeComponent = () => {
                             delay: index * 0.2,
                           }}
                         >
-                          <div className={`p-2 rounded-lg bg-gradient-to-br ${skill.color}`}>
-                            <skill.icon className="text-sm text-base-100" />
+                          <div className={`p-1.5 sm:p-2 rounded-lg bg-gradient-to-br ${skill.color}`}>
+                            <skill.icon className="text-xs sm:text-sm text-base-100" />
                           </div>
                         </motion.div>
                       ))}
                     </div>
                   </motion.div>
 
-                  <div className="flex-1 text-center lg:text-left space-y-4">
+                  <div className="flex-1 text-center lg:text-left space-y-4 w-full">
                     <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
                       <div className="p-2 bg-gradient-to-r from-primary to-secondary rounded-lg">
                         <FiAward className="text-xl text-base-100" />
                       </div>
-                      <h3 className="text-2xl font-bold text-base-content">Fullstack Developer</h3>
+                      <h3 className="text-xl sm:text-2xl font-bold text-base-content">Fullstack Developer</h3>
                     </div>
 
-                    <p className="text-base leading-relaxed text-base-content/80">
+                    <p className="text-sm sm:text-base leading-relaxed text-base-content/80">
                       Hi, I'm <span className="font-bold text-primary">Abdelaziz Sleem</span>, a passionate{" "}
                       <span className="font-bold text-primary">Fullstack Developer</span> with expertise in modern web technologies.
                       I specialize in creating responsive, performant applications that deliver exceptional user experiences.
                     </p>
 
                     <div className="grid gap-3 mt-5">
-                      <div className="flex items-center gap-3 p-3 bg-base-100 rounded-xl">
-                        <FiCode className="text-primary text-lg" />
-                        <div>
-                          <span className="font-semibold">Frontend:</span>
-                          <span className="text-base-content/70 ml-2">React, Next.js, TypeScript, Tailwind CSS</span>
+                      <div className="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 bg-base-100 rounded-2xl border border-base-300/60 shadow-sm transition-all hover:border-primary/30">
+                        <div className="p-2.5 bg-primary/10 rounded-xl text-primary shrink-0 mt-0.5 sm:mt-0 flex items-center justify-center">
+                          <FiCode className="text-xl sm:text-2xl" />
+                        </div>
+                        <div className="flex-1 text-sm sm:text-base text-left">
+                          <span className="font-bold text-base-content block sm:inline sm:mr-2">Frontend:</span>
+                          <span className="text-base-content/75">React, Next.js, TypeScript, Tailwind CSS</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-base-100 rounded-xl">
-                        <FiServer className="text-primary text-lg" />
-                        <div>
-                          <span className="font-semibold">Backend:</span>
-                          <span className="text-base-content/70 ml-2">Node.js, MongoDB, REST APIs</span>
+                      <div className="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 bg-base-100 rounded-2xl border border-base-300/60 shadow-sm transition-all hover:border-primary/30">
+                        <div className="p-2.5 bg-primary/10 rounded-xl text-primary shrink-0 mt-0.5 sm:mt-0 flex items-center justify-center">
+                          <FiServer className="text-xl sm:text-2xl" />
+                        </div>
+                        <div className="flex-1 text-sm sm:text-base text-left">
+                          <span className="font-bold text-base-content block sm:inline sm:mr-2">Backend:</span>
+                          <span className="text-base-content/75">Node.js, MongoDB, REST APIs</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-base-100 rounded-xl">
-                        <FiLayout className="text-primary text-lg" />
-                        <div>
-                          <span className="font-semibold">Tools:</span>
-                          <span className="text-base-content/70 ml-2">DaisyUI, ShadCn, Git, Figma</span>
+                      <div className="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 bg-base-100 rounded-2xl border border-base-300/60 shadow-sm transition-all hover:border-primary/30">
+                        <div className="p-2.5 bg-primary/10 rounded-xl text-primary shrink-0 mt-0.5 sm:mt-0 flex items-center justify-center">
+                          <FiLayout className="text-xl sm:text-2xl" />
+                        </div>
+                        <div className="flex-1 text-sm sm:text-base text-left">
+                          <span className="font-bold text-base-content block sm:inline sm:mr-2">Tools:</span>
+                          <span className="text-base-content/75">DaisyUI, ShadCn, Git, Figma</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6">
                   {stats.map((stat, index) => {
                     const IconComponent = stat.icon;
                     return (
@@ -213,15 +219,19 @@ const AboutMeComponent = () => {
                         key={stat.label}
                         variants={itemVariants}
                         whileHover={{ scale: 1.05, y: -2 }}
-                        className="bg-base-100 rounded-2xl p-4 text-center border border-base-300"
+                        className="bg-base-100 rounded-2xl p-2.5 sm:p-4 text-center border border-base-300/80 min-w-0 flex flex-col items-center justify-between shadow-sm"
                       >
-                        <div className="flex justify-center mb-2">
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <IconComponent className="text-primary text-lg" />
+                        <div className="flex justify-center mb-1 sm:mb-2">
+                          <div className="p-2 sm:p-2.5 bg-primary/10 rounded-xl text-primary flex items-center justify-center">
+                            <IconComponent className="text-lg sm:text-xl" />
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-primary mb-1">{stat.number}</div>
-                        <div className="text-xs text-base-content/70 font-medium">{stat.label}</div>
+                        <div className="text-lg sm:text-2xl font-extrabold text-primary mb-0.5 sm:mb-1 leading-tight">
+                          {stat.number}
+                        </div>
+                        <div className="text-[11px] sm:text-xs text-base-content/80 font-semibold leading-tight text-center break-words w-full px-0.5">
+                          {stat.label}
+                        </div>
                       </motion.div>
                     );
                   })}
@@ -229,16 +239,16 @@ const AboutMeComponent = () => {
               </motion.div>
 
               <motion.div
-                className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl p-6 border border-primary/20"
+                className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl p-5 sm:p-6 border border-primary/20"
                 variants={itemVariants}
               >
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                   <div className="p-2 bg-primary/20 rounded-lg">
                     <FiUser className="text-primary text-xl" />
                   </div>
-                  <h3 className="text-xl font-bold text-base-content">My Vision</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-base-content">My Vision</h3>
                 </div>
-                <p className="text-base-content/80 leading-relaxed">
+                <p className="text-sm sm:text-base text-base-content/80 leading-relaxed">
                   I aspire to become a <span className="font-bold text-primary">leading influencer</span> in the tech industry,
                   delivering innovative solutions while mentoring the next generation of developers through open-source contributions
                   and knowledge sharing.
@@ -248,7 +258,7 @@ const AboutMeComponent = () => {
               <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-4">
                 <Link href="/ContactMe" title="Contact Me">
                   <motion.button
-                    className="group relative bg-gradient-to-r from-primary to-secondary text-base-100 font-semibold text-lg px-8 py-4 rounded-2xl shadow-lg overflow-hidden"
+                    className="group relative bg-gradient-to-r from-primary to-secondary text-base-100 font-semibold text-base sm:text-lg px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-lg overflow-hidden"
                     whileHover={{
                       scale: 1.05,
                       boxShadow: "0 20px 40px rgba(163, 29, 29, 0.4)"
@@ -263,9 +273,9 @@ const AboutMeComponent = () => {
                   </motion.button>
                 </Link>
 
-                <a href="#brand-video" title="Watch AS Brand Intro">
+                <a href="#brand-video" title="Watch AS Brand Intro" className="hidden md:inline-block">
                   <motion.button
-                    className="group relative bg-base-200 border border-primary/30 text-base-content font-semibold text-lg px-7 py-4 rounded-2xl shadow-lg overflow-hidden flex items-center gap-3 hover:border-primary"
+                    className="group relative bg-base-200 border border-primary/30 text-base-content font-semibold text-base sm:text-lg px-7 py-4 rounded-2xl shadow-lg overflow-hidden flex items-center gap-3 hover:border-primary"
                     whileHover={{
                       scale: 1.05,
                       boxShadow: "0 10px 30px rgba(6, 182, 212, 0.3)"

@@ -124,20 +124,20 @@ export default function FeedbackList({ feedbacks = [] }) {
           <motion.button
             onClick={loadMore}
             disabled={isLoading}
-            className="bg-gradient-to-r from-primary to-secondary text-base-100 px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-primary to-secondary text-base-100 px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-semibold text-sm sm:text-base flex items-center justify-center gap-2 sm:gap-3 hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             whileHover={{ scale: isLoading ? 1 : 1.05, y: isLoading ? 0 : -2 }}
             whileTap={{ scale: 0.95 }}
           >
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-base-100 border-t-transparent rounded-full animate-spin" />
-                Loading...
+                <span>Loading...</span>
               </>
             ) : (
               <>
-                <Plus className="w-5 h-5" />
-                Load More Reviews
-                <span className="text-sm opacity-80">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                <span className="whitespace-nowrap">Load More Reviews</span>
+                <span className="text-xs sm:text-sm opacity-85 font-normal whitespace-nowrap">
                   ({safeFeedbacks.length - visibleCount} remaining)
                 </span>
               </>
