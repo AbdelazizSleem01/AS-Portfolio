@@ -26,6 +26,17 @@ const HomePageProjects = () => {
   const [zoomedImage, setZoomedImage] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
 
+  const setPageScrollLocked = (locked) => {
+    if (locked) {
+      document.documentElement.style.setProperty("overflow-y", "hidden", "important");
+      document.body.style.setProperty("overflow-y", "hidden", "important");
+      return;
+    }
+
+    document.documentElement.style.removeProperty("overflow-y");
+    document.body.style.removeProperty("overflow-y");
+  };
+
   const handleImageError = (projectId) => {
     setImageErrors((prev) => ({ ...prev, [projectId]: true }));
   };
@@ -60,24 +71,28 @@ const HomePageProjects = () => {
   const handleDetails = (project) => {
     setCurrentProject(project);
     setShowDetails(true);
-    document.body.style.overflow = "hidden";
+    setPageScrollLocked(true);
   };
 
   const closeDetails = () => {
     setShowDetails(false);
     setCurrentProject(null);
-    document.body.style.overflow = "unset";
+    setPageScrollLocked(false);
   };
 
   const handleImageZoom = (imageUrl) => {
     setZoomedImage(imageUrl);
-    document.body.style.overflow = "hidden";
+    setPageScrollLocked(true);
   };
 
   const closeImageZoom = () => {
     setZoomedImage(null);
-    document.body.style.overflow = "unset";
+    setPageScrollLocked(false);
   };
+
+  useEffect(() => {
+    return () => setPageScrollLocked(false);
+  }, []);
 
   const loadMore = () => {
     setDisplayCount(prev => prev + 2);
